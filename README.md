@@ -1,9 +1,6 @@
 # AI-Driven Multi-Agent Negotiation Training & Simulation Platform
 
-**Milestone 1 Deliverables** (Week 1–2, ~10 hours)
-
-This repo contains the design-phase output for Milestone 1: system workflow, agent
-persona model, scenario selection, and the Agent Configuration UI wireframe.
+**Milestone 1 Deliverables** 
 
 ## Folder structure
 
@@ -39,8 +36,3 @@ negotiation-simulator/
   # then visit http://localhost:8000/agent-configuration.html
   ```
 
-## Next milestone
-
-Milestone 2 builds the Orchestrator Agent, the LLM-powered offer generation
-engine, and the counteroffer/concession evaluation module on top of this
-design.

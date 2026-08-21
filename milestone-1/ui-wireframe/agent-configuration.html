@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Configuration — Negotiation Arena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#101B30;
+    --ink-2:#182647;
+    --parchment:#F4EEDF;
+    --parchment-dim:#E7DFCB;
+    --buyer:#2F6F62;
+    --buyer-dim:#DCE9E4;
+    --vendor:#B5502F;
+    --vendor-dim:#F1DFD4;
+    --brass:#C9A24B;
+    --brass-soft:#E4CE8F;
+    --ink-text:#1B1B18;
+    --light-text:#F4EEDF;
+    --muted:#8B93A8;
+    --radius:14px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #1B2C52 0%, var(--ink) 55%),
+      var(--ink);
+    color:var(--light-text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:48px 24px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---- Header ---- */
+  header.top{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:24px;
+    margin-bottom:36px;
+    flex-wrap:wrap;
+    border-bottom:1px solid rgba(244,238,223,0.12);
+    padding-bottom:24px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--brass-soft);
+    margin:0 0 10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(28px, 4vw, 42px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .top-meta{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    text-align:right;
+    line-height:1.7;
+  }
+  .top-meta b{color:var(--light-text); font-weight:500;}
+
+  /* ---- Scenario tabs (folder-tab styling) ---- */
+  .scenario-row{margin-bottom:38px;}
+  .section-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .tabs{display:flex; gap:8px; flex-wrap:wrap;}
+  .tab{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    font-weight:500;
+    padding:12px 20px 11px;
+    background:var(--ink-2);
+    color:var(--light-text);
+    border:1px solid rgba(244,238,223,0.14);
+    border-bottom:none;
+    border-radius:10px 10px 0 0;
+    cursor:pointer;
+    opacity:0.55;
+    transition:opacity .15s ease, transform .15s ease;
+    position:relative;
+    top:1px;
+  }
+  .tab:hover{opacity:0.85;}
+  .tab.active{
+    opacity:1;
+    background:var(--parchment);
+    color:var(--ink-text);
+    border-color:var(--brass-soft);
+  }
+  .tab .tab-sub{
+    display:block;
+    font-family:'Inter', sans-serif;
+    font-size:11px;
+    font-weight:400;
+    opacity:0.65;
+    margin-top:2px;
+  }
+
+  /* ---- Boardroom: two facing panels + seam ---- */
+  .boardroom{
+    display:grid;
+    grid-template-columns: 1fr 88px 1fr;
+    gap:0;
+    align-items:stretch;
+    margin-bottom:34px;
+  }
+  @media (max-width: 860px){
+    .boardroom{grid-template-columns:1fr; gap:20px;}
+    .seam{display:none;}
+  }
+
+  .panel{
+    background:var(--parchment);
+    color:var(--ink-text);
+    border-radius:var(--radius);
+    padding:28px 26px 26px;
+    position:relative;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.5);
+  }
+  .panel.buyer{border-top:4px solid var(--buyer);}
+  .panel.vendor{border-top:4px solid var(--vendor);}
+
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
+  .role-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .panel.buyer .role-tag{background:var(--buyer-dim); color:var(--buyer);}
+  .panel.vendor .role-tag{background:var(--vendor-dim); color:var(--vendor);}
+
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-size:23px;
+    font-weight:600;
+    margin:0;
+  }
+
+  label.field-label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#6B7280;
+    margin:18px 0 6px;
+  }
+  label.field-label:first-of-type{margin-top:4px;}
+
+  input[type="text"], select{
+    width:100%;
+    font-family:'Inter', sans-serif;
+    font-size:14.5px;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #D9CFB4;
+    background:#FBF8EF;
+    color:var(--ink-text);
+  }
+  input[type="text"]:focus, select:focus{
+    outline:2px solid var(--brass);
+    outline-offset:1px;
+    border-color:var(--brass);
+  }
+
+  .ledger-row{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:9px 0;
+    border-bottom:1px dotted #C9BF9F;
+    font-size:14px;
+  }
+  .ledger-row:last-child{border-bottom:none;}
+  .ledger-row .k{color:#6B7280; white-space:nowrap;}
+  .ledger-row .leader{flex:1; border-bottom:1px dotted #C9BF9F; margin-bottom:3px;}
+  .ledger-row .v{font-family:'IBM Plex Mono', monospace; font-weight:500; white-space:nowrap;}
+
+  /* Personality — wax seal style toggle buttons */
+  .seal-row{display:flex; gap:10px; margin-top:8px; flex-wrap:wrap;}
+  .seal{
+    flex:1;
+    min-width:88px;
+    text-align:center;
+    padding:12px 8px 10px;
+    border-radius:10px;
+    border:1.5px solid #D9CFB4;
+    background:#FBF8EF;
+    cursor:pointer;
+    font-family:'Inter', sans-serif;
+    font-size:12.5px;
+    color:#55524A;
+    transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .seal:hover{transform:translateY(-2px);}
+  .seal .dot{
+    display:block;
+    width:16px;height:16px;
+    margin:0 auto 6px;
+    border-radius:50%;
+    background:#D9CFB4;
+  }
+  .panel.buyer .seal.selected{border-color:var(--buyer); background:var(--buyer-dim); color:var(--buyer); font-weight:600;}
+  .panel.buyer .seal.selected .dot{background:var(--buyer);}
+  .panel.vendor .seal.selected{border-color:var(--vendor); background:var(--vendor-dim); color:var(--vendor); font-weight:600;}
+  .panel.vendor .seal.selected .dot{background:var(--vendor);}
+
+  /* ---- Center seam ---- */
+  .seam{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    position:relative;
+  }
+  .seam::before{
+    content:"";
+    position:absolute;
+    top:0; bottom:0; left:50%;
+    width:1px;
+    background:linear-gradient(to bottom, transparent, var(--brass-soft) 15%, var(--brass-soft) 85%, transparent);
+  }
+  .seam-emblem{
+    width:52px; height:52px;
+    border-radius:50%;
+    background:var(--ink-2);
+    border:1.5px solid var(--brass-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif;
+    font-size:13px;
+    font-weight:600;
+    color:var(--brass-soft);
+    z-index:1;
+    letter-spacing:0.02em;
+  }
+
+  /* ---- Bottom bar: negotiation setup + start ---- */
+  .setup-bar{
+    background:var(--ink-2);
+    border:1px solid rgba(244,238,223,0.14);
+    border-radius:var(--radius);
+    padding:22px 26px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .setup-stats{
+    display:flex;
+    gap:34px;
+    flex-wrap:wrap;
+  }
+  .stat .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:20px;
+    font-weight:600;
+    color:var(--brass-soft);
+  }
+  .stat .lbl{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:2px;
+  }
+  .start-btn{
+    font-family:'Fraunces', serif;
+    font-size:16px;
+    font-weight:600;
+    color:var(--ink-text);
+    background:linear-gradient(180deg, var(--brass-soft), var(--brass));
+    border:none;
+    padding:15px 30px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 10px 24px -10px rgba(201,162,75,0.55);
+    transition:transform .12s ease, box-shadow .12s ease;
+    letter-spacing:0.01em;
+  }
+  .start-btn:hover{transform:translateY(-1px); box-shadow:0 14px 28px -10px rgba(201,162,75,0.7);}
+  .start-btn:active{transform:translateY(0);}
+  .start-btn:disabled{opacity:0.45; cursor:not-allowed; box-shadow:none; transform:none;}
+
+  .status-msg{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--brass-soft);
+    margin-top:14px;
+    text-align:center;
+    min-height:16px;
+    letter-spacing:0.02em;
+  }
+
+  footer.foot{
+    margin-top:28px;
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="eyebrow">Negotiation Arena · Setup</p>
+      <h1>Agent Configuration</h1>
+    </div>
+    <div class="top-meta">
+      Milestone 1 — Wireframe<br>
+      <b>Mode:</b> Simulation (AI vs AI)
+    </div>
+  </header>
+
+  <div class="scenario-row">
+    <p class="section-label">01 — Scenario Selection</p>
+    <div class="tabs" id="scenarioTabs">
+      <div class="tab active" data-scenario="vendor">
+        Vendor Pricing
+        <span class="tab-sub">Buyer vs. Vendor</span>
+      </div>
+      <div class="tab" data-scenario="job">
+        Job Offer
+        <span class="tab-sub">Candidate vs. Employer</span>
+      </div>
+      <div class="tab" data-scenario="budget">
+        Budget Allocation
+        <span class="tab-sub">Dept. A vs. Dept. B</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">02 — Agent Configuration</p>
+  <div class="boardroom">
+
+    <!-- BUYER PANEL -->
+    <div class="panel buyer">
+      <div class="panel-head">
+        <h2>Buyer</h2>
+        <span class="role-tag">Party A</span>
+      </div>
+
+      <label class="field-label">Agent name</label>
+      <input type="text" value="Procurement — Buyer Agent" />
+
+      <label class="field-label">Personality</label>
+      <div class="seal-row" data-group="buyer">
+        <div class="seal" data-value="collaborative"><span class="dot"></span>Collaborative</div>
+        <div class="seal selected" data-value="risk-averse"><span class="dot"></span>Risk-averse</div>
+        <div class="seal" data-value="aggressive"><span class="dot"></span>Aggressive</div>
+      </div>
+
+      <label class="field-label">Goal &amp; constraint</label>
+      <div class="ledger-row"><span class="k">Goal</span><span class="leader"></span><span class="v">Lowest unit price</span></div>
+      <div class="ledger-row"><span class="k">Max budget</span><span class="leader"></span><span class="v">$50,000</span></div>
+      <div class="ledger-row"><span class="k">Opening offer</span><span class="leader"></span><span class="v">$40,000</span></div>
+    </div>
+
+    <!-- SEAM -->
+    <div class="seam">
+      <div class="seam-emblem">VS</div>
+    </div>
+
+    <!-- VENDOR PANEL -->
+    <div class="panel vendor">
+      <div class="panel-head">
+        <h2>Vendor</h2>
+        <span class="role-tag">Party B</span>
+      </div>
+
+      <label class="field-label">Agent name</label>
+      <input type="text" value="Sales — Vendor Agent" />
+
+      <label class="field-label">Personality</label>
+      <div class="seal-row" data-group="vendor">
+        <div class="seal" data-value="collaborative"><span class="dot"></span>Collaborative</div>
+        <div class="seal" data-value="risk-averse"><span class="dot"></span>Risk-averse</div>
+        <div class="seal selected" data-value="aggressive"><span class="dot"></span>Aggressive</div>
+      </div>
+
+      <label class="field-label">Goal &amp; constraint</label>
+      <div class="ledger-row"><span class="k">Goal</span><span class="leader"></span><span class="v">Maximize profit</span></div>
+      <div class="ledger-row"><span class="k">Min price</span><span class="leader"></span><span class="v">$42,000</span></div>
+      <div class="ledger-row"><span class="k">Opening offer</span><span class="leader"></span><span class="v">$58,000</span></div>
+    </div>
+
+  </div>
+
+  <p class="section-label">03 — Begin Negotiation</p>
+  <div class="setup-bar">
+    <div class="setup-stats">
+      <div class="stat"><div class="num">2</div><div class="lbl">Agents Ready</div></div>
+      <div class="stat"><div class="num">$8,000</div><div class="lbl">Agreement Zone Width</div></div>
+      <div class="stat"><div class="num">12</div><div class="lbl">Max Rounds</div></div>
+    </div>
+    <button class="start-btn" id="startBtn">Start Negotiation →</button>
+  </div>
+  <p class="status-msg" id="statusMsg"></p>
+
+  <footer class="foot">Negotiation Arena — Agent Configuration Screen · Milestone 1 Wireframe</footer>
+</div>
+
+<script>
+  // Personality selection (wax-seal toggle, one active per side)
+  document.querySelectorAll('.seal-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      const seal = e.target.closest('.seal');
+      if(!seal) return;
+      row.querySelectorAll('.seal').forEach(s => s.classList.remove('selected'));
+      seal.classList.add('selected');
+    });
+  });
+
+  // Scenario tab switching (visual only — Milestone 2 wires real data)
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('statusMsg').textContent =
+        tab.dataset.scenario === 'vendor'
+          ? ''
+          : 'Note: this wireframe pre-fills only the Vendor Pricing scenario. Other templates load in Milestone 2.';
+    });
+  });
+
+  // Start button
+  document.getElementById('startBtn').addEventListener('click', () => {
+    const msg = document.getElementById('statusMsg');
+    msg.textContent = 'Configuration locked. Handing off to Orchestrator Agent…';
+  });
+</script>
+
+</body>
+</html>

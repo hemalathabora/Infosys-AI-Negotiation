@@ -1,23 +1,15 @@
 const PERSONALITY_META = {
-  Aggressive: {
-    icon: "⚡",
-  },
-  Collaborative: {
-    icon: "🤝",
-  },
-  "Risk-averse": {
-    icon: "🛡",
-  },
+  Aggressive: { icon: "⚡" },
+  Collaborative: { icon: "🤝" },
+  "Risk-averse": { icon: "🛡" },
 };
 
 const OPTIONS = ["Aggressive", "Collaborative", "Risk-averse"];
 
 /**
- * Renders the agent's personality as a select control, matching the
- * reference design. Purely a display/interaction affordance for this
- * module — selecting a different value does not mutate the scenario's
- * persona data (that's the source of truth from data/scenarios.js);
- * wire `onChange` up if agent personas become user-editable later.
+ * Renders the agent's personality as a select control. Selecting a
+ * different value updates local card state only — the scenario's
+ * source-of-truth persona data lives in data/scenarios.js.
  */
 export default function PersonalityBadge({ personality, onChange }) {
   return (

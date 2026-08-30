@@ -1,24 +1,39 @@
 function parseConstraint(constraint) {
-  const match = constraint.match(/^(.*?)\s*(\$[\d,]+(?:\.\d+)?)$/);
-  if (!match) {
-    return { label: constraint.toUpperCase(), value: null };
+  if (typeof constraint === "object" && constraint) {
+    const text = constraint.text ?? constraint.label ?? "";
+    const value = constraint.defaultValue ?? constraint.value ?? null;
+    const formattedValue = value != null ? `$${Number(value).toLocaleString()}` : null;
+    return {
+      label: text,
+      value: formattedValue,
+      defaultValue: formattedValue,
+    };
   }
-  const [, qualifier, value] = match;
-  const hasPriceWord = /price|budget|amount/i.test(qualifier);
-  const label = `${qualifier.trim()}${hasPriceWord ? "" : " Price"}`.toUpperCase();
-  return { label, value };
+
+  const raw = String(constraint ?? "");
+  const match = raw.match(/^(.*?)\s*(\$[\d,]+(?:\.\d+)?)\s*(.*)$/);
+  if (!match) {
+    return { label: raw.toUpperCase(), value: null, defaultValue: null };
+  }
+  const [, qualifier, value, suffix] = match;
+  const label = suffix
+    ? `${qualifier.trim()} ${suffix.trim()}`
+    : `${qualifier.trim()} Price`;
+  return { label, value, defaultValue: value };
 }
 
-export default function ConstraintList({ constraints }) {
+export default function ConstraintList({ constraints, onChange }) {
   return (
     <div>
       <h4 className="text-xs font-bold uppercase tracking-wider text-primary">Constraints</h4>
       <ul className="mt-2 flex flex-col gap-2">
-        {constraints.map((constraint) => {
-          const { label, value } = parseConstraint(constraint);
+        {constraints.map((constraint, index) => {
+          const { label, value, defaultValue } = parseConstraint(constraint);
+          const currentValue = value ?? defaultValue ?? 0;
+
           return (
             <li
-              key={constraint}
+              key={`${label}-${index}`}
               className="flex items-center gap-3 rounded-xl border border-border bg-cardAlt px-3.5 py-2.5"
             >
               <span
@@ -30,13 +45,17 @@ export default function ConstraintList({ constraints }) {
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </span>
-              <div>
+              <div className="flex-1">
                 <p className="text-[11px] font-semibold tracking-wide text-textSecondary">
                   {label}
                 </p>
-                {value && (
-                  <p className="text-sm font-bold text-textPrimary">{value}</p>
-                )}
+                <input
+                  type="number"
+                  min="0"
+                  value={currentValue}
+                  onChange={(event) => onChange?.(index, event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-bold text-textPrimary outline-none transition-colors focus:border-primary"
+                />
               </div>
             </li>
           );

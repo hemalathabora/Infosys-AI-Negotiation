@@ -1,4 +1,4 @@
-import { scenarios, scenarioList } from "../data/scenarios";
+import { scenarios, scenarioList } from "../data/scenarios.js";
 
 // Simulated network latency so loading states are visible/testable.
 // Swap the bodies of these functions for real fetch() calls once a
@@ -34,15 +34,18 @@ export async function fetchScenarioById(scenarioId) {
 export function isConfigurationValid(scenario) {
   if (!scenario || !Array.isArray(scenario.agents)) return false;
   if (scenario.agents.length !== 2) return false;
-  return scenario.agents.every(
-    (agent) =>
-      agent.name &&
-      agent.role &&
-      agent.goal &&
-      Array.isArray(agent.constraints) &&
-      agent.constraints.length > 0 &&
-      agent.personality
-  );
+  return scenario.agents.every((agent) => {
+    if (!agent.name || !agent.role || !agent.goal || !agent.personality) return false;
+    if (!Array.isArray(agent.constraints) || agent.constraints.length === 0) return false;
+
+    return agent.constraints.every((constraint) => {
+      if (typeof constraint === "string") return constraint.trim().length > 0;
+      if (constraint && typeof constraint === "object") {
+        return Boolean(constraint.text && (constraint.defaultValue !== undefined || constraint.value !== undefined));
+      }
+      return false;
+    });
+  });
 }
 
 /**
@@ -60,7 +63,13 @@ export function buildOrchestratorHandoff(scenario) {
       name: agent.name,
       role: agent.role,
       goal: agent.goal,
-      constraints: agent.constraints,
+      constraints: agent.constraints.map((constraint) => {
+        if (typeof constraint === "string") return constraint;
+        return {
+          text: constraint.text,
+          defaultValue: constraint.defaultValue ?? constraint.value,
+        };
+      }),
       personality: agent.personality,
     })),
   };

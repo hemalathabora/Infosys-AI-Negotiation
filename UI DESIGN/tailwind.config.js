@@ -4,10 +4,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: "#04070D",
-        card: "#0A101C",
-        cardAlt: "#0D1524",
-        border: "#1C2A3E",
+        bg: "#071018",
+        card: "#0D1924",
+        cardAlt: "#101F2C",
+        border: "#203442",
         borderGlow: "#2C4A66",
         primary: "#38BDF8",
         primaryBright: "#7DD3FC",
@@ -17,13 +17,16 @@ export default {
         textSecondary: "#8195AC",
       },
       fontFamily: {
-        sans: ["Inter", "Manrope", "system-ui", "sans-serif"],
+        sans: ["Space Grotesk", "system-ui", "sans-serif"],
+        mono: ["DM Mono", "monospace"],
       },
       boxShadow: {
         card: "0 1px 2px rgba(0,0,0,0.5)",
-        cardHover: "0 0 0 1px rgba(56,189,248,0.35), 0 8px 28px rgba(56,189,248,0.12)",
+        cardHover:
+          "0 0 0 1px rgba(56,189,248,0.35), 0 8px 28px rgba(56,189,248,0.12)",
         glow: "0 0 0 1px rgba(56,189,248,0.4), 0 0 24px rgba(56,189,248,0.18)",
-        glowSm: "0 0 0 1px rgba(56,189,248,0.3), 0 0 12px rgba(56,189,248,0.12)",
+        glowSm:
+          "0 0 0 1px rgba(56,189,248,0.3), 0 0 12px rgba(56,189,248,0.12)",
       },
       keyframes: {
         fadeIn: {

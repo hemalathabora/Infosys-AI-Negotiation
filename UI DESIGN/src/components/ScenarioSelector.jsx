@@ -28,7 +28,6 @@ export default function ScenarioSelector({ scenarioList, selectedScenarioId, onC
           {scenarioList.map((scenario) => (
             <option key={scenario.id} value={scenario.id}>
               {scenario.name}
-              {!scenario.isConfigured ? " (coming soon)" : ""}
             </option>
           ))}
         </select>

@@ -7,12 +7,16 @@ import PersonalityBadge from "./PersonalityBadge";
 /**
  * @param {{ agent: import('../types/negotiation').Agent, index: number }} props
  */
-export default function AgentCard({ agent, index }) {
+export default function AgentCard({ agent, index, onConstraintChange }) {
   const [personality, setPersonality] = useState(agent.personality);
 
   const isConfigured = Boolean(
     agent.name && agent.role && agent.goal && agent.constraints?.length && personality
   );
+
+  const handleConstraintChange = (constraintIndex, nextValue) => {
+    onConstraintChange?.(agent.id, constraintIndex, nextValue);
+  };
 
   return (
     <article
@@ -20,17 +24,12 @@ export default function AgentCard({ agent, index }) {
       aria-labelledby={`agent-${agent.id}-name`}
     >
       <AgentHeader index={index} />
-      <AgentIdentity
-        index={index}
-        name={agent.name}
-        role={agent.role}
-        headingId={`agent-${agent.id}-name`}
-      />
+      <AgentIdentity name={agent.name} role={agent.role} headingId={`agent-${agent.id}-name`} />
 
       <div className="h-px w-full bg-border" />
 
       <GoalSection goal={agent.goal} />
-      <ConstraintList constraints={agent.constraints} />
+      <ConstraintList constraints={agent.constraints} onChange={handleConstraintChange} />
       <PersonalityBadge personality={personality} onChange={setPersonality} />
 
       <div className="h-px w-full bg-border" />

@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function StartNegotiationButton({ disabled, isStarting, onClick }) {
   return (
     <button
@@ -24,11 +25,11 @@ export default function StartNegotiationButton({ disabled, isStarting, onClick }
               </svg>
             </span>
           )}
-          {isStarting ? "Starting…" : "Start Negotiation"}
+          {isStarting ? "Startingâ€¦" : "Start Negotiation"}
         </span>
         {!isStarting && (
           <span aria-hidden="true" className="text-primaryBright transition-transform group-hover:translate-x-0.5">
-            →
+            â†’
           </span>
         )}
       </div>
@@ -42,3 +43,6 @@ export default function StartNegotiationButton({ disabled, isStarting, onClick }
     </button>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

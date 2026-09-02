@@ -1,9 +1,9 @@
+﻿// Designed by TEAM 4
 import { useState } from "react";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
-import GuideBot from "./components/GuideBot";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function App() {
       case "Dashboard":
         return (
           <div data-guide="dashboard-shell" className="flex-1">
-            <Dashboard />
+            <Dashboard onNavigate={setActivePage} />
           </div>
         );
       case "Configure Agents":
@@ -47,7 +47,7 @@ export default function App() {
       default:
         return (
           <div data-guide="dashboard-shell" className="flex-1">
-            <Dashboard />
+            <Dashboard onNavigate={setActivePage} />
           </div>
         );
     }
@@ -74,7 +74,9 @@ export default function App() {
         />
         {renderPage()}
       </div>
-      <GuideBot currentPage={activePage} />
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

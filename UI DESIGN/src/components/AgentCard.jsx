@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 import { useState } from "react";
 import AgentHeader, { AgentIdentity } from "./AgentHeader";
 import GoalSection from "./GoalSection";
@@ -41,13 +42,13 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
               className="flex h-5 w-5 items-center justify-center rounded-full bg-success/20 text-success"
               aria-hidden="true"
             >
-              ✓
+              âœ“
             </span>
             <span className="font-semibold text-success">Configured</span>
           </>
         ) : (
           <>
-            <span className="text-warning" aria-hidden="true">⚠</span>
+            <span className="text-warning" aria-hidden="true">âš </span>
             <span className="font-semibold text-warning">Incomplete configuration</span>
           </>
         )}
@@ -55,3 +56,6 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
     </article>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

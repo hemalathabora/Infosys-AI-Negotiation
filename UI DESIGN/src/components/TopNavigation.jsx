@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function TopNavigation({ onMenuToggle, theme, onThemeChange, activePage }) {
   const isDark = theme === "dark";
   const navItems = ["Dashboard", "Configure Agents", "Negotiation Arena", "Analytics", "Reports"];
@@ -62,9 +63,17 @@ export default function TopNavigation({ onMenuToggle, theme, onThemeChange, acti
 
       <div className="flex items-center gap-2 sm:gap-3">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-[#0d1d2e] px-3 py-2 text-xs font-semibold text-[#dfeaf5]">
+          <span className="breathing-dot" aria-hidden="true" />
           <span className={isDark ? "text-[#c4ff3a]" : "text-sky-700"}>Live</span>
+        </div>
+
+        <div className="inline-flex items-center rounded-full border border-[#c4ff3a]/30 bg-[#c4ff3a]/10 px-2.5 py-1.5 text-[10px] font-bold tracking-[0.18em] text-[#c4ff3a] uppercase shadow-[0_0_18px_rgba(196,255,58,0.15)]">
+          TEAM 4
         </div>
       </div>
     </header>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

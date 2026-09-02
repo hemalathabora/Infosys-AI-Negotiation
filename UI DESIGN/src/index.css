@@ -1,3 +1,4 @@
+﻿/* Designed by TEAM 4 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,6 +32,7 @@ select:focus-visible,
   border-radius: 8px;
 }
 
+/* Implemented by TEAM 4 */
 .skeleton {
   background: linear-gradient(90deg, #0A101C 25%, #121b2c 37%, #0A101C 63%);
   background-size: 400px 100%;
@@ -43,3 +45,28 @@ html, body {
 .glow-icon {
   box-shadow: 0 0 16px rgba(56,189,248,0.25);
 }
+
+.breathing-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background: #c4ff3a;
+  box-shadow: 0 0 12px rgba(196, 255, 58, 0.9);
+  animation: breathingDot 1.8s ease-in-out infinite;
+}
+
+@keyframes breathingDot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.5;
+  }
+}
+/* Designed by TEAM 4 */
+/* Designed by TEAM 4 */
+

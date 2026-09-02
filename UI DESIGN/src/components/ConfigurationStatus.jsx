@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 function CheckRow({ label, checked }) {
   return (
     <li className="flex items-center gap-2.5 text-sm">
@@ -7,7 +8,7 @@ function CheckRow({ label, checked }) {
         }`}
         aria-hidden="true"
       >
-        {checked ? "✓" : ""}
+        {checked ? "âœ“" : ""}
       </span>
       <span className={checked ? "text-textPrimary" : "text-textSecondary"}>{label}</span>
     </li>
@@ -46,3 +47,6 @@ export default function ConfigurationStatus({ scenarioSelected, agentChecks, isV
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

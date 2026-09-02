@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 const NAV_ITEMS = [
   { label: "Dashboard", icon: "grid" },
   { label: "Configure Agents", icon: "usersActive" },
@@ -62,3 +63,6 @@ export default function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
     </>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

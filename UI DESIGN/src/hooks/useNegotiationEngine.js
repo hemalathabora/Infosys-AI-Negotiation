@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 import { useCallback, useState } from "react";
 import { Orchestrator } from "../engine/orchestrator.js";
 import { buildConcessionTimeline, totalConcessionByAgent } from "../engine/concessionTracking.js";
@@ -5,11 +6,11 @@ import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 
 /**
  * Bridges Agent Configuration to the negotiation engine. This is the
- * "Connect the Existing UI" deliverable: Scenario Selection → Agent
- * Configuration → Negotiation State Created → turn-by-turn offers →
- * decision → next round, all driven from here.
+ * "Connect the Existing UI" deliverable: Scenario Selection â†’ Agent
+ * Configuration â†’ Negotiation State Created â†’ turn-by-turn offers â†’
+ * decision â†’ next round, all driven from here.
  *
- * The Orchestrator instance is intentionally NOT exposed directly —
+ * The Orchestrator instance is intentionally NOT exposed directly â€”
  * only plain state + actions, so the UI never needs to know it's backed
  * by a class.
  */
@@ -32,8 +33,9 @@ export function useNegotiationEngine() {
   const runToCompletion = useCallback(async () => {
     if (!orchestrator) return;
     setIsRunning(true);
+// Implemented by TEAM 4
     // Small artificial delay per round so the transcript feels like a
-    // live session rather than an instant dump — purely presentational.
+    // live session rather than an instant dump â€” purely presentational.
     while (
       orchestrator.getState().status !== NEGOTIATION_STATUS.AGREEMENT &&
       orchestrator.getState().status !== NEGOTIATION_STATUS.DEADLOCK &&
@@ -67,3 +69,6 @@ export function useNegotiationEngine() {
     reset,
   };
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

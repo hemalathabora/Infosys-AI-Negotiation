@@ -1,9 +1,10 @@
+﻿// Designed by TEAM 4
 import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 
 /**
  * Builds the initial NegotiationState for a session, straight from the
  * scenario + agent data that Agent Configuration already validated.
- * This is the object created the moment "Start Negotiation" is pressed —
+ * This is the object created the moment "Start Negotiation" is pressed â€”
  * see hooks/useScenarioConfiguration.js and pages/AgentConfiguration.jsx
  * for where it gets triggered.
  *
@@ -26,6 +27,7 @@ export function createNegotiationState(scenario) {
     current_round: 0,
     current_agent_turn: scenario.agents[0]?.id ?? null,
     previous_offer: null,
+// Implemented by TEAM 4
     current_offer: null,
     status: NEGOTIATION_STATUS.NOT_STARTED,
     agent_profiles,
@@ -55,3 +57,6 @@ export function applyOffer(state, offer, nextAgentId, status) {
     history: [...state.history, offer],
   };
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

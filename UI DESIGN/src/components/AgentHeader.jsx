@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function AgentHeader({ index }) {
   return (
     <div className="flex items-start justify-between">
@@ -15,6 +16,7 @@ export default function AgentHeader({ index }) {
 export function AgentIdentity({ name, role, headingId }) {
   return (
     <div className="mt-4 flex items-center gap-3.5">
+
       <div
         className="glow-icon flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-primary"
         aria-hidden="true"
@@ -33,3 +35,6 @@ export function AgentIdentity({ name, role, headingId }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

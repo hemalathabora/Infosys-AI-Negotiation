@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function ScenarioSelector({ scenarioList, selectedScenarioId, onChange, disabled }) {
   return (
     <div className="flex-1">
@@ -45,3 +46,6 @@ export default function ScenarioSelector({ scenarioList, selectedScenarioId, onC
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

@@ -1,14 +1,15 @@
+﻿// Designed by TEAM 4
 const PERSONALITY_META = {
-  Aggressive: { icon: "⚡" },
-  Collaborative: { icon: "🤝" },
-  "Risk-averse": { icon: "🛡" },
+  Aggressive: { icon: "âš¡" },
+  Collaborative: { icon: "ðŸ¤" },
+  "Risk-averse": { icon: "ðŸ›¡" },
 };
 
 const OPTIONS = ["Aggressive", "Collaborative", "Risk-averse"];
 
 /**
  * Renders the agent's personality as a select control. Selecting a
- * different value updates local card state only — the scenario's
+ * different value updates local card state only â€” the scenario's
  * source-of-truth persona data lives in data/scenarios.js.
  */
 export default function PersonalityBadge({ personality, onChange }) {
@@ -53,3 +54,6 @@ export default function PersonalityBadge({ personality, onChange }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

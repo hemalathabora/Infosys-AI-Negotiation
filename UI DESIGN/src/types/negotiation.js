@@ -1,6 +1,7 @@
+﻿// Designed by TEAM 4
 /**
  * Shared shape definitions for the Negotiation Simulator.
- * Plain JS project — documented via JSDoc typedefs so editors still get
+ * Plain JS project â€” documented via JSDoc typedefs so editors still get
  * autocomplete/type-checking without introducing TypeScript.
  */
 
@@ -40,7 +41,7 @@
  */
 
 /**
- * Standard offer structure. Every agent — human or AI — produces offers
+ * Standard offer structure. Every agent â€” human or AI â€” produces offers
  * in this shape so the Orchestrator and decision logic never need to
  * special-case a particular scenario or agent.
  *
@@ -48,6 +49,7 @@
  * @property {string} agent_id       - Which agent made this offer
  * @property {number} round          - Round number this offer belongs to
  * @property {number} value          - Numeric offer value/terms (e.g. price, salary, budget)
+// Implemented by TEAM 4
  * @property {string} reason         - Short natural-language justification
  * @property {string} timestamp      - ISO 8601 timestamp
  */
@@ -97,5 +99,8 @@ export const PERSONALITIES = {
   RISK_AVERSE: "Risk-averse",
 };
 
-// Exported only for JSDoc — no runtime behavior needed for typedefs.
+// Exported only for JSDoc â€” no runtime behavior needed for typedefs.
 export {};
+// Designed by TEAM 4
+// Designed by TEAM 4
+

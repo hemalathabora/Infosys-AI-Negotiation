@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 const STATUS_META = {
   not_started: { label: "Not Started", classes: "bg-white/5 text-textSecondary border-border" },
   in_progress: { label: "In Progress", classes: "bg-primary/15 text-primaryBright border-primary/30" },
@@ -17,7 +18,7 @@ function StatusBadge({ status }) {
 }
 
 function formatValue(value) {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "â€”";
   return `$${Math.round(value).toLocaleString()}`;
 }
 
@@ -47,7 +48,7 @@ export default function NegotiationSessionPanel({
             Negotiation Session
           </h3>
           <p className="mt-1 text-sm text-textSecondary">
-            Round-based simulation driven by the rule-based Orchestrator prototype — no LLM involved yet.
+            Round-based simulation driven by the rule-based Orchestrator prototype â€” no LLM involved yet.
           </p>
         </div>
         <StatusBadge status={state.status} />
@@ -62,7 +63,7 @@ export default function NegotiationSessionPanel({
         <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">Turn</p>
           <p className="mt-1 text-sm font-bold text-textPrimary">
-            {isDone ? "—" : agentLabel(scenario.agents, state.current_agent_turn)}
+            {isDone ? "â€”" : agentLabel(scenario.agents, state.current_agent_turn)}
           </p>
         </div>
         <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
@@ -91,7 +92,7 @@ export default function NegotiationSessionPanel({
           disabled={isRunning || isDone}
           className="rounded-lg border border-primary/40 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primaryBright transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {isRunning ? "Running…" : "Run to completion"}
+          {isRunning ? "Runningâ€¦" : "Run to completion"}
         </button>
         <button
           type="button"
@@ -174,3 +175,6 @@ export default function NegotiationSessionPanel({
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

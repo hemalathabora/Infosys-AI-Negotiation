@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function GoalSection({ goal }) {
   return (
     <div>
@@ -17,3 +18,6 @@ export default function GoalSection({ goal }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

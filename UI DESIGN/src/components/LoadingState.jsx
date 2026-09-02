@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 function SkeletonCard() {
   return (
     <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-6" aria-hidden="true">
@@ -30,3 +31,6 @@ export default function LoadingState({ message }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

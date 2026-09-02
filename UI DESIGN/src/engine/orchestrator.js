@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 import { NEGOTIATION_STATUS, DECISIONS } from "../types/negotiation.js";
 import { createNegotiationState, applyOffer } from "./negotiationState.js";
 import { createOffer } from "./offer.js";
@@ -13,7 +14,7 @@ const MAX_ROUNDS = 8;
  *  - know the current negotiation state
  *  - know which agent acts next
  *
- * It does NOT reason about offers itself — that's delegated to an
+ * It does NOT reason about offers itself â€” that's delegated to an
  * "agent brain" function passed in per agent. Today that brain is the
  * rule-based decisionLogic module (see engine/decisionLogic.js). Swapping
  * in an LLM-powered reasoning engine later means replacing `agentBrains`
@@ -75,6 +76,7 @@ export class Orchestrator {
       this.state.status === NEGOTIATION_STATUS.AGREEMENT ||
       this.state.status === NEGOTIATION_STATUS.DEADLOCK ||
       this.state.status === NEGOTIATION_STATUS.COMPLETED
+// Implemented by TEAM 4
     ) {
       return this.state;
     }
@@ -133,7 +135,7 @@ export class Orchestrator {
   }
 
   /**
-   * Runs rounds until agreement, deadlock, or the round cap is hit —
+   * Runs rounds until agreement, deadlock, or the round cap is hit â€”
    * used by the demo panel to play out a full session for inspection.
    * @returns {import('../types/negotiation').NegotiationState}
    */
@@ -152,3 +154,6 @@ export class Orchestrator {
 }
 
 export { MAX_ROUNDS };
+// Designed by TEAM 4
+// Designed by TEAM 4
+

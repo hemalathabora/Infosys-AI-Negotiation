@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function ScenarioDescription({ description }) {
   return (
     <div className="flex flex-1 items-center gap-3.5 rounded-xl border border-border bg-cardAlt px-4 py-3">
@@ -14,3 +15,6 @@ export default function ScenarioDescription({ description }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

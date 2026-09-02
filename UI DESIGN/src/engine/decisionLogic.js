@@ -1,7 +1,8 @@
+﻿// Designed by TEAM 4
 import { DECISIONS } from "../types/negotiation.js";
 
 /**
- * Concession rate per personality — the fraction of the remaining gap
+ * Concession rate per personality â€” the fraction of the remaining gap
  * an agent is willing to close in a single counteroffer. This is the
  * only place personality affects behavior in the rule-based prototype;
  * an LLM-based agent would replace this whole module later but should
@@ -10,7 +11,7 @@ import { DECISIONS } from "../types/negotiation.js";
 const CONCESSION_RATE = {
   Aggressive: 0.1, // gives up ground slowly
   Collaborative: 0.35, // gives up ground generously to reach agreement
-  "Risk-averse": 0.25, // moderate — prioritizes a safe, non-deadlocked outcome
+  "Risk-averse": 0.25, // moderate â€” prioritizes a safe, non-deadlocked outcome
 };
 
 /** How close two offers need to be (as a fraction of the negotiation range) to count as "close enough" to accept. */
@@ -18,9 +19,9 @@ const ACCEPTANCE_TOLERANCE = 0.03;
 
 /**
  * Extracts a negotiation "limit" and "direction" from a constraint string.
- * "Maximum $X ..." → this agent must not go above X, so it wants the
+ * "Maximum $X ..." â†’ this agent must not go above X, so it wants the
  * negotiated value to be as LOW as possible ("minimize").
- * "Minimum $X ..." → this agent must not go below X, so it wants the
+ * "Minimum $X ..." â†’ this agent must not go below X, so it wants the
  * negotiated value to be as HIGH as possible ("maximize").
  *
  * @param {string[]} constraints
@@ -44,7 +45,7 @@ export function deriveLimitFromConstraints(constraints) {
 }
 
 /**
- * An agent's opening anchor offer — favorable to them, on the far side of
+ * An agent's opening anchor offer â€” favorable to them, on the far side of
  * their own limit, per the classic anchor-then-concede pattern.
  *
  * @param {"minimize"|"maximize"} direction
@@ -54,6 +55,7 @@ export function deriveLimitFromConstraints(constraints) {
 export function anchorOffer(direction, limit) {
   const spread = limit * 0.15;
   return direction === "minimize" ? limit - spread : limit + spread;
+// Implemented by TEAM 4
 }
 
 /**
@@ -88,14 +90,14 @@ export function decide({
   if (withinOwnLimit && closeEnough) {
     return {
       decision: DECISIONS.ACCEPT,
-      reason: `Offer of ${incomingValue} is within constraint (${direction === "minimize" ? "≤" : "≥"} ${limit}) and close to my last position.`,
+      reason: `Offer of ${incomingValue} is within constraint (${direction === "minimize" ? "â‰¤" : "â‰¥"} ${limit}) and close to my last position.`,
     };
   }
 
   if (!withinOwnLimit && round >= maxRounds) {
     return {
       decision: DECISIONS.REJECT,
-      reason: `After ${round} rounds, offer of ${incomingValue} still violates my constraint (${direction === "minimize" ? "≤" : "≥"} ${limit}).`,
+      reason: `After ${round} rounds, offer of ${incomingValue} still violates my constraint (${direction === "minimize" ? "â‰¤" : "â‰¥"} ${limit}).`,
     };
   }
 
@@ -111,3 +113,6 @@ export function decide({
     reason: `Conceding ${(rate * 100).toFixed(0)}% of the gap toward ${incomingValue} (${personality} concession rate), staying within my constraint.`,
   };
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

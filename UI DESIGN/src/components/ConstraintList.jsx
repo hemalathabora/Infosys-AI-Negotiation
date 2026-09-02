@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 function parseConstraint(constraint) {
   if (typeof constraint === "object" && constraint) {
     const text = constraint.text ?? constraint.label ?? "";
@@ -86,3 +87,6 @@ export default function ConstraintList({ constraints, onChange }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

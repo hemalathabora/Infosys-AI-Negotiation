@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 export default function ReadyBanner({ isValid, agentCount }) {
   return (
     <div className="relative flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-r from-primary/10 via-card to-card px-5 py-4">
@@ -46,3 +47,6 @@ export default function ReadyBanner({ isValid, agentCount }) {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

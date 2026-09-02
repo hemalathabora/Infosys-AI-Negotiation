@@ -1,8 +1,9 @@
+﻿// Designed by TEAM 4
 import { scenarios, scenarioList } from "../data/scenarios.js";
 
 // Simulated network latency so loading states are visible/testable.
 // Swap the bodies of these functions for real fetch() calls once a
-// backend endpoint exists — callers don't need to change.
+// backend endpoint exists â€” callers don't need to change.
 const SIMULATED_LATENCY_MS = 350;
 
 function delay(ms) {
@@ -36,6 +37,7 @@ export function isConfigurationValid(scenario) {
   if (scenario.agents.length !== 2) return false;
   return scenario.agents.every((agent) => {
     if (!agent.name || !agent.role || !agent.goal || !agent.personality) return false;
+// Implemented by TEAM 4
     if (!Array.isArray(agent.constraints) || agent.constraints.length === 0) return false;
 
     return agent.constraints.every((constraint) => {
@@ -50,7 +52,7 @@ export function isConfigurationValid(scenario) {
 
 /**
  * Builds the structured handoff object passed to the Orchestrator.
- * The UI never calls an LLM or negotiation logic directly — this is
+ * The UI never calls an LLM or negotiation logic directly â€” this is
  * the boundary object that crosses into that layer.
  * @param {import('../types/negotiation').Scenario} scenario
  * @returns {import('../types/negotiation').NegotiationHandoff}
@@ -74,3 +76,6 @@ export function buildOrchestratorHandoff(scenario) {
     })),
   };
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

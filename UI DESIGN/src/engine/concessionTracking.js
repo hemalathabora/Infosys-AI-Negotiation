@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 /**
  * Builds a per-agent concession timeline from the offer history:
  * for each agent, their sequence of offered values across rounds and the
@@ -22,6 +23,7 @@ export function buildConcessionTimeline(history) {
         return { round: offer.round, value: offer.value, delta: null, direction: "opening" };
       }
       const delta = offer.value - sorted[i - 1].value;
+// Implemented by TEAM 4
       return {
         round: offer.round,
         value: offer.value,
@@ -34,7 +36,7 @@ export function buildConcessionTimeline(history) {
 }
 
 /**
- * Total concession size (sum of absolute round-over-round moves) per agent —
+ * Total concession size (sum of absolute round-over-round moves) per agent â€”
  * a quick summary metric for the outcome report.
  *
  * @param {ReturnType<typeof buildConcessionTimeline>} timeline
@@ -47,3 +49,6 @@ export function totalConcessionByAgent(timeline) {
   }
   return totals;
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

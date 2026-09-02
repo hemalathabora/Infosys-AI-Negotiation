@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 const PERSONALITIES = [
   {
     label: "Aggressive",
@@ -26,6 +27,7 @@ const PERSONALITIES = [
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
         <path d="M12 2l7 3.5v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9v-5L12 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
       </svg>
+// Implemented by TEAM 4
     ),
   },
 ];
@@ -55,3 +57,6 @@ export default function PersonalitiesInfoPanel() {
     </div>
   );
 }
+// Designed by TEAM 4
+// Designed by TEAM 4
+

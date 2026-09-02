@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 import { scenarios } from "./scenarios.js";
 
 export const dashboardStats = {
@@ -76,6 +77,7 @@ export const agentPerformance = [
   },
   {
     name: "Vendor",
+// Implemented by TEAM 4
     role: "Sales Representative",
     personality: "Aggressive",
     totalNegotiations: 14,
@@ -155,3 +157,6 @@ export const activityTimeline = [
     time: "2 hours ago",
   },
 ];
+// Designed by TEAM 4
+// Designed by TEAM 4
+

@@ -1,3 +1,4 @@
+﻿// Designed by TEAM 4
 /**
  * Scenario data store.
  *
@@ -45,6 +46,7 @@ export const scenarios = {
     agents: [
       {
         id: "candidate",
+// Implemented by TEAM 4
         name: "Candidate",
         role: "Job Candidate",
         goal: "Maximize total compensation and benefits",
@@ -93,3 +95,6 @@ export const scenarioList = Object.values(scenarios).map((s) => ({
   name: s.scenario_name,
   isConfigured: s.isConfigured,
 }));
+// Designed by TEAM 4
+// Designed by TEAM 4
+

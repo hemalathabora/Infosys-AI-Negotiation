@@ -1,50 +1,136 @@
+// Designed by TEAM 4
+
 const resultStyles = {
-  Agreement: "bg-[#0d2d28] text-[#9af0c4] border border-[#1d4d48]",
-  "In Progress": "bg-[#102534] text-[#bfe7ff] border border-[#204a67]",
-  Deadlock: "bg-[#2d1a10] text-[#f6c26b] border border-[#4d3020]",
+  Agreement:
+    "border border-primary/25 bg-primary/10 text-primary",
+
+  "In Progress":
+    "border border-primary/20 bg-cardAlt text-primary",
+
+  Deadlock:
+    "border border-warning/25 bg-warning/10 text-warning",
 };
 
 export default function RecentNegotiations({ rows }) {
   return (
-    <div className="rounded-2xl border border-[#1d374d] bg-[#0b1d2d] p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-xl font-black text-white">Recent Negotiations</h3>
+    <section className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6">
+
+      {/* Header */}
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+            History
+          </p>
+
+          <h3 className="mt-1 text-xl font-bold tracking-tight text-textPrimary">
+            Recent Negotiations
+          </h3>
+
+          <p className="mt-1 text-sm text-textSecondary">
+            Latest negotiation sessions and their outcomes.
+          </p>
+        </div>
+
+        <span className="hidden rounded-full border border-border bg-cardAlt px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-textSecondary sm:inline-flex">
+          {rows.length} Recent
+        </span>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl border border-border">
         <table className="min-w-full text-left">
-          <thead>
-            <tr className="border-b border-[#1d374d] text-[11px] uppercase tracking-[0.18em] text-[#7fa7c0]">
-              <th className="pb-3 pr-4 font-semibold">Scenario</th>
-              <th className="pb-3 pr-4 font-semibold">Agents</th>
-              <th className="pb-3 pr-4 font-semibold">Mode</th>
-              <th className="pb-3 pr-4 font-semibold">Rounds</th>
-              <th className="pb-3 pr-4 font-semibold">Result</th>
-              <th className="pb-3 pr-4 font-semibold">Date</th>
-              <th className="pb-3 pr-4 font-semibold">Action</th>
+
+          <thead className="bg-cardAlt">
+            <tr className="border-b border-border">
+
+              <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Scenario
+              </th>
+
+              <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Agents
+              </th>
+
+              <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Rounds
+              </th>
+
+              <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Result
+              </th>
+
+              <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Date
+              </th>
+
+              <th className="px-4 py-3 text-right text-[10px] font-bold uppercase tracking-[0.15em] text-textSecondary">
+                Action
+              </th>
+
             </tr>
           </thead>
+
           <tbody>
-            {rows.map((row) => (
-              <tr key={`${row.scenario}-${row.date}-${row.rounds}`} className="border-b border-[#112d3d] text-sm text-[#dfeaf5]">
-                <td className="py-3 pr-4 font-medium text-white">{row.scenario}</td>
-                <td className="py-3 pr-4">{row.agents}</td>
-                <td className="py-3 pr-4">{row.mode}</td>
-                <td className="py-3 pr-4">{row.rounds}</td>
-                <td className="py-3 pr-4">
-                  <span className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${resultStyles[row.result] || resultStyles["In Progress"]}`}>
+            {rows.map((row, index) => (
+              <tr
+                key={`${row.scenario}-${row.date}-${row.rounds}-${index}`}
+                className="border-b border-border/70 last:border-0 transition-colors hover:bg-cardAlt/60"
+              >
+
+                {/* Scenario */}
+                <td className="px-4 py-4">
+                  <p className="text-sm font-semibold text-textPrimary">
+                    {row.scenario}
+                  </p>
+
+                  <p className="mt-1 text-xs text-textMuted">
+                    {row.mode}
+                  </p>
+                </td>
+
+                {/* Agents */}
+                <td className="px-4 py-4 text-sm text-textSecondary">
+                  {row.agents}
+                </td>
+
+                {/* Rounds */}
+                <td className="px-4 py-4">
+                  <span className="font-mono text-sm text-textPrimary">
+                    {row.rounds}
+                  </span>
+                </td>
+
+                {/* Result */}
+                <td className="px-4 py-4">
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${resultStyles[row.result] || resultStyles["In Progress"]}`}
+                  >
                     {row.result}
                   </span>
                 </td>
-                <td className="py-3 pr-4 text-[#8ca6bb]">{row.date}</td>
-                <td className="py-3 pr-4">
-                  <button className="text-[#c4ff3a] hover:text-[#dcff7b]">View</button>
+
+                {/* Date */}
+                <td className="px-4 py-4 text-xs text-textSecondary">
+                  {row.date}
                 </td>
+
+                {/* Action */}
+                <td className="px-4 py-4 text-right">
+                  <button
+                    type="button"
+                    className="text-xs font-semibold text-primary transition hover:text-primaryBright"
+                  >
+                    View
+                  </button>
+                </td>
+
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
-    </div>
+
+    </section>
   );
 }

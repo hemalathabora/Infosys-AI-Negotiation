@@ -1,26 +1,84 @@
 ﻿// Designed by TEAM 4
-import { useState } from "react";
+
 import AgentHeader, { AgentIdentity } from "./AgentHeader";
 import GoalSection from "./GoalSection";
 import ConstraintList from "./ConstraintList";
 import PersonalityBadge from "./PersonalityBadge";
 
 /**
- * @param {{ agent: import('../types/negotiation').Agent, index: number }} props
+ * Agent configuration card.
+ *
+ * Personality and constraints are controlled by the parent
+ * AgentConfiguration / useScenarioConfiguration state.
+ *
+ * This is important because the final selected agent configuration
+ * must be passed into the NegotiationState and then to the Orchestrator.
+ *
+ * @param {{
+ *   agent: import("../types/negotiation").Agent,
+ *   index: number,
+ *   onConstraintChange?: (agentId: string, constraintIndex: number, nextValue: string) => void,
+ *   onPersonalityChange?: (agentId: string, nextPersonality: string) => void
+ * }} props
  */
-export default function AgentCard({ agent, index, onConstraintChange }) {
-  const [personality, setPersonality] = useState(agent.personality);
+export default function AgentCard({
+  agent,
+  index,
+  onConstraintChange,
+  onPersonalityChange,
+}) {
+  /**
+   * The parent owns the actual personality value.
+   *
+   * We intentionally do NOT keep personality in local component state.
+   *
+   * Flow:
+   *
+   * PersonalityBadge
+   *       ↓
+   * AgentCard
+   *       ↓
+   * onPersonalityChange
+   *       ↓
+   * AgentConfiguration
+   *       ↓
+   * selectedScenario.agents
+   *       ↓
+   * NegotiationState
+   *       ↓
+   * Orchestrator
+   */
+  const personality = agent.personality;
 
   const isConfigured = Boolean(
     agent.name &&
-    agent.role &&
-    agent.goal &&
-    agent.constraints?.length &&
-    personality,
+      agent.role &&
+      agent.goal &&
+      agent.constraints?.length &&
+      personality,
   );
 
+  /**
+   * Sends constraint changes to the parent.
+   */
   const handleConstraintChange = (constraintIndex, nextValue) => {
-    onConstraintChange?.(agent.id, constraintIndex, nextValue);
+    onConstraintChange?.(
+      agent.id,
+      constraintIndex,
+      nextValue,
+    );
+  };
+
+  /**
+   * Sends personality changes to the parent.
+   *
+   * This is the important Milestone 1 integration change.
+   */
+  const handlePersonalityChange = (nextPersonality) => {
+    onPersonalityChange?.(
+      agent.id,
+      nextPersonality,
+    );
   };
 
   return (
@@ -28,7 +86,10 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
       className="animate-fadeIn flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-card transition-shadow hover:shadow-cardHover sm:p-6"
       aria-labelledby={`agent-${agent.id}-name`}
     >
+      {/* Agent number / header */}
       <AgentHeader index={index} />
+
+      {/* Agent name and role */}
       <AgentIdentity
         name={agent.name}
         role={agent.role}
@@ -37,15 +98,24 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
 
       <div className="h-px w-full bg-border" />
 
+      {/* Agent goal */}
       <GoalSection goal={agent.goal} />
+
+      {/* Agent constraints */}
       <ConstraintList
         constraints={agent.constraints}
         onChange={handleConstraintChange}
       />
-      <PersonalityBadge personality={personality} onChange={setPersonality} />
+
+      {/* Agent personality */}
+      <PersonalityBadge
+        personality={personality}
+        onChange={handlePersonalityChange}
+      />
 
       <div className="h-px w-full bg-border" />
 
+      {/* Configuration status */}
       <div className="flex items-center gap-2 text-sm">
         {isConfigured ? (
           <>
@@ -53,7 +123,12 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
               className="flex h-5 w-5 items-center justify-center rounded-full bg-success/20 text-success"
               aria-hidden="true"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
                 <path
                   d="M5 12.5l4.5 4.5L19 7.5"
                   stroke="currentColor"
@@ -63,18 +138,30 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
                 />
               </svg>
             </span>
-            <span className="font-semibold text-success">Configured</span>
+
+            <span className="font-semibold text-success">
+              Configured
+            </span>
           </>
         ) : (
           <>
-            <span className="text-warning" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <span
+              className="text-warning"
+              aria-hidden="true"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
                 <path
                   d="M12 4l9 16H3L12 4z"
                   stroke="currentColor"
                   strokeWidth="1.8"
                   strokeLinejoin="round"
                 />
+
                 <path
                   d="M12 9v5M12 17h.01"
                   stroke="currentColor"
@@ -83,6 +170,7 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
                 />
               </svg>
             </span>
+
             <span className="font-semibold text-warning">
               Incomplete configuration
             </span>
@@ -92,5 +180,3 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
     </article>
   );
 }
-// Designed by TEAM 4
-// Designed by TEAM 4

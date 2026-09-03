@@ -1,5 +1,7 @@
 ﻿// Designed by TEAM 4
+
 import { useCallback, useEffect, useState } from "react";
+
 import {
   fetchScenarioById,
   isConfigurationValid,
@@ -7,25 +9,107 @@ import {
 
 const DEFAULT_SCENARIO_ID = "vendor_pricing";
 
-export function useScenarioConfiguration() {
-  const [selectedScenarioId, setSelectedScenarioId] = useState(
-    DEFAULT_SCENARIO_ID
-  );
-  const [selectedScenario, setSelectedScenario] = useState(null);
-  const [agents, setAgents] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isStarting, setIsStarting] = useState(false);
+/**
+ * Safely converts a constraint into the structure expected by the UI
+ * and negotiation engine.
+ */
+function updateConstraintValue(constraint, numericValue) {
+  if (typeof constraint === "string") {
+    const text = constraint.trim();
 
+    /*
+     * Try to preserve the original constraint wording.
+     *
+     * Examples:
+     * "Maximum budget: $50,000"
+     * "Minimum acceptable price: $42,000"
+     */
+    const match = text.match(
+      /^(.*?)(\$[\d,]+(?:\.\d+)?)(.*)$/i
+    );
+
+    const sanitizedText = match
+      ? `${match[1].trim()} $${numericValue.toLocaleString()} ${match[3].trim()}`.trim()
+      : `Custom constraint $${numericValue.toLocaleString()}`;
+
+    return {
+      text: sanitizedText,
+      defaultValue: numericValue,
+      value: numericValue,
+    };
+  }
+
+  if (constraint && typeof constraint === "object") {
+    return {
+      ...constraint,
+      defaultValue: numericValue,
+      value: numericValue,
+    };
+  }
+
+  return {
+    text: `Custom constraint $${numericValue.toLocaleString()}`,
+    defaultValue: numericValue,
+    value: numericValue,
+  };
+}
+
+/**
+ * Updates one agent inside a scenario.
+ *
+ * This helper is used for both:
+ * - local agents state
+ * - selectedScenario.agents
+ *
+ * Keeping the same update logic prevents the two states from
+ * getting out of sync.
+ */
+function updateAgentById(agents, agentId, updater) {
+  return agents.map((agent) => {
+    if (agent.id !== agentId) {
+      return agent;
+    }
+
+    return updater(agent);
+  });
+}
+
+export function useScenarioConfiguration() {
+  const [selectedScenarioId, setSelectedScenarioId] =
+    useState(DEFAULT_SCENARIO_ID);
+
+  const [selectedScenario, setSelectedScenario] =
+    useState(null);
+
+  const [agents, setAgents] = useState([]);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState(null);
+
+  const [isStarting, setIsStarting] =
+    useState(false);
+
+  /**
+   * Load a scenario from the scenario service.
+   */
   const loadScenario = useCallback(async (scenarioId) => {
     setIsLoading(true);
     setError(null);
+
     try {
       const scenario = await fetchScenarioById(scenarioId);
+
       setSelectedScenario(scenario);
-      setAgents(scenario.agents);
+      setAgents(scenario.agents ?? []);
     } catch (err) {
-      setError(err.message || "Unable to load agent configuration.");
+      setError(
+        err?.message ||
+          "Unable to load agent configuration."
+      );
+
       setSelectedScenario(null);
       setAgents([]);
     } finally {
@@ -33,108 +117,201 @@ export function useScenarioConfiguration() {
     }
   }, []);
 
+  /**
+   * Load the default/current scenario.
+   */
   useEffect(() => {
     loadScenario(selectedScenarioId);
   }, [selectedScenarioId, loadScenario]);
 
+  /**
+   * Select another scenario.
+   */
   const selectScenario = useCallback((scenarioId) => {
     setSelectedScenarioId(scenarioId);
   }, []);
 
+  /**
+   * Retry loading the current scenario.
+   */
   const retry = useCallback(() => {
     loadScenario(selectedScenarioId);
   }, [loadScenario, selectedScenarioId]);
 
-  const updateAgentConstraint = useCallback((agentId, constraintIndex, nextValue) => {
-    const numericValue = Number(nextValue);
-    if (Number.isNaN(numericValue)) return;
+  /**
+   * ------------------------------------------------------------
+   * UPDATE CONSTRAINT
+   * ------------------------------------------------------------
+   *
+   * Updates both:
+   *
+   * agents
+   * selectedScenario.agents
+   *
+   * so they always remain synchronized.
+   */
+  const updateAgentConstraint = useCallback(
+    (agentId, constraintIndex, nextValue) => {
+      const numericValue = Number(nextValue);
 
-    setAgents((prevAgents) =>
-      prevAgents.map((agent) => {
-        if (agent.id !== agentId) return agent;
+      if (Number.isNaN(numericValue)) {
+        return;
+      }
 
-        const nextConstraints = agent.constraints.map((constraint, index) => {
-          if (index !== constraintIndex) return constraint;
+      /**
+       * Update the standalone agents state.
+       */
+      setAgents((previousAgents) =>
+        updateAgentById(
+          previousAgents,
+          agentId,
+          (agent) => {
+            const nextConstraints = (
+              agent.constraints ?? []
+            ).map((constraint, index) => {
+              if (index !== constraintIndex) {
+                return constraint;
+              }
 
-          if (typeof constraint === "string") {
-            const text = constraint.trim();
-            const match = text.match(/^(.*?)(\$\s*[\d,]+(?:\.\d+)?)(.*)$/);
-            const sanitizedText = match
-              ? `${match[1].trim()} $${numericValue.toLocaleString()} ${match[3].trim()}`.trim()
-              : `Custom constraint $${numericValue.toLocaleString()}`;
+              return updateConstraintValue(
+                constraint,
+                numericValue
+              );
+            });
 
             return {
-              text: sanitizedText,
-              defaultValue: numericValue,
-              value: numericValue,
+              ...agent,
+              constraints: nextConstraints,
             };
           }
+        )
+      );
 
-          if (constraint && typeof constraint === "object") {
-            return {
-              ...constraint,
-              defaultValue: numericValue,
-              value: numericValue,
-// Implemented by TEAM 4
-            };
-          }
+      /**
+       * Update selectedScenario as well.
+       *
+       * This is important because selectedScenario is the object
+       * eventually passed to the negotiation engine.
+       */
+      setSelectedScenario((previousScenario) => {
+        if (!previousScenario) {
+          return previousScenario;
+        }
 
-          return {
-            text: `Custom constraint $${numericValue.toLocaleString()}`,
-            defaultValue: numericValue,
-            value: numericValue,
-          };
-        });
+        return {
+          ...previousScenario,
 
-        return { ...agent, constraints: nextConstraints };
-      })
-    );
+          agents: updateAgentById(
+            previousScenario.agents ?? [],
+            agentId,
+            (agent) => {
+              const nextConstraints = (
+                agent.constraints ?? []
+              ).map((constraint, index) => {
+                if (index !== constraintIndex) {
+                  return constraint;
+                }
 
-    setSelectedScenario((prevScenario) => {
-      if (!prevScenario) return prevScenario;
-      return {
-        ...prevScenario,
-        agents: prevScenario.agents.map((agent) => {
-          if (agent.id !== agentId) return agent;
-
-          const nextConstraints = agent.constraints.map((constraint, index) => {
-            if (index !== constraintIndex) return constraint;
-
-            if (typeof constraint === "string") {
-              const text = constraint.trim();
-              const match = text.match(/^(.*?)(\$\s*[\d,]+(?:\.\d+)?)(.*)$/);
-              const sanitizedText = match
-                ? `${match[1].trim()} $${numericValue.toLocaleString()} ${match[3].trim()}`.trim()
-                : `Custom constraint $${numericValue.toLocaleString()}`;
+                return updateConstraintValue(
+                  constraint,
+                  numericValue
+                );
+              });
 
               return {
-                text: sanitizedText,
-                defaultValue: numericValue,
-                value: numericValue,
+                ...agent,
+                constraints: nextConstraints,
               };
             }
+          ),
+        };
+      });
+    },
+    []
+  );
 
-            if (constraint && typeof constraint === "object") {
-              return {
-                ...constraint,
-                defaultValue: numericValue,
-                value: numericValue,
-              };
-            }
+  /**
+   * ------------------------------------------------------------
+   * UPDATE PERSONALITY
+   * ------------------------------------------------------------
+   *
+   * This is the important Milestone 1 integration.
+   *
+   * Previously AgentCard stored personality locally:
+   *
+   * AgentCard local state
+   *
+   * That meant the selected personality could remain only in
+   * the UI and never reach selectedScenario.
+   *
+   * Now:
+   *
+   * AgentCard
+   *    ↓
+   * updateAgentPersonality()
+   *    ↓
+   * agents
+   *    ↓
+   * selectedScenario.agents
+   *    ↓
+   * NegotiationState
+   *    ↓
+   * Orchestrator
+   */
+  const updateAgentPersonality = useCallback(
+    (agentId, nextPersonality) => {
+      if (!agentId || !nextPersonality) {
+        return;
+      }
 
-            return {
-              text: `Custom constraint $${numericValue.toLocaleString()}`,
-              defaultValue: numericValue,
-              value: numericValue,
-            };
-          });
+      /**
+       * Update agents state.
+       */
+      setAgents((previousAgents) =>
+        updateAgentById(
+          previousAgents,
+          agentId,
+          (agent) => ({
+            ...agent,
+            personality: nextPersonality,
+          })
+        )
+      );
 
-          return { ...agent, constraints: nextConstraints };
-        }),
-      };
-    });
-  }, []);
+      /**
+       * Update selectedScenario.
+       *
+       * This is the object used when Start Negotiation
+       * is pressed.
+       */
+      setSelectedScenario((previousScenario) => {
+        if (!previousScenario) {
+          return previousScenario;
+        }
 
+        return {
+          ...previousScenario,
+
+          agents: updateAgentById(
+            previousScenario.agents ?? [],
+            agentId,
+            (agent) => ({
+              ...agent,
+              personality: nextPersonality,
+            })
+          ),
+        };
+      });
+    },
+    []
+  );
+
+  /**
+   * Validate the CURRENT selected scenario.
+   *
+   * This means the validation checks the same object that will
+   * eventually be passed to the Orchestrator.
+   */
   const configurationValid = selectedScenario
     ? isConfigurationValid(selectedScenario)
     : false;
@@ -143,16 +320,21 @@ export function useScenarioConfiguration() {
     selectedScenarioId,
     selectedScenario,
     agents,
+
     isLoading,
     error,
     isStarting,
+
     setIsStarting,
+
     configurationValid,
+
     selectScenario,
     retry,
+
     updateAgentConstraint,
+
+    // New Milestone 1 integration action.
+    updateAgentPersonality,
   };
 }
-// Designed by TEAM 4
-// Designed by TEAM 4
-

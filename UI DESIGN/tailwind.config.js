@@ -9,37 +9,41 @@ export default {
     extend: {
       /*
        * ============================================================
-       * NEGOTIATION AI - COLOR SYSTEM
+       * ENTERPRISE AI NEGOTIATION - COLOR SYSTEM
        * ============================================================
        */
 
       colors: {
-        // Main application backgrounds
-        bg: "#071018",
-        header: "#04070D",
-        sidebar: "#071018",
+        // Application backgrounds & surfaces
+        bg: "#0B0F17",
+        header: "#0B0F17",
+        sidebar: "#0F172A",
 
-        // Cards and panels
-        card: "#0C212F",
-        cardAlt: "#0E2338",
+        // Elevated Cards & Glass Panels
+        card: "#131C2E",
+        cardAlt: "#18243B",
 
-        // Borders
-        border: "#203442",
-        borderGlow: "#1E607F",
+        // Borders & Dividers
+        border: "#1E293B",
+        borderGlow: "#334155",
 
-        // Primary cyan theme
-        primary: "#4DD0FF",
-        primaryBright: "#38BDF8",
+        // Core Accents: Indigo & Azure
+        primary: "#6366F1",
+        primaryBright: "#818CF8",
+        azure: "#3B82F6",
+        azureBright: "#60A5FA",
 
-        // Status colors
-        success: "#B6FF00",
+        // Status Colors (Refined Corporate Tones)
+        success: "#10B981",
+        successBright: "#34D399",
         warning: "#F59E0B",
+        warningBright: "#FBBF24",
         danger: "#EF4444",
 
-        // Text
-        textPrimary: "#F1F5F9",
-        textSecondary: "#8CA6BB",
-        textMuted: "#60788C",
+        // Professional Typography Hierarchy
+        textPrimary: "#F8FAFC",
+        textSecondary: "#94A3B8",
+        textMuted: "#64748B",
       },
 
       /*
@@ -50,37 +54,44 @@ export default {
 
       fontFamily: {
         sans: [
-          "Space Grotesk",
+          "Plus Jakarta Sans",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+
+        body: [
+          "Inter",
           "system-ui",
           "sans-serif",
         ],
 
         mono: [
-          "DM Mono",
+          "JetBrains Mono",
           "monospace",
         ],
       },
 
       /*
        * ============================================================
-       * SHADOWS / GLOW
+       * SHADOWS / SURFACE ELEVATION
        * ============================================================
        */
 
       boxShadow: {
-        card: "0 1px 2px rgba(0, 0, 0, 0.5)",
+        card: "0 4px 20px -2px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3)",
 
         cardHover:
-          "0 0 0 1px rgba(77, 208, 255, 0.35), 0 8px 28px rgba(77, 208, 255, 0.12)",
+          "0 12px 32px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(99, 102, 241, 0.35)",
 
         glow:
-          "0 0 0 1px rgba(77, 208, 255, 0.4), 0 0 24px rgba(77, 208, 255, 0.18)",
+          "0 0 24px rgba(99, 102, 241, 0.22), 0 0 0 1px rgba(99, 102, 241, 0.3)",
 
         glowSm:
-          "0 0 0 1px rgba(77, 208, 255, 0.3), 0 0 12px rgba(77, 208, 255, 0.12)",
+          "0 0 12px rgba(99, 102, 241, 0.16), 0 0 0 1px rgba(99, 102, 241, 0.25)",
 
         successGlow:
-          "0 0 12px rgba(182, 255, 0, 0.20)",
+          "0 0 16px rgba(16, 185, 129, 0.22)",
       },
 
       /*
@@ -93,7 +104,7 @@ export default {
         fadeIn: {
           "0%": {
             opacity: 0,
-            transform: "translateY(4px)",
+            transform: "translateY(6px)",
           },
 
           "100%": {
@@ -111,14 +122,26 @@ export default {
             backgroundPosition: "400px 0",
           },
         },
+
+        pulseSubtle: {
+          "0%, 100%": {
+            opacity: 1,
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: 0.6,
+            transform: "scale(1.15)",
+          },
+        },
       },
 
       animation: {
-        fadeIn: "fadeIn 0.25s ease-out",
+        fadeIn: "fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
         shimmer: "shimmer 1.4s linear infinite",
+        pulseSubtle: "pulseSubtle 2.5s ease-in-out infinite",
       },
     },
   },
 
   plugins: [],
-};
+};

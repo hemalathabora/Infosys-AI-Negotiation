@@ -1,5 +1,3 @@
-// Designed by TEAM 4
-
 export default function TopNavigation({
   onMenuToggle,
   theme,
@@ -10,10 +8,10 @@ export default function TopNavigation({
 
   return (
     <header
-      className={`sticky top-0 z-30 flex h-20 items-center justify-between border-b px-4 backdrop-blur sm:px-6 ${
+      className={`sticky top-0 z-30 flex h-16 items-center justify-between border-b px-4 backdrop-blur-xl sm:px-6 transition-colors duration-200 ${
         isDark
-          ? "border-border bg-header/95"
-          : "border-slate-200 bg-slate-50/95"
+          ? "border-border/80 bg-header/90"
+          : "border-slate-200 bg-white/90"
       }`}
     >
       {/* Left side - Logo and Project Name */}
@@ -22,9 +20,9 @@ export default function TopNavigation({
         <button
           type="button"
           onClick={onMenuToggle}
-          className={`rounded-lg border p-2 lg:hidden ${
+          className={`rounded-lg border p-2 transition-colors lg:hidden ${
             isDark
-              ? "border-border text-textSecondary hover:border-primary hover:text-primary"
+              ? "border-border text-textSecondary hover:border-primary hover:text-textPrimary"
               : "border-slate-300 text-slate-600 hover:text-slate-900"
           }`}
           aria-label="Toggle navigation menu"
@@ -48,60 +46,44 @@ export default function TopNavigation({
         {/* Logo + Project Name */}
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-extrabold ${
-              isDark
-                ? "border-primary/40 bg-primary/10 text-primary"
-                : "border-sky-300 bg-sky-100 text-sky-700"
-            }`}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 text-xs font-bold text-white shadow-glowSm`}
           >
-            AI
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
           </div>
 
           <div>
-            <p
-              className={`text-lg font-bold leading-tight tracking-tight ${
-                isDark ? "text-textPrimary" : "text-slate-900"
-              }`}
-            >
-              NEGOTIATION AI
-            </p>
+            <div className="flex items-center gap-2">
+              <p
+                className={`text-base font-extrabold tracking-tight font-sans ${
+                  isDark ? "text-textPrimary" : "text-slate-900"
+                }`}
+              >
+                NEGOTIATION <span className="text-primary font-black">AI</span>
+              </p>
+            </div>
 
             <p
-              className={`text-[10px] font-semibold tracking-[0.15em] ${
-                isDark ? "text-primary" : "text-sky-700"
+              className={`text-[10px] font-semibold tracking-[0.18em] uppercase ${
+                isDark ? "text-textMuted" : "text-slate-500"
               }`}
             >
-              Multi-Agent Training Platform
+              Enterprise Multi-Agent Platform
             </p>
           </div>
         </div>
       </div>
 
-      {/* Right side - Status */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Live Status */}
-        <div
-          className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${
-            isDark
-              ? "border-border bg-card text-textPrimary"
-              : "border-slate-300 bg-white text-slate-700"
-          }`}
-        >
-          <span className="breathing-dot" aria-hidden="true" />
+      {/* Right side - Status & Badges */}
+      <div className="flex items-center gap-2.5 sm:gap-3">
 
-          <span
-            className={isDark ? "text-primary" : "text-sky-700"}
-          >
-            Live
-          </span>
-        </div>
-
-        {/* Team */}
+        {/* Team Badge */}
         <div
-          className={`inline-flex items-center rounded-full border px-2.5 py-1.5 text-[10px] font-bold tracking-[0.18em] uppercase ${
+          className={`inline-flex items-center rounded-md border px-2.5 py-1 text-[10px] font-mono font-semibold tracking-wider uppercase ${
             isDark
-              ? "border-primary/30 bg-primary/10 text-primary"
-              : "border-sky-300 bg-sky-50 text-sky-700"
+              ? "border-primary/30 bg-primary/10 text-primaryBright"
+              : "border-indigo-200 bg-indigo-50 text-indigo-700"
           }`}
         >
           TEAM 4

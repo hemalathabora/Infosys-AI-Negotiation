@@ -1,4 +1,3 @@
-﻿// Designed by TEAM 4
 function parseConstraint(constraint) {
   if (typeof constraint === "object" && constraint) {
     const text = constraint.text ?? constraint.label ?? "";
@@ -35,10 +34,10 @@ function parseConstraint(constraint) {
 export default function ConstraintList({ constraints, onChange }) {
   return (
     <div>
-      <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-        Constraints
+      <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
+        Negotiation Constraints
       </h4>
-      <ul className="mt-2 flex flex-col gap-2">
+      <ul className="mt-2.5 flex flex-col gap-2">
         {constraints.map((constraint, index) => {
           const { label, value, defaultValue } = parseConstraint(constraint);
           const currentValue = value ?? defaultValue ?? 0;
@@ -46,30 +45,16 @@ export default function ConstraintList({ constraints, onChange }) {
           return (
             <li
               key={`${label}-${index}`}
-              className="flex items-center gap-3 rounded-xl border border-border bg-cardAlt px-3.5 py-2.5"
+              className="flex items-center gap-3 rounded-xl border border-border/80 bg-cardAlt/60 px-3.5 py-2.5 transition-colors hover:border-borderGlow"
             >
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 font-mono font-bold text-xs"
                 aria-hidden="true"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M12 8v8M8 12h8"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                  <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
+                ${index + 1}
               </span>
-              <div className="flex-1">
-                <p className="text-[11px] font-semibold tracking-wide text-textSecondary">
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-medium tracking-wide text-textSecondary font-sans truncate">
                   {label}
                 </p>
                 <input
@@ -77,7 +62,7 @@ export default function ConstraintList({ constraints, onChange }) {
                   min="0"
                   value={currentValue}
                   onChange={(event) => onChange?.(index, event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm font-bold text-textPrimary outline-none transition-colors focus:border-primary"
+                  className="mt-1 w-full rounded-lg border border-border/80 bg-bg px-2.5 py-1.5 font-mono text-sm font-semibold text-textPrimary outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
             </li>
@@ -87,6 +72,5 @@ export default function ConstraintList({ constraints, onChange }) {
     </div>
   );
 }
-// Designed by TEAM 4
-// Designed by TEAM 4
+
 

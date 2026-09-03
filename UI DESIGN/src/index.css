@@ -1,4 +1,4 @@
-﻿/* Designed by TEAM 4 */
+/* Enterprise AI Platform CSS */
 
 @tailwind base;
 @tailwind components;
@@ -28,30 +28,36 @@ body {
 
 
 /* ============================================================
-   BODY
+   BODY & BASE TYPOGRAPHY
 ============================================================ */
 
 body {
-  background-color: #04070D;
+  background-color: #0B0F17;
 
   background-image:
     radial-gradient(
-      ellipse 900px 500px at 15% -10%,
-      rgba(56, 189, 248, 0.08),
-      transparent 60%
+      circle at 15% 0%,
+      rgba(99, 102, 241, 0.07),
+      transparent 45%
     ),
     radial-gradient(
-      ellipse 700px 500px at 100% 20%,
-      rgba(56, 189, 248, 0.05),
-      transparent 60%
+      circle at 85% 20%,
+      rgba(59, 130, 246, 0.05),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 50% 80%,
+      rgba(16, 185, 129, 0.03),
+      transparent 50%
     );
 
   background-attachment: fixed;
 
-  color: #F1F5F9;
+  color: #F8FAFC;
 
   font-family:
     "Inter",
+    "Plus Jakarta Sans",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -60,6 +66,11 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+  letter-spacing: -0.02em;
 }
 
 
@@ -76,6 +87,23 @@ body {
 
 
 /* ============================================================
+   GLASS PANELS & CARDS
+============================================================ */
+
+.glass-panel {
+  background: rgba(19, 28, 46, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-header {
+  background: rgba(11, 15, 23, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+}
+
+
+/* ============================================================
    FOCUS STATES
 ============================================================ */
 
@@ -85,7 +113,7 @@ select:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid #38BDF8;
+  outline: 2px solid #6366F1;
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -111,22 +139,14 @@ button {
    SCROLLBAR
 ============================================================ */
 
-/*
-  Only the application content should scroll.
-  The browser/body itself should remain fixed.
-*/
-
 * {
   scrollbar-width: thin;
-  scrollbar-color: #52606D transparent;
+  scrollbar-color: #334155 transparent;
 }
 
-
-/* Chrome / Edge / Safari */
-
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 *::-webkit-scrollbar-track {
@@ -134,12 +154,12 @@ button {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: #52606D;
+  background: #334155;
   border-radius: 9999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #718096;
+  background: #475569;
 }
 
 
@@ -151,9 +171,9 @@ button {
   background:
     linear-gradient(
       90deg,
-      #0A101C 25%,
-      #121B2C 37%,
-      #0A101C 63%
+      #0F172A 25%,
+      #1E293B 37%,
+      #0F172A 63%
     );
 
   background-size: 400px 100%;
@@ -161,95 +181,52 @@ button {
 
 
 /* ============================================================
-   GLOW ICON
+   GLOW ICON & INDICATORS
 ============================================================ */
 
 .glow-icon {
-  box-shadow:
-    0 0 16px rgba(56, 189, 248, 0.25);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.25);
 }
-
-
-/* ============================================================
-   LIVE / BREATHING DOT
-============================================================ */
 
 .breathing-dot {
-  width: 10px;
-  height: 10px;
-
+  width: 8px;
+  height: 8px;
   border-radius: 9999px;
-
-  background: #4DD0FF;
-
-  box-shadow:
-    0 0 10px rgba(77, 208, 255, 0.7);
-
-  animation:
-    breathingDot 1.8s ease-in-out infinite;
+  background: #10B981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+  animation: breathingDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-
-/* ============================================================
-   BREATHING ANIMATION
-============================================================ */
-
 @keyframes breathingDot {
-  0%,
-  100% {
+  0%, 100% {
     transform: scale(1);
     opacity: 1;
   }
 
   50% {
-    transform: scale(1.6);
-    opacity: 0.5;
+    transform: scale(1.4);
+    opacity: 0.55;
   }
 }
 
 
 /* ============================================================
-   RESPONSIVE SAFETY
+   RESPONSIVE SAFETY & TABLES
 ============================================================ */
 
-img,
-svg,
-video,
-canvas {
+img, svg, video, canvas {
   max-width: 100%;
 }
 
-
-/* Prevent long text from creating horizontal overflow */
-
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+p, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;
 }
-
-
-/* ============================================================
-   TABLES
-============================================================ */
 
 table {
   border-collapse: collapse;
 }
 
-
-/* ============================================================
-   TEXT SELECTION
-============================================================ */
-
 ::selection {
-  background: rgba(77, 208, 255, 0.2);
-  color: #F1F5F9;
-}
-
-
-/* Designed by TEAM 4 */
+  background: rgba(99, 102, 241, 0.25);
+  color: #F8FAFC;
+}

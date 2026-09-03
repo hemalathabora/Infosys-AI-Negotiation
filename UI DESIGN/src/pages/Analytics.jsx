@@ -3,20 +3,21 @@ function formatValue(value) {
   return `$${Math.round(value).toLocaleString()}`;
 }
 
-function Metric({ label, value, detail, accent = "cyan" }) {
-  const color =
-    accent === "lime"
-      ? "text-[#c4ff3a]"
-      : accent === "red"
-        ? "text-[#ff8d8d]"
-        : "text-[#4dd0ff]";
+function Metric({ label, value, detail, accent = "azure" }) {
+  const colorClass =
+    accent === "emerald"
+      ? "text-emerald-400 font-mono"
+      : accent === "rose"
+        ? "text-rose-400 font-mono"
+        : "text-indigo-400 font-mono";
+
   return (
-    <div className="rounded-2xl border border-[#1d374d] bg-[#0b1b2a] p-5">
-      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#66849a]">
+    <div className="rounded-2xl border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all hover:border-borderGlow">
+      <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
         {label}
       </p>
-      <p className={`mt-2 text-2xl font-black ${color}`}>{value}</p>
-      <p className="mt-1 text-xs text-[#8ca6bb]">{detail}</p>
+      <p className={`mt-2 text-2xl font-extrabold ${colorClass}`}>{value}</p>
+      <p className="mt-1 text-xs text-textSecondary font-body">{detail}</p>
     </div>
   );
 }
@@ -24,18 +25,25 @@ function Metric({ label, value, detail, accent = "cyan" }) {
 function OfferBar({ offer, maxValue, agent, index }) {
   const width = maxValue ? Math.max(8, (offer.value / maxValue) * 100) : 8;
   const isFirst = index === 0;
+
   return (
     <div className="grid grid-cols-[100px_1fr_92px] items-center gap-3 text-xs sm:grid-cols-[140px_1fr_110px]">
-      <div className="truncate font-semibold text-white">
-        R{offer.round} · {agent.name}
+      <div className="truncate font-medium text-textPrimary font-sans">
+        R{offer.round} · {agent?.name || "Agent"}
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-[#152d40]">
+      <div className="h-2.5 overflow-hidden rounded-full bg-slate-900 border border-border/60">
         <div
-          className={`h-full rounded-full ${isFirst ? "bg-[#66849a]" : agent.id === "buyer" || agent.id === "candidate" ? "bg-[#4dd0ff]" : "bg-[#c4ff3a]"}`}
+          className={`h-full rounded-full transition-all duration-300 ${
+            isFirst
+              ? "bg-slate-500"
+              : agent?.id === "buyer" || agent?.id === "candidate"
+                ? "bg-gradient-to-r from-blue-600 to-azure"
+                : "bg-gradient-to-r from-indigo-600 to-indigo-400"
+          }`}
           style={{ width: `${width}%` }}
         />
       </div>
-      <div className="text-right font-bold text-[#dfeaf5]">
+      <div className="text-right font-mono font-bold text-textPrimary">
         {formatValue(offer.value)}
       </div>
     </div>
@@ -49,19 +57,22 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
         data-guide="reports-panel"
         className="flex-1 px-4 py-8 sm:px-6 lg:px-10"
       >
-        <div className="mx-auto max-w-5xl rounded-2xl border border-[#214a69] bg-[#0b1b2a] p-10 text-center">
-          <h1 className="text-2xl font-black text-white">
-            No negotiation data yet
+        <div className="mx-auto max-w-5xl rounded-2xl border border-border/80 bg-card p-10 text-center space-y-4">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/10 text-indigo-400">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+          </div>
+          <h1 className="text-2xl font-bold text-textPrimary font-sans">
+            No Analytics Data Available
           </h1>
-          <p className="mt-2 text-sm text-[#8ca6bb]">
-            Complete a negotiation to see its performance analytics.
+          <p className="text-sm text-textSecondary max-w-md mx-auto">
+            Execute a negotiation session in the Arena to view performance graphs and strategy breakdowns.
           </p>
           <button
             type="button"
             onClick={() => onNavigate("Configure Agents")}
-            className="mt-6 rounded-lg bg-[#4dd0ff] px-5 py-2.5 text-sm font-bold text-[#061018]"
+            className="rounded-xl bg-gradient-to-r from-indigo-600 to-azure px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-glowSm hover:shadow-glow transition-all"
           >
-            Start a negotiation
+            Start A Negotiation
           </button>
         </div>
       </main>
@@ -81,181 +92,148 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
   return (
     <main
       data-guide="reports-panel"
-      className="flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8"
+      className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 animate-fadeIn"
     >
-      <div className="mx-auto max-w-[1500px]">
-        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div className="mx-auto max-w-7xl space-y-6">
+
+        {/* HEADER */}
+        <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border/60 pb-5">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#4dd0ff]">
-              Negotiation analytics
-            </p>
-            <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              {scenario.scenario_name}
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="h-2 w-2 rounded-full bg-indigo-500" />
+              <p className="text-xs font-mono font-semibold uppercase tracking-widest text-indigo-400">
+                PERFORMANCE ANALYTICS
+              </p>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-textPrimary font-sans">
+              {scenario.scenario_name || scenario.name}
             </h1>
-            <p className="mt-2 text-sm text-[#8ca6bb]">
-              Complete performance analysis from every offer and decision in
-              this session.
+            <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
+              Quantitative breakdown of offer trajectories, utility convergence, and concession rates.
             </p>
           </div>
+
           <span
-            className={`rounded-full border px-3 py-2 text-xs font-bold uppercase tracking-wider ${isAgreement ? "border-[#c4ff3a]/40 bg-[#c4ff3a]/10 text-[#c4ff3a]" : "border-[#ff8d8d]/40 bg-[#ff8d8d]/10 text-[#ff8d8d]"}`}
+            className={`rounded-full border px-3.5 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider ${
+              isAgreement
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-successGlow"
+                : "border-amber-500/40 bg-amber-500/10 text-amber-400"
+            }`}
           >
-            {isAgreement ? "Agreement reached" : "Deadlock"}
+            {isAgreement ? "Agreement Reached" : "Session Deadlock"}
           </span>
         </header>
 
-        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
+        {/* METRICS CARDS */}
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric
-            label="Outcome"
+            label="Outcome Result"
             value={isAgreement ? "Agreement" : "Deadlock"}
             detail={
               isAgreement
                 ? `Settled at ${formatValue(finalOffer)}`
                 : "No mutually acceptable terms"
             }
-            accent={isAgreement ? "lime" : "red"}
+            accent={isAgreement ? "emerald" : "rose"}
           />
           <Metric
-            label="Rounds played"
+            label="Rounds Completed"
             value={state.current_round}
-            detail={`${state.history.length} offers exchanged`}
+            detail={`${state.history.length} total offers exchanged`}
           />
           <Metric
-            label="Opening position"
+            label="Opening Position"
             value={formatValue(firstOffer)}
-            detail="First anchor in the session"
+            detail="Initial anchor value in session"
           />
           <Metric
-            label="Total movement"
+            label="Total Movement"
             value={formatValue(totalMovement)}
-            detail="Combined concession value"
-            accent="lime"
+            detail="Combined concession sum"
+            accent="emerald"
           />
         </section>
 
-        <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[1.4fr_1fr]">
-          <div className="rounded-2xl border border-[#214a69] bg-[#0b1b2a] p-5 sm:p-6">
-            <div className="mb-5 flex items-end justify-between gap-3">
+
+        {/* DETAILED CARDS GRID */}
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_1fr]">
+
+          {/* OFFER TRAJECTORY BARS */}
+          <div className="rounded-2xl border border-border/80 bg-card/90 p-5 sm:p-6 backdrop-blur-md space-y-5">
+            <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/60 pb-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[#4dd0ff]">
-                  Offer movement
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-indigo-400">
+                  POSITION PROGRESSION
                 </p>
-                <h2 className="mt-1 text-lg font-extrabold text-white">
-                  Every position in sequence
+                <h2 className="mt-0.5 text-lg font-bold text-textPrimary font-sans">
+                  Offer Trajectory Sequence
                 </h2>
               </div>
-              <span className="text-xs text-[#8ca6bb]">
-                Higher bars represent larger values
+              <span className="text-xs text-textMuted font-mono">
+                Horizontal scale represents value magnitude
               </span>
             </div>
-            <div className="space-y-4">
-              {state.history.map((offer, index) => (
-                <OfferBar
-                  key={`${offer.agent_id}-${offer.round}-${index}`}
-                  offer={offer}
-                  maxValue={maxValue}
-                  agent={
-                    scenario.agents.find(
-                      (item) => item.id === offer.agent_id,
-                    ) ?? scenario.agents[0]
-                  }
-                  index={index}
-                />
-              ))}
-            </div>
-          </div>
 
-          <div className="rounded-2xl border border-[#214a69] bg-[#0b1b2a] p-5 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#4dd0ff]">
-              Agent performance
-            </p>
-            <h2 className="mt-1 text-lg font-extrabold text-white">
-              Concession breakdown
-            </h2>
-            <div className="mt-5 space-y-4">
-              {scenario.agents.map((agent) => {
-                const entries = timeline[agent.id] ?? [];
-                const total = concessionTotals[agent.id] ?? 0;
-                const share = totalMovement
-                  ? Math.round((total / totalMovement) * 100)
-                  : 0;
+            <div className="space-y-3.5 pt-2">
+              {state.history.map((offer, idx) => {
+                const agent = scenario.agents.find((a) => a.id === offer.agent_id);
                 return (
-                  <div
-                    key={agent.id}
-                    className="border-b border-white/10 pb-4 last:border-0 last:pb-0"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{agent.name}</span>
-                      <span className="text-sm font-black text-[#4dd0ff]">
-                        {formatValue(total)}
-                      </span>
-                    </div>
-                    <div className="mt-2 h-2 rounded-full bg-[#152d40]">
-                      <div
-                        className="h-full rounded-full bg-[#c4ff3a]"
-                        style={{ width: `${share}%` }}
-                      />
-                    </div>
-                    <div className="mt-2 flex justify-between text-xs text-[#8ca6bb]">
-                      <span>{agent.personality}</span>
-                      <span>
-                        {entries.length} offers · {share}% of movement
-                      </span>
-                    </div>
-                  </div>
+                  <OfferBar
+                    key={idx}
+                    offer={offer}
+                    maxValue={maxValue}
+                    agent={agent}
+                    index={idx}
+                  />
                 );
               })}
             </div>
           </div>
-        </section>
 
-        <section className="mt-5 rounded-2xl border border-[#214a69] bg-[#0b1b2a] p-5 sm:p-6">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+
+          {/* AGENT SUMMARY COMPARISON */}
+          <div className="rounded-2xl border border-border/80 bg-card/90 p-5 sm:p-6 backdrop-blur-md space-y-5 flex flex-col justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-[#4dd0ff]">
-                Session transcript
-              </p>
-              <h2 className="mt-1 text-lg font-extrabold text-white">
-                What happened, round by round
-              </h2>
+              <div className="border-b border-border/60 pb-3">
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-indigo-400">
+                  CONCESSION ANALYSIS
+                </p>
+                <h2 className="mt-0.5 text-lg font-bold text-textPrimary font-sans">
+                  Agent Flexibility Metrics
+                </h2>
+              </div>
+
+              <div className="mt-5 space-y-4">
+                {scenario.agents.map((agent) => {
+                  const moved = concessionTotals[agent.id] ?? 0;
+                  return (
+                    <div key={agent.id} className="rounded-xl border border-border/80 bg-cardAlt/70 p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-textPrimary font-sans">{agent.name}</span>
+                        <span className="font-mono text-xs text-indigo-400 font-bold">
+                          Moved {formatValue(moved)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-textSecondary font-body">Role: {agent.role} ({agent.personality})</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+
             <button
               type="button"
-              onClick={() => onNavigate("Negotiation Arena")}
-              className="rounded-lg border border-[#4dd0ff]/40 px-3 py-2 text-xs font-bold text-[#4dd0ff]"
+              onClick={() => onNavigate("Reports")}
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-azure px-4 py-2.5 text-xs font-semibold text-white shadow-glowSm hover:shadow-glow transition-all font-sans text-center"
             >
-              Back to arena
+              Generate Executive Report →
             </button>
+
           </div>
-          <div className="space-y-3">
-            {state.history.map((offer, index) => (
-              <div
-                key={`${offer.agent_id}-${offer.round}-detail`}
-                className="flex gap-3 rounded-xl border border-[#1d374d] bg-[#091521] p-3"
-              >
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#10364b] text-xs font-bold text-[#4dd0ff]">
-                  {index + 1}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                    <span className="font-bold text-white">
-                      {scenario.agents.find(
-                        (agent) => agent.id === offer.agent_id,
-                      )?.name ?? offer.agent_id}
-                    </span>
-                    <span className="text-[#66849a]">Round {offer.round}</span>
-                    <span className="font-bold text-[#c4ff3a]">
-                      {formatValue(offer.value)}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs leading-relaxed text-[#8ca6bb]">
-                    {offer.reason}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+
         </section>
+
       </div>
     </main>
   );

@@ -16,9 +16,6 @@ import { useNegotiationEngine } from "../hooks/useNegotiationEngine.js";
 import { scenarioList } from "../data/scenarios.js";
 
 
-/* ============================================================
-   VIEW TOGGLE
-============================================================ */
 
 function ViewToggle({ view, onChange }) {
   return (
@@ -63,9 +60,6 @@ function ViewToggle({ view, onChange }) {
 }
 
 
-/* ============================================================
-   MAIN PAGE
-============================================================ */
 
 export default function AgentConfiguration({ onNegotiationStart, onNegotiationReset }) {
   const {
@@ -85,10 +79,6 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
   const [view, setView] = useState("grid");
 
 
-  /* ============================================================
-     START NEGOTIATION
-  ============================================================ */
-
   function handleStartNegotiation() {
     if (!configurationValid || !selectedScenario) return;
     if (onNegotiationStart) {
@@ -98,10 +88,6 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
     }
   }
 
-
-  /* ============================================================
-     CONSTRAINT CHANGE
-  ============================================================ */
 
   function handleConstraintChange(
     agentId,

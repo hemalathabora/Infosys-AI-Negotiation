@@ -1,6 +1,4 @@
-// Designed by TEAM 4
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
@@ -11,17 +9,44 @@ import NegotiationArena from "./pages/NegotiationArena";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
+import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const [theme, setTheme] = useState("dark");
-
   const [activePage, setActivePage] = useState("Dashboard");
   const [activeScenario, setActiveScenario] = useState(null);
+
   const negotiation = useNegotiationEngine();
+  const { history, addSession, stats, clearHistory } = useNegotiationHistory();
 
   const isDark = theme === "dark";
+
+  // Auto-record completed session to history when a negotiation completes
+  useEffect(() => {
+    if (!negotiation.state || !activeScenario) return;
+
+    const { status, current_round, current_offer, history: offerHistory } = negotiation.state;
+    if (status === "agreement" || status === "deadlock") {
+      const isAgreement = status === "agreement";
+      const agentNames = activeScenario.agents.map((a) => a.name).join(" vs ");
+      const finalVal = current_offer?.value;
+      const settlementStr = finalVal ? `$${Math.round(finalVal).toLocaleString()}` : "N/A";
+      const sessionData = {
+        id: `session-${Date.now()}`,
+        scenario: activeScenario.scenario_name || activeScenario.name,
+        scenario_id: activeScenario.scenario_id,
+        agents: agentNames,
+        rounds: current_round,
+        result: isAgreement ? "Agreement" : "Deadlock",
+        utility: isAgreement ? "90%" : "40%",
+        settlement: settlementStr,
+        date: "Just now",
+        timestamp: Date.now(),
+      };
+      addSession(sessionData);
+    }
+  }, [negotiation.state?.status, activeScenario, addSession]);
 
 
   /* ============================================================
@@ -39,6 +64,11 @@ export default function App() {
           >
             <Dashboard
               onNavigate={setActivePage}
+              activeScenario={activeScenario}
+              negotiation={negotiation}
+              history={history}
+              stats={stats}
+              onClearHistory={clearHistory}
             />
           </div>
         );
@@ -75,6 +105,7 @@ export default function App() {
             scenario={activeScenario}
             negotiation={negotiation}
             onNavigate={setActivePage}
+            history={history}
           />
         );
 
@@ -85,6 +116,7 @@ export default function App() {
             scenario={activeScenario}
             negotiation={negotiation}
             onNavigate={setActivePage}
+            history={history}
           />
         );
 
@@ -97,6 +129,11 @@ export default function App() {
           >
             <Dashboard
               onNavigate={setActivePage}
+              activeScenario={activeScenario}
+              negotiation={negotiation}
+              history={history}
+              stats={stats}
+              onClearHistory={clearHistory}
             />
           </div>
         );
@@ -120,8 +157,8 @@ export default function App() {
         duration-200
         ${
           isDark
-            ? "bg-[#04070D] text-[#F1F5F9]"
-            : "bg-[#ECF4FF] text-[#0F172A]"
+            ? "bg-[#0B0F17] text-[#F8FAFC]"
+            : "bg-[#F8FAFC] text-[#0F172A]"
         }
       `}
     >
@@ -186,7 +223,3 @@ export default function App() {
     </div>
   );
 }
-
-
-// Designed by TEAM 4
-

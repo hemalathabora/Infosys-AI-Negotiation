@@ -1,10 +1,4 @@
 ﻿// Designed by TEAM 4
-const PERSONALITY_META = {
-  Aggressive: { icon: "âš¡" },
-  Collaborative: { icon: "ðŸ¤" },
-  "Risk-averse": { icon: "ðŸ›¡" },
-};
-
 const OPTIONS = ["Aggressive", "Collaborative", "Risk-averse"];
 
 /**
@@ -15,14 +9,21 @@ const OPTIONS = ["Aggressive", "Collaborative", "Risk-averse"];
 export default function PersonalityBadge({ personality, onChange }) {
   return (
     <div>
-      <h4 className="text-xs font-bold uppercase tracking-wider text-primary">Personality</h4>
+      <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
+        Personality
+      </h4>
       <div className="mt-2 flex items-center gap-2.5">
         <span
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
           aria-hidden="true"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3l7 3.5v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9v-5L12 3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+            <path
+              d="M12 3l7 3.5v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9v-5L12 3z"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            />
           </svg>
         </span>
         <div className="relative flex-1">
@@ -34,7 +35,7 @@ export default function PersonalityBadge({ personality, onChange }) {
           >
             {OPTIONS.map((opt) => (
               <option key={opt} value={opt}>
-                {PERSONALITY_META[opt].icon} {opt}
+                {opt}
               </option>
             ))}
           </select>
@@ -46,7 +47,13 @@ export default function PersonalityBadge({ personality, onChange }) {
             fill="none"
             aria-hidden="true"
           >
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
       </div>
@@ -56,4 +63,3 @@ export default function PersonalityBadge({ personality, onChange }) {
 }
 // Designed by TEAM 4
 // Designed by TEAM 4
-

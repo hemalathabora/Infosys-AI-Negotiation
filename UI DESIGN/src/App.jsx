@@ -4,11 +4,17 @@ import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
+import NegotiationArena from "./pages/NegotiationArena";
+import Analytics from "./pages/Analytics";
+import Reports from "./pages/Reports";
+import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState("Dashboard");
+  const [activeScenario, setActiveScenario] = useState(null);
+  const negotiation = useNegotiationEngine();
 
   const isDark = theme === "dark";
 
@@ -23,26 +29,39 @@ export default function App() {
       case "Configure Agents":
         return (
           <div data-guide="agent-configuration-shell" className="flex-1">
-            <AgentConfiguration />
+            <AgentConfiguration
+              onNegotiationStart={(scenario) => {
+                setActiveScenario(scenario);
+                negotiation.start(scenario);
+                setActivePage("Negotiation Arena");
+              }}
+              onNegotiationReset={negotiation.reset}
+            />
           </div>
         );
       case "Negotiation Arena":
         return (
-          <div data-guide="negotiation-arena" className="flex-1 bg-[#04070D] p-6 text-white">
-            Negotiation arena placeholder
-          </div>
+          <NegotiationArena
+            scenario={activeScenario}
+            negotiation={negotiation}
+            onNavigate={setActivePage}
+          />
         );
       case "Analytics":
         return (
-          <div data-guide="reports-panel" className="flex-1 bg-[#04070D] p-6 text-white">
-            Analytics page placeholder
-          </div>
+          <Analytics
+            scenario={activeScenario}
+            negotiation={negotiation}
+            onNavigate={setActivePage}
+          />
         );
       case "Reports":
         return (
-          <div data-guide="reports-panel" className="flex-1 bg-[#04070D] p-6 text-white">
-            Reports page placeholder
-          </div>
+          <Reports
+            scenario={activeScenario}
+            negotiation={negotiation}
+            onNavigate={setActivePage}
+          />
         );
       default:
         return (
@@ -79,4 +98,3 @@ export default function App() {
 }
 // Designed by TEAM 4
 // Designed by TEAM 4
-

@@ -1,24 +1,44 @@
 ﻿// Designed by TEAM 4
 const STATUS_META = {
-  not_started: { label: "Not Started", classes: "bg-white/5 text-textSecondary border-border" },
-  in_progress: { label: "In Progress", classes: "bg-primary/15 text-primaryBright border-primary/30" },
-  agreement: { label: "Agreement", classes: "bg-success/15 text-success border-success/30" },
-  rejected: { label: "Rejected", classes: "bg-warning/15 text-warning border-warning/30" },
-  deadlock: { label: "Deadlock", classes: "bg-warning/15 text-warning border-warning/30" },
-  completed: { label: "Completed", classes: "bg-primary/15 text-primaryBright border-primary/30" },
+  not_started: {
+    label: "Not Started",
+    classes: "bg-white/5 text-textSecondary border-border",
+  },
+  in_progress: {
+    label: "In Progress",
+    classes: "bg-primary/15 text-primaryBright border-primary/30",
+  },
+  agreement: {
+    label: "Agreement",
+    classes: "bg-success/15 text-success border-success/30",
+  },
+  rejected: {
+    label: "Rejected",
+    classes: "bg-warning/15 text-warning border-warning/30",
+  },
+  deadlock: {
+    label: "Deadlock",
+    classes: "bg-warning/15 text-warning border-warning/30",
+  },
+  completed: {
+    label: "Completed",
+    classes: "bg-primary/15 text-primaryBright border-primary/30",
+  },
 };
 
 function StatusBadge({ status }) {
   const meta = STATUS_META[status] ?? STATUS_META.not_started;
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${meta.classes}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${meta.classes}`}
+    >
       {meta.label}
     </span>
   );
 }
 
 function formatValue(value) {
-  if (value === null || value === undefined) return "â€”";
+  if (value === null || value === undefined) return "N/A";
   return `$${Math.round(value).toLocaleString()}`;
 }
 
@@ -48,7 +68,8 @@ export default function NegotiationSessionPanel({
             Negotiation Session
           </h3>
           <p className="mt-1 text-sm text-textSecondary">
-            Round-based simulation driven by the rule-based Orchestrator prototype â€” no LLM involved yet.
+            Round-based simulation driven by the rule-based Orchestrator
+            prototype - no LLM involved yet.
           </p>
         </div>
         <StatusBadge status={state.status} />
@@ -57,22 +78,38 @@ export default function NegotiationSessionPanel({
       {/* State model summary */}
       <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">Round</p>
-          <p className="mt-1 text-lg font-bold text-textPrimary">{state.current_round}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">Turn</p>
-          <p className="mt-1 text-sm font-bold text-textPrimary">
-            {isDone ? "â€”" : agentLabel(scenario.agents, state.current_agent_turn)}
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">
+            Round
+          </p>
+          <p className="mt-1 text-lg font-bold text-textPrimary">
+            {state.current_round}
           </p>
         </div>
         <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">Previous Offer</p>
-          <p className="mt-1 text-sm font-bold text-textPrimary">{formatValue(state.previous_offer?.value)}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">
+            Turn
+          </p>
+          <p className="mt-1 text-sm font-bold text-textPrimary">
+            {isDone
+              ? "Complete"
+              : agentLabel(scenario.agents, state.current_agent_turn)}
+          </p>
         </div>
         <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">Current Offer</p>
-          <p className="mt-1 text-sm font-bold text-textPrimary">{formatValue(state.current_offer?.value)}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">
+            Previous Offer
+          </p>
+          <p className="mt-1 text-sm font-bold text-textPrimary">
+            {formatValue(state.previous_offer?.value)}
+          </p>
+        </div>
+        <div className="rounded-xl border border-border bg-cardAlt px-3.5 py-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-textSecondary">
+            Current Offer
+          </p>
+          <p className="mt-1 text-sm font-bold text-textPrimary">
+            {formatValue(state.current_offer?.value)}
+          </p>
         </div>
       </div>
 
@@ -92,7 +129,7 @@ export default function NegotiationSessionPanel({
           disabled={isRunning || isDone}
           className="rounded-lg border border-primary/40 bg-primary/10 px-3.5 py-2 text-xs font-semibold text-primaryBright transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {isRunning ? "Runningâ€¦" : "Run to completion"}
+          {isRunning ? "Running..." : "Run to completion"}
         </button>
         <button
           type="button"
@@ -118,14 +155,18 @@ export default function NegotiationSessionPanel({
             <tbody>
               {state.history.map((offer, i) => (
                 <tr key={i} className="border-b border-border/60 last:border-0">
-                  <td className="px-3 py-2 text-textSecondary">{offer.round}</td>
+                  <td className="px-3 py-2 text-textSecondary">
+                    {offer.round}
+                  </td>
                   <td className="px-3 py-2 font-semibold text-textPrimary">
                     {agentLabel(scenario.agents, offer.agent_id)}
                   </td>
                   <td className="px-3 py-2 font-semibold text-primaryBright">
                     {formatValue(offer.value)}
                   </td>
-                  <td className="px-3 py-2 text-textSecondary">{offer.reason}</td>
+                  <td className="px-3 py-2 text-textSecondary">
+                    {offer.reason}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -141,7 +182,10 @@ export default function NegotiationSessionPanel({
           </h4>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {Object.entries(timeline).map(([agentId, entries]) => (
-              <div key={agentId} className="rounded-xl border border-border bg-cardAlt p-3.5">
+              <div
+                key={agentId}
+                className="rounded-xl border border-border bg-cardAlt p-3.5"
+              >
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-sm font-semibold text-textPrimary">
                     {agentLabel(scenario.agents, agentId)}
@@ -158,7 +202,13 @@ export default function NegotiationSessionPanel({
                     >
                       R{e.round}: {formatValue(e.value)}
                       {e.delta !== null && (
-                        <span className={e.delta === 0 ? "text-textSecondary" : "text-primaryBright"}>
+                        <span
+                          className={
+                            e.delta === 0
+                              ? "text-textSecondary"
+                              : "text-primaryBright"
+                          }
+                        >
                           {" "}
                           ({e.delta > 0 ? "+" : ""}
                           {Math.round(e.delta).toLocaleString()})
@@ -177,4 +227,3 @@ export default function NegotiationSessionPanel({
 }
 // Designed by TEAM 4
 // Designed by TEAM 4
-

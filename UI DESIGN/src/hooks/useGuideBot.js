@@ -7,7 +7,17 @@ import {
 const STORAGE_KEY = "negotiation-guide-bot-state";
 
 export function useGuideBot(currentPage = "Dashboard") {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
+      if (typeof saved.isOpen === "boolean") {
+        return saved.isOpen;
+      }
+    } catch {
+      // ignore malformed storage
+    }
+    return false;
+  });
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -16,17 +26,6 @@ export function useGuideBot(currentPage = "Dashboard") {
       text: "Hi! I'm your Negotiation Guide. I can help you understand the platform and guide you through each step.",
     },
   ]);
-
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {};
-      if (typeof saved.isOpen === "boolean") {
-        setIsOpen(saved.isOpen);
-      }
-    } catch {
-      // ignore malformed storage
-    }
-  }, []);
 
   useEffect(() => {
     localStorage.setItem(

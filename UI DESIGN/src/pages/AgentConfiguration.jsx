@@ -1,18 +1,18 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 import { useState } from "react";
 
 import ScenarioDescription from "../components/ScenarioDescription";
 import AgentCard from "../components/AgentCard";
-import ConfigurationStatus from "../components/ConfigurationStatus";
-import PersonalitiesInfoPanel from "../components/PersonalitiesInfoPanel";
 import StartNegotiationButton from "../components/StartNegotiationButton";
 import ReadyBanner from "../components/ReadyBanner";
 import LoadingState from "../components/LoadingState";
 import ErrorState from "../components/ErrorState";
 import EmptyState from "../components/EmptyState";
+import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
 
 import { useScenarioConfiguration } from "../hooks/useScenarioConfiguration.js";
+import { useNegotiationEngine } from "../hooks/useNegotiationEngine.js";
 import { scenarioList } from "../data/scenarios.js";
 
 
@@ -67,7 +67,7 @@ function ViewToggle({ view, onChange }) {
    MAIN PAGE
 ============================================================ */
 
-export default function AgentConfiguration() {
+export default function AgentConfiguration({ onNegotiationStart, onNegotiationReset }) {
   const {
     selectedScenarioId,
     selectedScenario,
@@ -91,7 +91,11 @@ export default function AgentConfiguration() {
 
   function handleStartNegotiation() {
     if (!configurationValid || !selectedScenario) return;
-    negotiation.start(selectedScenario);
+    if (onNegotiationStart) {
+      onNegotiationStart(selectedScenario);
+    } else {
+      negotiation.start(selectedScenario);
+    }
   }
 
 
@@ -117,7 +121,11 @@ export default function AgentConfiguration() {
   ============================================================ */
 
   function handleScenarioChange(scenarioId) {
-    negotiation.reset();
+    if (onNegotiationReset) {
+      onNegotiationReset();
+    } else {
+      negotiation.reset();
+    }
     selectScenario(scenarioId);
   }
 
@@ -209,15 +217,13 @@ export default function AgentConfiguration() {
               Choose the business situation you want the AI agents to negotiate.
             </p>
 
-          </div>
-
 
 
           {/* Scenario Cards */}
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 
-            {scenarioList.map((scenario, index) => {
+            {scenarioList.map((scenario) => {
 
               const isActive =
                 scenario.id === selectedScenarioId;
@@ -249,7 +255,7 @@ export default function AgentConfiguration() {
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-[#7fa7c0]">
                     Scenario {scenarioList.findIndex((item) => item.id === scenario.id) + 1}
                   </p>
-                  <p className="mt-2 text-2xl font-extrabold text-white">{scenario.name}</p>
+                  <p className="mt-2 text-2xl font-extrabold text-[#F1F5F9]">{scenario.name}</p>
                 </button>
               );
 
@@ -285,7 +291,7 @@ export default function AgentConfiguration() {
                   <path d="M3 19a6 6 0 0112 0M14.5 19a4.5 4.5 0 019 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
                 </svg>
 
-              </div>
+              </span>
 
 
               <div>

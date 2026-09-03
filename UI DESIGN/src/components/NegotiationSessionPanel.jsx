@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 const STATUS_META = {
   not_started: { label: "Not Started", classes: "bg-white/5 text-textSecondary border-border" },
@@ -300,8 +300,8 @@ export default function NegotiationSessionPanel({
               </div>
             ))}
           </div>
-
-        )}
+        </div>
+      )}
 
     </div>
   );

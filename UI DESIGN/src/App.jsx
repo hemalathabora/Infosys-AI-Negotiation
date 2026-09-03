@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 import { useState } from "react";
 
@@ -71,17 +71,21 @@ export default function App() {
 
       case "Analytics":
         return (
-          <div data-guide="reports-panel" className="flex-1 bg-[#04070D] p-6 text-white">
-            Analytics page placeholder
-          </div>
+          <Analytics
+            scenario={activeScenario}
+            negotiation={negotiation}
+            onNavigate={setActivePage}
+          />
         );
 
 
       case "Reports":
         return (
-          <div data-guide="reports-panel" className="flex-1 bg-[#04070D] p-6 text-white">
-            Reports page placeholder
-          </div>
+          <Reports
+            scenario={activeScenario}
+            negotiation={negotiation}
+            onNavigate={setActivePage}
+          />
         );
 
 

@@ -1,10 +1,10 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 export default function TopNavigation({
   onMenuToggle,
   theme,
-  onThemeChange,
-  activePage,
+  _onThemeChange,
+  _activePage,
 }) {
   const isDark = theme === "dark";
 

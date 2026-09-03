@@ -21,17 +21,17 @@ import {
 /**
  * Maximum number of complete negotiation rounds.
  *
- * IMPORTANT:
- * One round contains BOTH agents.
+ * One complete round contains both agent turns.
  *
  * Example:
+ *
  * Round 1:
- *   Agent 1 -> offer
- *   Agent 2 -> response
+ *   Agent 1 -> Offer
+ *   Agent 2 -> Response
  *
  * Round 2:
- *   Agent 1 -> offer
- *   Agent 2 -> response
+ *   Agent 1 -> Offer
+ *   Agent 2 -> Response
  */
 const MAX_ROUNDS = 8;
 
@@ -42,13 +42,15 @@ export class Orchestrator {
   constructor(scenario) {
     this.scenario = scenario;
 
-    // Create initial negotiation state.
+    // Create the initial negotiation state.
     this.state = createNegotiationState(scenario);
 
     /**
-     * Store the effective position/constraint of every agent.
+     * Store the effective negotiation position
+     * of every agent.
      *
      * Example:
+     *
      * {
      *   candidate: {
      *     direction: "maximize",
@@ -63,7 +65,9 @@ export class Orchestrator {
     this.positions = {};
 
     for (const agent of scenario.agents) {
-      const derived = deriveLimitFromConstraints(agent.constraints);
+      const derived = deriveLimitFromConstraints(
+        agent.constraints,
+      );
 
       this.positions[agent.id] =
         derived ?? {
@@ -72,10 +76,12 @@ export class Orchestrator {
         };
     }
 
-    // Order in which agents take turns.
-    this.agentOrder = scenario.agents.map((agent) => agent.id);
+    // Store the order in which agents take turns.
+    this.agentOrder = scenario.agents.map(
+      (agent) => agent.id,
+    );
 
-    // First agent starts every new round.
+    // The first agent starts every new round.
     this.firstAgentId = this.agentOrder[0] ?? null;
   }
 
@@ -121,9 +127,14 @@ export class Orchestrator {
    * @returns {string|null}
    */
   getNextAgent(currentAgentId) {
-    const index = this.agentOrder.indexOf(currentAgentId);
+    const index = this.agentOrder.indexOf(
+      currentAgentId,
+    );
 
-    if (index === -1 || this.agentOrder.length === 0) {
+    if (
+      index === -1 ||
+      this.agentOrder.length === 0
+    ) {
       return null;
     }
 
@@ -133,47 +144,40 @@ export class Orchestrator {
   }
 
   /**
-   * Determines which negotiation round the current agent belongs to.
+   * Determines which negotiation round
+   * the current agent belongs to.
    *
-   * ROUND RULE:
-   *
-   * First agent:
-   *   - If negotiation hasn't started -> Round 1
-   *   - If previous round was completed -> next round
-   *
-   * Second agent:
-   *   - Stays in the SAME round as the first agent.
-   *
-   * Example:
+   * Round convention:
    *
    * Initial:
-   *   Round 0, Candidate
+   *   Round 0 -> Agent 1
    *
-   * Candidate acts:
-   *   Round 1, Employer's turn
+   * Agent 1 acts:
+   *   Round 1 -> Agent 2
    *
-   * Employer acts:
-   *   Round 1, Candidate's turn
+   * Agent 2 acts:
+   *   Round 1 -> Agent 1
    *
-   * Candidate acts:
-   *   Round 2, Employer's turn
+   * Agent 1 acts:
+   *   Round 2 -> Agent 2
    *
-   * Employer acts:
-   *   Round 2, Candidate's turn
+   * Agent 2 acts:
+   *   Round 2 -> Agent 1
    *
    * @param {string} agentId
    * @returns {number}
    */
   getRoundForCurrentTurn(agentId) {
-    // First move of the entire negotiation.
+    // First move of the negotiation.
     if (this.state.current_round === 0) {
       return 1;
     }
 
     /**
-     * When the first agent acts again, a NEW round begins.
+     * When the first agent acts again,
+     * a new round begins.
      *
-     * When the second agent acts, it remains inside
+     * The second agent stays inside
      * the current round.
      */
     if (agentId === this.firstAgentId) {
@@ -184,7 +188,11 @@ export class Orchestrator {
   }
 
   /**
-   * Checks whether the current agent is starting a new round.
+   * Checks whether the current agent
+   * is starting a new round.
+   *
+   * @param {string} agentId
+   * @returns {boolean}
    */
   isStartingNewRound(agentId) {
     return (
@@ -194,70 +202,82 @@ export class Orchestrator {
   }
 
   /**
-   * Advances the negotiation by exactly ONE AGENT TURN.
+   * Advances the negotiation by exactly
+   * ONE agent turn.
    *
-   * IMPORTANT:
-   * One `step()` = one agent action.
+   * One step() = one agent action.
    *
-   * But two `step()` calls normally represent ONE complete round.
+   * Normally:
    *
-   * Example:
-   *
-   * step()
-   * Candidate -> Round 1
-   *
-   * step()
-   * Employer -> Round 1
-   *
-   * step()
-   * Candidate -> Round 2
-   *
-   * step()
-   * Employer -> Round 2
+   * Step 1 -> Agent 1, Round 1
+   * Step 2 -> Agent 2, Round 1
+   * Step 3 -> Agent 1, Round 2
+   * Step 4 -> Agent 2, Round 2
    *
    * @returns {import("../types/negotiation").NegotiationState}
    */
   step() {
-    // Do nothing if negotiation is already finished.
+    /**
+     * Do nothing if the negotiation
+     * has already reached a terminal state.
+     */
     if (
-      this.state.status === NEGOTIATION_STATUS.AGREEMENT ||
-      this.state.status === NEGOTIATION_STATUS.REJECTED ||
-      this.state.status === NEGOTIATION_STATUS.DEADLOCK ||
-      this.state.status === NEGOTIATION_STATUS.COMPLETED
+      this.state.status ===
+        NEGOTIATION_STATUS.AGREEMENT ||
+      this.state.status ===
+        NEGOTIATION_STATUS.REJECTED ||
+      this.state.status ===
+        NEGOTIATION_STATUS.DEADLOCK ||
+      this.state.status ===
+        NEGOTIATION_STATUS.COMPLETED
     ) {
       return this.state;
     }
 
-    const agentId = this.state.current_agent_turn;
+    const agentId =
+      this.state.current_agent_turn;
 
     if (!agentId) {
       return this.state;
     }
 
-    const position = this.positions[agentId];
+    const position =
+      this.positions[agentId];
 
     if (!position) {
       return this.state;
     }
 
-    /**
-     * Determine the actual negotiation round.
-     *
-     * This is the important fix.
-     *
-     * We no longer do:
-     *
-     * current_round + 1
-     *
-     * for every agent.
-     */
-    const round = this.getRoundForCurrentTurn(agentId);
+    const agent = this.scenario.agents.find(
+      (item) => item.id === agentId,
+    );
 
-    // Safety check for maximum rounds.
+    if (!agent) {
+      return this.state;
+    }
+
+    /**
+     * Determine the actual round.
+     *
+     * Important:
+     * We do NOT simply increment the round
+     * after every agent action.
+     */
+    const round =
+      this.getRoundForCurrentTurn(agentId);
+
+    /**
+     * Safety check.
+     *
+     * If the calculated round is greater than
+     * the maximum allowed rounds, the negotiation
+     * ends in deadlock.
+     */
     if (round > MAX_ROUNDS) {
       this.state = {
         ...this.state,
-        status: NEGOTIATION_STATUS.DEADLOCK,
+        status:
+          NEGOTIATION_STATUS.DEADLOCK,
         current_agent_turn: null,
       };
 
@@ -269,37 +289,39 @@ export class Orchestrator {
      * OPENING MOVE
      * ---------------------------------------------------------
      *
-     * There is no previous offer.
-     *
-     * The first agent creates an opening anchor offer.
+     * If there is no current offer, the current agent
+     * creates the opening anchor offer.
      */
     if (!this.state.current_offer) {
       const value = anchorOffer(
         position.direction,
-        position.limit
+        position.limit,
       );
 
-      const agent = this.scenario.agents.find(
-        (item) => item.id === agentId
-      );
-
-      const personality = agent?.personality ?? "Unknown";
+      const personality =
+        agent.personality ?? "Unknown";
 
       const offer = createOffer({
         agent_id: agentId,
         round,
         value,
-        reason: `Opening anchor offer (${personality}).`,
+        reason:
+          `Opening anchor offer based on ` +
+          `the ${personality} personality.`,
       });
 
-      // The other agent responds in the SAME round.
-      const nextAgent = this.getNextAgent(agentId);
+      /**
+       * The other agent responds in
+       * the SAME negotiation round.
+       */
+      const nextAgent =
+        this.getNextAgent(agentId);
 
       this.state = applyOffer(
         this.state,
         offer,
         nextAgent,
-        NEGOTIATION_STATUS.IN_PROGRESS
+        NEGOTIATION_STATUS.IN_PROGRESS,
       );
 
       return this.state;
@@ -310,43 +332,58 @@ export class Orchestrator {
      * RESPONSE MOVE
      * ---------------------------------------------------------
      *
-     * The current agent evaluates the previous agent's offer.
+     * The current agent evaluates the
+     * incoming offer.
      */
-    const incoming = this.state.current_offer;
+    const incoming =
+      this.state.current_offer;
 
-    const agent = this.scenario.agents.find(
-      (item) => item.id === agentId
-    );
-
-    const personality = agent?.personality ?? "Unknown";
+    const personality =
+      agent.personality ?? "Unknown";
 
     /**
-     * Find the current agent's previous offer.
+     * Find the current agent's most recent offer.
      *
-     * This helps the decision logic determine the size/direction
-     * of a concession.
+     * This is used as the agent's previous
+     * negotiating position.
      */
-    const ownLastOffer = [...this.state.history]
-      .reverse()
-      .find((offer) => offer.agent_id === agentId);
+    const ownLastOffer =
+      [...this.state.history]
+        .reverse()
+        .find(
+          (offer) =>
+            offer.agent_id === agentId,
+        );
 
     const ownLastValue = ownLastOffer
       ? ownLastOffer.value
       : anchorOffer(
           position.direction,
-          position.limit
+          position.limit,
         );
 
     /**
-     * Rule-based decision engine.
+     * ---------------------------------------------------------
+     * RULE-BASED DECISION ENGINE
+     * ---------------------------------------------------------
      *
-     * The decision can be:
+     * The decision is based on:
+     *
+     * 1. Agent goal
+     * 2. Agent constraint
+     * 3. Agent personality
+     * 4. Previous offer
+     * 5. Incoming offer
+     * 6. Current round
+     *
+     * Possible decisions:
      *
      * ACCEPT
      * REJECT
      * COUNTEROFFER
      */
     const result = decide({
+      goal: agent.goal,
       direction: position.direction,
       limit: position.limit,
       personality,
@@ -361,7 +398,9 @@ export class Orchestrator {
      * ACCEPT
      * ---------------------------------------------------------
      */
-    if (result.decision === DECISIONS.ACCEPT) {
+    if (
+      result.decision === DECISIONS.ACCEPT
+    ) {
       const offer = createOffer({
         agent_id: agentId,
         round,
@@ -370,15 +409,16 @@ export class Orchestrator {
       });
 
       /**
-       * Negotiation is complete.
+       * Agreement has been reached.
        *
-       * No next agent is needed.
+       * There is no next agent because
+       * the negotiation is finished.
        */
       this.state = applyOffer(
         this.state,
         offer,
         null,
-        NEGOTIATION_STATUS.AGREEMENT
+        NEGOTIATION_STATUS.AGREEMENT,
       );
 
       return this.state;
@@ -389,7 +429,9 @@ export class Orchestrator {
      * REJECT
      * ---------------------------------------------------------
      */
-    if (result.decision === DECISIONS.REJECT) {
+    if (
+      result.decision === DECISIONS.REJECT
+    ) {
       const offer = createOffer({
         agent_id: agentId,
         round,
@@ -398,13 +440,22 @@ export class Orchestrator {
       });
 
       /**
-       * Negotiation ends in deadlock/rejection.
+       * IMPORTANT:
+       *
+       * REJECTED and DEADLOCK are different states.
+       *
+       * REJECTED:
+       *   An agent explicitly rejects the offer.
+       *
+       * DEADLOCK:
+       *   Maximum rounds are reached without
+       *   reaching an agreement.
        */
       this.state = applyOffer(
         this.state,
         offer,
         null,
-        NEGOTIATION_STATUS.DEADLOCK
+        NEGOTIATION_STATUS.REJECTED,
       );
 
       return this.state;
@@ -415,59 +466,71 @@ export class Orchestrator {
      * COUNTEROFFER
      * ---------------------------------------------------------
      */
+    const nextValue =
+      Number.isFinite(result.nextValue)
+        ? result.nextValue
+        : incoming.value;
+
     const offer = createOffer({
       agent_id: agentId,
       round,
-      value: result.nextValue,
+      value: nextValue,
       reason: result.reason,
     });
 
     /**
-     * The next agent acts.
+     * Move to the next agent.
      *
-     * If Employer just acted:
-     *
-     * Employer -> Candidate
-     *
-     * Candidate is the first agent, so the NEXT step
-     * will automatically start Round + 1.
-     *
-     * If Candidate just acted:
+     * Example:
      *
      * Candidate -> Employer
      *
-     * Employer stays in the SAME round.
+     * Employer -> Candidate
+     *
+     * When Candidate becomes active again,
+     * getRoundForCurrentTurn() starts the
+     * next round.
      */
-    const nextAgent = this.getNextAgent(agentId);
+    const nextAgent =
+      this.getNextAgent(agentId);
 
     this.state = applyOffer(
       this.state,
       offer,
       nextAgent,
-      NEGOTIATION_STATUS.IN_PROGRESS
+      NEGOTIATION_STATUS.IN_PROGRESS,
     );
 
     return this.state;
   }
 
   /**
-   * Runs the complete negotiation.
+   * Runs the complete negotiation automatically.
    *
-   * Since one round contains two agent turns,
-   * MAX_ROUNDS * 2 is the maximum number of steps.
+   * Since one round contains two agent turns:
+   *
+   * MAX_ROUNDS * number of agents
+   *
+   * is the maximum number of steps.
    *
    * @returns {import("../types/negotiation").NegotiationState}
    */
   runToCompletion() {
     let guard = 0;
 
-    const MAX_STEPS = MAX_ROUNDS * this.agentOrder.length;
+    const MAX_STEPS =
+      MAX_ROUNDS *
+      this.agentOrder.length;
 
     while (
-      this.state.status !== NEGOTIATION_STATUS.AGREEMENT &&
-      this.state.status !== NEGOTIATION_STATUS.REJECTED &&
-      this.state.status !== NEGOTIATION_STATUS.DEADLOCK &&
-      this.state.status !== NEGOTIATION_STATUS.COMPLETED &&
+      this.state.status !==
+        NEGOTIATION_STATUS.AGREEMENT &&
+      this.state.status !==
+        NEGOTIATION_STATUS.REJECTED &&
+      this.state.status !==
+        NEGOTIATION_STATUS.DEADLOCK &&
+      this.state.status !==
+        NEGOTIATION_STATUS.COMPLETED &&
       guard < MAX_STEPS
     ) {
       this.step();
@@ -475,16 +538,19 @@ export class Orchestrator {
     }
 
     /**
-     * If the maximum number of rounds is reached without
-     * agreement or rejection, mark it as deadlock.
+     * If all allowed steps have been used
+     * and the negotiation is still active,
+     * mark it as DEADLOCK.
      */
     if (
       guard >= MAX_STEPS &&
-      this.state.status === NEGOTIATION_STATUS.IN_PROGRESS
+      this.state.status ===
+        NEGOTIATION_STATUS.IN_PROGRESS
     ) {
       this.state = {
         ...this.state,
-        status: NEGOTIATION_STATUS.DEADLOCK,
+        status:
+          NEGOTIATION_STATUS.DEADLOCK,
         current_agent_turn: null,
       };
     }

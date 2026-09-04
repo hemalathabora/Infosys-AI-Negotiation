@@ -62,60 +62,69 @@ export default function Dashboard({
   });
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] flex-1 bg-bg px-4 py-8 sm:px-8 text-textPrimary animate-fadeIn">
-      <div className="mx-auto max-w-7xl space-y-8">
+    <main className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
+      <div className="mx-auto max-w-7xl space-y-6">
 
         {/* =====================================================
-            DASHBOARD HEADER
+            BREADCRUMB & HEADER BAR MATCHING REFERENCE IMAGE
         ====================================================== */}
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-6">
+        <div className="flex flex-col gap-5 border-b border-[#292831] pb-6">
+          {/* Breadcrumb Header */}
 
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-              <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-400">
-                EXECUTIVE DASHBOARD & REAL-TIME ENGINE
-              </span>
+          {/* Project Action Pills Row */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div className="flex flex-wrap items-center gap-2">
+
+
+              {/* Indexes Counter Pill */}
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#302F39] bg-[#1E1D24] px-4 py-2 text-xs font-medium text-slate-300 hover:bg-[#25242D] transition"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                </svg>
+                {stats.totalSimulations} Simulations
+              </button>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-textPrimary font-sans">
-              Negotiation Command Center
-            </h1>
+            {/* Right Header Buttons: Red Delete + Pink Create */}
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onClearHistory}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#522026] bg-[#35161B] px-3.5 py-2 text-xs font-medium text-[#F87171] hover:bg-[#451B21] transition"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                Reset Engine History
+              </button>
 
-            <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
-              Live multi-agent execution telemetry, persistent audit log, and statistical convergence.
-            </p>
+              <button
+                type="button"
+                onClick={() => onNavigate("Configure Agents")}
+                className="
+                  inline-flex items-center gap-2
+                  rounded-xl
+                  bg-slate-100 hover:bg-white
+                  px-4 py-2
+                  text-xs sm:text-sm
+                  font-bold
+                  text-slate-950
+                  border border-slate-200
+                  shadow-md
+                  transition-all
+                  duration-150
+                  active:scale-95
+                "
+              >
+                <span className="text-base font-bold">+</span>
+                Configure New Session
+              </button>
+            </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => onNavigate("Configure Agents")}
-              className="
-                inline-flex items-center gap-2
-                rounded-xl
-                bg-gradient-to-r from-indigo-600 via-indigo-500 to-blue-600
-                px-5
-                py-2.5
-                text-xs sm:text-sm
-                font-semibold
-                text-white
-                shadow-glowSm
-                transition-all
-                duration-200
-                hover:-translate-y-0.5
-                hover:shadow-glow
-                active:translate-y-0
-              "
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              Configure New Session
-            </button>
-          </div>
-
         </div>
 
 

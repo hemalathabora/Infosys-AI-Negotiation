@@ -1,13 +1,9 @@
-﻿// Designed by TEAM 4
 import { useState } from "react";
 import AgentHeader, { AgentIdentity } from "./AgentHeader";
 import GoalSection from "./GoalSection";
 import ConstraintList from "./ConstraintList";
 import PersonalityBadge from "./PersonalityBadge";
 
-/**
- * @param {{ agent: import('../types/negotiation').Agent, index: number }} props
- */
 export default function AgentCard({ agent, index, onConstraintChange }) {
   const [personality, setPersonality] = useState(agent.personality);
 
@@ -25,7 +21,7 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
 
   return (
     <article
-      className="animate-fadeIn flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-card transition-shadow hover:shadow-cardHover sm:p-6"
+      className="animate-fadeIn flex flex-col gap-5 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-5 sm:p-6 shadow-md transition-all hover:border-[#3E3D49]"
       aria-labelledby={`agent-${agent.id}-name`}
     >
       <AgentHeader index={index} />
@@ -35,62 +31,38 @@ export default function AgentCard({ agent, index, onConstraintChange }) {
         headingId={`agent-${agent.id}-name`}
       />
 
-      <div className="h-px w-full bg-border" />
+      <div className="h-px w-full bg-[#2B2A33]" />
 
       <GoalSection goal={agent.goal} />
+
       <ConstraintList
         constraints={agent.constraints}
         onChange={handleConstraintChange}
       />
+
       <PersonalityBadge personality={personality} onChange={setPersonality} />
 
-      <div className="h-px w-full bg-border" />
+      <div className="h-px w-full bg-[#2B2A33]" />
 
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2 text-xs font-mono">
         {isConfigured ? (
-          <>
-            <span
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-success/20 text-success"
-              aria-hidden="true"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M5 12.5l4.5 4.5L19 7.5"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-            <span className="font-semibold text-success">Configured</span>
-          </>
+          <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-emerald-400">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span className="font-semibold">CONFIGURATION COMPLETE</span>
+          </div>
         ) : (
-          <>
-            <span className="text-warning" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 4l9 16H3L12 4z"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 9v5M12 17h.01"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-            <span className="font-semibold text-warning">
-              Incomplete configuration
-            </span>
-          </>
+          <div className="flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-amber-400">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span className="font-semibold">INCOMPLETE CONFIGURATION</span>
+          </div>
         )}
       </div>
     </article>
   );
 }
-// Designed by TEAM 4
-// Designed by TEAM 4

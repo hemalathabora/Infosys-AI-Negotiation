@@ -14,36 +14,41 @@ export default {
        */
 
       colors: {
-        // Application backgrounds & surfaces
-        bg: "#0B0F17",
-        header: "#0B0F17",
-        sidebar: "#0F172A",
+        // Outer Application & Sidebar (Matte Pitch Black like reference image left part)
+        bg: "#0C0C0F",
+        header: "#0C0C0F",
+        sidebar: "#0C0C0F",
 
-        // Elevated Cards & Glass Panels
-        card: "#131C2E",
-        cardAlt: "#18243B",
+        // Elevated Main Panel (Right part warm dark charcoal container from image)
+        mainPanel: "#17161B",
+
+        // Inset Cards & Inner Surfaces
+        card: "#201F25",
+        cardAlt: "#25242C",
 
         // Borders & Dividers
-        border: "#1E293B",
-        borderGlow: "#334155",
+        border: "#2A2931",
+        borderSubtle: "#302F39",
+        borderGlow: "#3D3B48",
 
-        // Core Accents: Indigo & Azure
-        primary: "#6366F1",
-        primaryBright: "#818CF8",
+        // Primary Brand Accent: Clean Off-White / White
+        primary: "#F8FAFC",
+        primaryBright: "#FFFFFF",
+        brandWhite: "#F1F5F9",
         azure: "#3B82F6",
         azureBright: "#60A5FA",
 
-        // Status Colors (Refined Corporate Tones)
+        // Status & Badge Tones
         success: "#10B981",
         successBright: "#34D399",
         warning: "#F59E0B",
         warningBright: "#FBBF24",
         danger: "#EF4444",
 
-        // Professional Typography Hierarchy
+        // Typography Hierarchy
         textPrimary: "#F8FAFC",
-        textSecondary: "#94A3B8",
-        textMuted: "#64748B",
+        textSecondary: "#A1A1AA",
+        textMuted: "#71717A",
       },
 
       /*

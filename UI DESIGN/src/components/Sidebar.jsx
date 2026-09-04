@@ -12,7 +12,7 @@ function NavIcon({ name, active }) {
     height: 18,
     viewBox: "0 0 24 24",
     fill: "none",
-    stroke: active ? "#818CF8" : "currentColor",
+    stroke: active ? "#FFFFFF" : "currentColor",
     strokeWidth: 2,
     strokeLinecap: "round",
     strokeLinejoin: "round",
@@ -41,16 +41,16 @@ export default function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
           type="button"
           aria-label="Close menu overlay"
           onClick={onClose}
-          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm lg:hidden"
         />
       )}
       <aside
-        className={`fixed z-40 flex h-full w-64 shrink-0 flex-col border-r border-border/80 bg-sidebar/95 p-3.5 transition-transform duration-200 lg:sticky lg:top-16 lg:z-0 lg:h-[calc(100vh-4rem)] lg:translate-x-0 ${
+        className={`fixed z-40 flex h-full w-60 shrink-0 flex-col border-r border-[#1F1E26] bg-[#0C0C0F] p-3 transition-transform duration-200 lg:sticky lg:top-16 lg:z-0 lg:h-[calc(100vh-5rem)] lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="mb-3 px-3 pt-2">
-          <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-textMuted">
+        <div className="mb-2 px-3 pt-2">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#61606E]">
             Main Menu
           </p>
         </div>
@@ -69,11 +69,11 @@ export default function Sidebar({ isOpen, onClose, activePage, onNavigate }) {
                 aria-current={active ? "page" : undefined}
                 className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-all duration-150 ${
                   active
-                    ? "bg-gradient-to-r from-indigo-500/15 via-indigo-500/5 to-transparent text-textPrimary font-semibold border-l-2 border-indigo-500 shadow-glowSm"
-                    : "text-textSecondary hover:bg-white/[0.04] hover:text-textPrimary border-l-2 border-transparent"
+                    ? "bg-[#222129] text-white font-semibold border-l-2 border-slate-100 shadow-sm"
+                    : "text-[#9494A0] hover:bg-[#16151C] hover:text-white border-l-2 border-transparent"
                 }`}
               >
-                <div className={`transition-transform group-hover:scale-110 ${active ? "text-primaryBright" : "text-textMuted group-hover:text-textSecondary"}`}>
+                <div className={`transition-transform group-hover:scale-105 ${active ? "text-white" : "text-[#71707E] group-hover:text-[#9494A0]"}`}>
                   <NavIcon name={item.icon} active={active} />
                 </div>
                 <div className="flex flex-col min-w-0">

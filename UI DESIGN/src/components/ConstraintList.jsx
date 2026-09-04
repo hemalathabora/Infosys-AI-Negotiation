@@ -33,11 +33,11 @@ function parseConstraint(constraint) {
 
 export default function ConstraintList({ constraints, onChange }) {
   return (
-    <div>
+    <div className="space-y-2.5">
       <h4 className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
         Negotiation Constraints
       </h4>
-      <ul className="mt-2.5 flex flex-col gap-2">
+      <ul className="flex flex-col gap-2.5">
         {constraints.map((constraint, index) => {
           const { label, value, defaultValue } = parseConstraint(constraint);
           const currentValue = value ?? defaultValue ?? 0;
@@ -45,16 +45,16 @@ export default function ConstraintList({ constraints, onChange }) {
           return (
             <li
               key={`${label}-${index}`}
-              className="flex items-center gap-3 rounded-xl border border-border/80 bg-cardAlt/60 px-3.5 py-2.5 transition-colors hover:border-borderGlow"
+              className="flex items-center gap-3 rounded-xl border border-[#2D2C36] bg-[#1A191E] px-3.5 py-2.5 transition-colors focus-within:border-slate-400"
             >
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 font-mono font-bold text-xs"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#3A3944] bg-[#25242C] text-white font-mono font-bold text-xs"
                 aria-hidden="true"
               >
                 ${index + 1}
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] font-medium tracking-wide text-textSecondary font-sans truncate">
+                <p className="text-xs font-medium tracking-wide text-textSecondary font-sans truncate">
                   {label}
                 </p>
                 <input
@@ -62,7 +62,7 @@ export default function ConstraintList({ constraints, onChange }) {
                   min="0"
                   value={currentValue}
                   onChange={(event) => onChange?.(index, event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-border/80 bg-bg px-2.5 py-1.5 font-mono text-sm font-semibold text-textPrimary outline-none transition-colors focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="mt-1 w-full rounded-lg border border-[#3A3944] bg-[#222129] px-3 py-1.5 font-mono text-sm font-bold text-white outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white"
                 />
               </div>
             </li>
@@ -72,5 +72,3 @@ export default function ConstraintList({ constraints, onChange }) {
     </div>
   );
 }
-
-

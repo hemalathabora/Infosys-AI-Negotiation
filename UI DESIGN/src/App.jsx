@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import CinematicLoader from "./components/CinematicLoader";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 
@@ -16,9 +17,16 @@ export default function App() {
   const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState("Dashboard");
   const [activeScenario, setActiveScenario] = useState(null);
+  const [loaderKey, setLoaderKey] = useState(1);
+  const [showLoader, setShowLoader] = useState(true);
 
   const negotiation = useNegotiationEngine();
   const { history, addSession, stats, clearHistory } = useNegotiationHistory();
+
+  const handleReplayIntro = () => {
+    setLoaderKey((prev) => prev + 1);
+    setShowLoader(true);
+  };
 
   const isDark = theme === "dark";
 
@@ -163,6 +171,13 @@ export default function App() {
       `}
     >
 
+      {showLoader && (
+        <CinematicLoader
+          key={loaderKey}
+          onComplete={() => setShowLoader(false)}
+        />
+      )}
+
       {/* ======================================================
           TOP NAVIGATION
       ======================================================= */}
@@ -176,6 +191,7 @@ export default function App() {
           theme={theme}
           onThemeChange={setTheme}
           activePage={activePage}
+          onReplayIntro={handleReplayIntro}
         />
 
       </header>
@@ -191,6 +207,9 @@ export default function App() {
           min-h-0
           flex-1
           overflow-hidden
+          bg-[#0C0C0F]
+          p-2 sm:p-3 lg:p-4
+          gap-2 lg:gap-4
         "
       >
 
@@ -204,7 +223,7 @@ export default function App() {
         />
 
 
-        {/* Main page area */}
+        {/* Main page area (Elevated rounded container like reference screenshot) */}
 
         <div
           className="
@@ -213,6 +232,10 @@ export default function App() {
             flex-1
             overflow-y-auto
             overflow-x-hidden
+            rounded-2xl lg:rounded-[20px]
+            border border-[#27262F]
+            bg-[#17161B]
+            shadow-2xl
           "
         >
           {renderPage()}

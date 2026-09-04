@@ -1,52 +1,50 @@
-﻿// Designed by TEAM 4
 export default function ReadyBanner({ isValid, agentCount }) {
   return (
-    <div className="relative flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-r from-primary/10 via-card to-card px-5 py-4">
-      <span
-        className="glow-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/40 bg-primary/10 text-primary"
-        aria-hidden="true"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2l7 3.5v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9v-5L12 2z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          {isValid && <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />}
-        </svg>
-      </span>
-      <div className="relative z-10">
-        <p className="font-semibold text-primaryBright">
-          {isValid
-            ? "Both agents are configured and ready."
-            : `${agentCount} of 2 agents configured.`}
-        </p>
-        <p className="text-sm text-textSecondary">
-          You can review or modify their personalities before starting the negotiation.
-        </p>
+    <div className="relative flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[#302F39] bg-[#222129] px-5 py-4 shadow-sm">
+      <div className="flex items-center gap-3.5">
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+            isValid
+              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+              : "border-amber-500/40 bg-amber-500/10 text-amber-400"
+          }`}
+          aria-hidden="true"
+        >
+          {isValid ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+          )}
+        </span>
+        <div>
+          <p className="font-bold text-white font-sans text-sm sm:text-base">
+            {isValid
+              ? "Both AI Agent Personas Ready for Launch"
+              : `${agentCount} of 2 Agent Personas Configured`}
+          </p>
+          <p className="text-xs text-textSecondary font-body mt-0.5">
+            {isValid
+              ? "All parameters validated. You can start the turn-based AI simulation now."
+              : "Complete the constraint parameters for both Agent A and Agent B."}
+          </p>
+        </div>
       </div>
 
-      <svg
-        className="pointer-events-none absolute -right-4 bottom-0 top-0 hidden w-64 opacity-40 sm:block"
-        viewBox="0 0 260 100"
-        fill="none"
-        aria-hidden="true"
-      >
-        <g stroke="#38BDF8" strokeWidth="1">
-          <path d="M10 70L60 40L110 60L160 20L210 55L250 30" opacity="0.5" />
-          <path d="M20 30L70 60L130 25L180 65L230 45" opacity="0.35" />
-        </g>
-        <g fill="#38BDF8">
-          <circle cx="10" cy="70" r="2.5" />
-          <circle cx="60" cy="40" r="2.5" />
-          <circle cx="110" cy="60" r="2.5" />
-          <circle cx="160" cy="20" r="2.5" />
-          <circle cx="210" cy="55" r="2.5" />
-          <circle cx="250" cy="30" r="2.5" />
-          <circle cx="70" cy="60" r="2" opacity="0.6" />
-          <circle cx="130" cy="25" r="2" opacity="0.6" />
-          <circle cx="180" cy="65" r="2" opacity="0.6" />
-        </g>
-      </svg>
+      <div className="hidden sm:block">
+        <span className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 font-mono text-xs font-semibold ${
+          isValid
+            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+            : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+        }`}>
+          {isValid ? "STATUS: READY" : "STATUS: PENDING"}
+        </span>
+      </div>
     </div>
   );
 }
-// Designed by TEAM 4
-// Designed by TEAM 4
-

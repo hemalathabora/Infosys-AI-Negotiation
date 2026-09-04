@@ -11,6 +11,7 @@ export default function StartNegotiationButton({
       className="
         group
         flex
+        h-full
         w-full
         items-center
         justify-between
@@ -19,7 +20,7 @@ export default function StartNegotiationButton({
         border-slate-200
         bg-slate-100
         hover:bg-white
-        px-6 py-5
+        p-6
         text-slate-950
         shadow-xl
         transition-all
@@ -36,8 +37,8 @@ export default function StartNegotiationButton({
         <span
           className="
             flex
-            h-10
-            w-10
+            h-11
+            w-11
             items-center
             justify-center
             rounded-xl
@@ -64,13 +65,13 @@ export default function StartNegotiationButton({
             {isStarting ? "Initializing Engine..." : "Launch Negotiation Simulation"}
           </p>
           <p className="text-xs font-medium text-slate-600 font-body">
-            Transmits agent parameters to the turn-based AI orchestrator engine.
+            Transmits agent parameters to orchestrator.
           </p>
         </div>
       </div>
 
-      <div className="hidden sm:flex items-center gap-2">
-        <span className="rounded-xl bg-slate-950 px-4 py-2 font-mono text-xs font-bold text-white shadow-sm">
+      <div className="flex items-center gap-2">
+        <span className="rounded-xl bg-slate-950 px-4 py-2.5 font-mono text-xs font-bold text-white shadow-sm">
           START SIMULATION →
         </span>
       </div>

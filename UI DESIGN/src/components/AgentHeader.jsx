@@ -1,8 +1,8 @@
 export default function AgentHeader({ index }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="rounded-xl border border-[#302F39] bg-[#25242C] px-3 py-1 font-mono text-xs font-bold text-white tracking-wider">
-        AGENT {String(index).padStart(2, "0")}
+      <span className="rounded-xl border border-[#302F39] bg-[#25242C] px-3.5 py-1.5 font-mono text-xs font-bold text-white tracking-wider">
+        PARTY {String(index).padStart(2, "0")}
       </span>
       <span className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-slate-300">
         <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />

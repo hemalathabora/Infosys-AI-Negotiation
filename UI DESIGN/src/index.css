@@ -210,4 +210,102 @@ table {
 ::selection {
   background: rgba(99, 102, 241, 0.25);
   color: #F8FAFC;
+}
+
+
+/* ============================================================
+   EXECUTIVE PRINT STYLES (@media print)
+============================================================ */
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  /* Hide UI navigation, sidebars, buttons and widgets */
+  aside,
+  header.glass-header,
+  nav,
+  button,
+  .no-print,
+  [data-guide-bot],
+  svg.no-print {
+    display: none !important;
+  }
+
+  /* Reset root containers for page pagination */
+  html,
+  body,
+  #root,
+  main {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Card containers in print mode */
+  .rounded-2xl,
+  .rounded-xl,
+  section {
+    background-color: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #0F172A !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Force dark contrast typography for print */
+  h1, h2, h3, h4, h5, h6, p, span, div, td, th {
+    color: #0F172A !important;
+    text-shadow: none !important;
+  }
+
+  .text-slate-400,
+  .text-textSecondary,
+  .text-textMuted {
+    color: #475569 !important;
+  }
+
+  .text-emerald-400 {
+    color: #059669 !important;
+    font-weight: 800 !important;
+  }
+
+  main,
+  section,
+  div {
+    background-color: #FFFFFF !important;
+  }
+
+  table {
+    border: 1px solid #CBD5E1 !important;
+  }
+
+  th {
+    background-color: #F1F5F9 !important;
+    color: #0F172A !important;
+    border-bottom: 2px solid #94A3B8 !important;
+  }
+
+  td {
+    border-bottom: 1px solid #E2E8F0 !important;
+    color: #0F172A !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 15mm 15mm 15mm 15mm;
+  }
 }

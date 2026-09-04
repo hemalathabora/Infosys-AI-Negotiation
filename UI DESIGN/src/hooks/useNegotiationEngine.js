@@ -1,11 +1,14 @@
 ﻿// Designed by TEAM 4
 
 import { useCallback, useState } from "react";
+
 import { Orchestrator } from "../engine/orchestrator.js";
+
 import {
   buildConcessionTimeline,
   totalConcessionByAgent,
 } from "../engine/concessionTracking.js";
+
 import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 
 /*
@@ -28,7 +31,10 @@ import { NEGOTIATION_STATUS } from "../types/negotiation.js";
  * Turn-by-turn Offers
  *       |
  *       v
- * Agreement / Deadlock
+ * Accept / Reject / Counteroffer
+ *       |
+ *       v
+ * Agreement / Rejected / Deadlock
  */
 
 export function useNegotiationEngine() {
@@ -40,14 +46,15 @@ export function useNegotiationEngine() {
 
   const [hasStarted, setHasStarted] = useState(false);
 
-
   /* ============================================================
      START NEGOTIATION
   ============================================================ */
 
   const start = useCallback((scenario) => {
     if (!scenario) {
-      console.error("Cannot start negotiation: scenario is missing.");
+      console.error(
+        "Cannot start negotiation: scenario is missing.",
+      );
       return;
     }
 
@@ -66,7 +73,7 @@ export function useNegotiationEngine() {
     } catch (error) {
       console.error(
         "Failed to start negotiation:",
-        error
+        error,
       );
 
       setOrchestrator(null);
@@ -76,15 +83,14 @@ export function useNegotiationEngine() {
     }
   }, []);
 
-
   /* ============================================================
-     STEP ONE ROUND
+     STEP ONE AGENT TURN
   ============================================================ */
 
   const step = useCallback(() => {
     if (!orchestrator) {
       console.warn(
-        "Cannot perform step: negotiation has not started."
+        "Cannot perform step: negotiation has not started.",
       );
       return;
     }
@@ -98,11 +104,34 @@ export function useNegotiationEngine() {
     } catch (error) {
       console.error(
         "Negotiation step failed:",
-        error
+        error,
       );
     }
   }, [orchestrator]);
 
+  /* ============================================================
+     CHECK TERMINAL STATUS
+  ============================================================ */
+
+  const isTerminalStatus = useCallback(
+    (negotiationState) => {
+      if (!negotiationState) {
+        return false;
+      }
+
+      return (
+        negotiationState.status ===
+          NEGOTIATION_STATUS.AGREEMENT ||
+        negotiationState.status ===
+          NEGOTIATION_STATUS.REJECTED ||
+        negotiationState.status ===
+          NEGOTIATION_STATUS.DEADLOCK ||
+        negotiationState.status ===
+          NEGOTIATION_STATUS.COMPLETED
+      );
+    },
+    [],
+  );
 
   /* ============================================================
      RUN TO COMPLETION
@@ -111,7 +140,7 @@ export function useNegotiationEngine() {
   const runToCompletion = useCallback(async () => {
     if (!orchestrator) {
       console.warn(
-        "Cannot run negotiation: negotiation has not started."
+        "Cannot run negotiation: negotiation has not started.",
       );
       return;
     }
@@ -120,51 +149,60 @@ export function useNegotiationEngine() {
 
     try {
       while (true) {
-        const currentState = orchestrator.getState();
+        const currentState =
+          orchestrator.getState();
 
-        const isAgreement =
-          currentState.status ===
-          NEGOTIATION_STATUS.AGREEMENT;
-
-        const isDeadlock =
-          currentState.status ===
-          NEGOTIATION_STATUS.DEADLOCK;
-
-        const maximumRoundsReached =
-          currentState.current_round >= 20;
-
-        if (
-          isAgreement ||
-          isDeadlock ||
-          maximumRoundsReached
-        ) {
+        /*
+         * Stop if negotiation has already reached
+         * a terminal state.
+         */
+        if (isTerminalStatus(currentState)) {
           break;
         }
 
-        const nextState = orchestrator.step();
+        /*
+         * Perform exactly ONE agent turn.
+         *
+         * The Orchestrator controls:
+         * - current agent
+         * - current round
+         * - offer
+         * - decision
+         * - next agent
+         * - final status
+         */
+        const nextState =
+          orchestrator.step();
 
         setState({
           ...nextState,
         });
 
         /*
-         * Small delay so the negotiation looks like
-         * a live turn-by-turn simulation.
+         * Stop immediately after the latest step
+         * reaches a terminal state.
+         */
+        if (isTerminalStatus(nextState)) {
+          break;
+        }
+
+        /*
+         * Small delay so the negotiation looks
+         * like a live turn-by-turn simulation.
          */
         await new Promise((resolve) =>
-          setTimeout(resolve, 220)
+          setTimeout(resolve, 220),
         );
       }
     } catch (error) {
       console.error(
         "Negotiation execution failed:",
-        error
+        error,
       );
     } finally {
       setIsRunning(false);
     }
-  }, [orchestrator]);
-
+  }, [orchestrator, isTerminalStatus]);
 
   /* ============================================================
      RESET NEGOTIATION
@@ -177,19 +215,19 @@ export function useNegotiationEngine() {
     setIsRunning(false);
   }, []);
 
-
   /* ============================================================
      CONCESSION TRACKING
   ============================================================ */
 
   const timeline = state
-    ? buildConcessionTimeline(state.history || [])
+    ? buildConcessionTimeline(
+        state.history || [],
+      )
     : {};
 
   const concessionTotals = state
     ? totalConcessionByAgent(timeline)
     : {};
-
 
   /* ============================================================
      RETURN API
@@ -215,6 +253,5 @@ export function useNegotiationEngine() {
     reset,
   };
 }
-
 
 // Designed by TEAM 4

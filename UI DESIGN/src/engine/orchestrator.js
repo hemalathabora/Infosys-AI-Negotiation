@@ -1,4 +1,3 @@
-﻿// Designed by TEAM 4
 
 import {
   NEGOTIATION_STATUS,
@@ -15,8 +14,12 @@ import { createOffer } from "./offer.js";
 import {
   deriveLimitFromConstraints,
   anchorOffer,
-  decide,
 } from "./decisionLogic.js";
+
+import {
+  buildAgentInput,
+  generate_agent_response,
+} from "./agentInterface.js";
 
 /**
  * Maximum number of complete negotiation rounds.
@@ -338,9 +341,6 @@ export class Orchestrator {
     const incoming =
       this.state.current_offer;
 
-    const personality =
-      agent.personality ?? "Unknown";
-
     /**
      * Find the current agent's most recent offer.
      *
@@ -364,34 +364,28 @@ export class Orchestrator {
 
     /**
      * ---------------------------------------------------------
-     * RULE-BASED DECISION ENGINE
+     * AGENT DECISION INTERFACE (LLM / RULE-BASED)
      * ---------------------------------------------------------
      *
-     * The decision is based on:
-     *
-     * 1. Agent goal
-     * 2. Agent constraint
-     * 3. Agent personality
-     * 4. Previous offer
-     * 5. Incoming offer
-     * 6. Current round
-     *
-     * Possible decisions:
-     *
-     * ACCEPT
-     * REJECT
-     * COUNTEROFFER
+     * 1. Build standardized agent input structure (Task 3)
+     * 2. Pass input to agent response generator (Task 4)
      */
-    const result = decide({
-      goal: agent.goal,
-      direction: position.direction,
-      limit: position.limit,
-      personality,
-      ownLastValue,
-      incomingValue: incoming.value,
-      round,
-      maxRounds: MAX_ROUNDS,
-    });
+    const agentInput = buildAgentInput(
+      agent,
+      this.scenario,
+      this.state,
+    );
+
+    const result = generate_agent_response(
+      agentInput,
+      {
+        direction: position.direction,
+        limit: position.limit,
+        ownLastValue,
+        round,
+        maxRounds: MAX_ROUNDS,
+      },
+    );
 
     /**
      * ---------------------------------------------------------

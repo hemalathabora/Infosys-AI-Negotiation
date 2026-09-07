@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 /**
  * Shared shape definitions for the Negotiation Simulator.
  * Plain JS project â€” documented via JSDoc typedefs so editors still get
@@ -52,6 +52,20 @@
 // Implemented by TEAM 4
  * @property {string} reason         - Short natural-language justification
  * @property {string} timestamp      - ISO 8601 timestamp
+ */
+
+/**
+ * Standard Agent Input structure for passing data to the LLM reasoning engine or decision logic.
+ *
+ * @typedef {Object} AgentInput
+ * @property {string} agent_id              - ID of the active agent
+ * @property {Personality} agent_persona    - Personality policy mode (Aggressive, Collaborative, Risk-averse)
+ * @property {string} role                 - Agent's organizational or transactional role
+ * @property {string} goals                - Strategic objective of the agent
+ * @property {(string|Constraint)[]} constraints - Operating boundaries and numeric limits
+ * @property {{ round: number, status: NegotiationStatus }} current_negotiation_state - Current round and negotiation status
+ * @property {Offer[]} previous_history    - Full ordered log of previous offers and decisions
+ * @property {Offer|null} current_opponent_offer - Latest offer received from the opposing agent
  */
 
 /**

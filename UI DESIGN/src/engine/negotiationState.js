@@ -1,5 +1,4 @@
-﻿// Designed by TEAM 4
-
+﻿
 import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 
 /**

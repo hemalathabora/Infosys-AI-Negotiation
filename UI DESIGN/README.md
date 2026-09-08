@@ -1,137 +1,127 @@
-# Agent Configuration UI — Multi-Agent Negotiation Simulator
+# AI-Driven Multi-Agent Negotiation Simulator
 
-Frontend for the **AI-Driven Multi-Agent Negotiation Training & Simulation
-Platform**. This package implements the **Agent Configuration** page:
-scenario selection, agent persona display, configuration validation, and a
-structured handoff object for the Orchestrator module.
+An end-to-end **AI-Driven Multi-Agent Negotiation Training & Simulation Platform** featuring:
+1. **Agent Configuration UI** — Scenario selection, agent persona & constraint setup, validation.
+2. **Orchestrator Module** — Turn management, round tracking, session status control.
+3. **LLM Reasoning Layer** — Context-aware AI negotiation response generation.
 
 ```
-USER → SCENARIO SELECTION → AGENT CONFIGURATION → ORCHESTRATOR → AI AGENTS → NEGOTIATION → OUTCOME REPORT
+USER → SCENARIO SELECTION → AGENT CONFIGURATION → ORCHESTRATOR → LLM REASONING LAYER → MULTI-ROUND NEGOTIATION → OUTCOME REPORT
 ```
 
-This UI owns everything up to and including **Agent Configuration**. It does
-**not** implement LLM reasoning, negotiation strategy, offer/counteroffer
-logic, deadlock handling, or agent-to-agent communication — those belong to
-the Orchestrator and Agent Reasoning modules (other team members).
+---
 
-## Stack
+## 🤖 LLM Reasoning Layer & Orchestrator Integration
 
-- **React 19 + Vite** — no existing repo was found to integrate with, so this
-  was scaffolded fresh per the "prefer React + Vite if no framework is
-  specified" fallback rule.
-- **Tailwind CSS** for styling, configured with the dark AI-product palette
-  (`tailwind.config.js`: `bg`, `card`, `border`, `primary`, `success`,
-  `warning`, `textPrimary`, `textSecondary`).
-- Plain JavaScript (JSX) with JSDoc typedefs in `src/types/negotiation.js` —
-  no TypeScript toolchain was introduced since none existed.
+The LLM Reasoning Engine (`src/engine/llmReasoning.js` & `src/engine/agentInterface.js`) enables AI agents to generate context-aware negotiation responses based on complete historical context, agent personas, strategic goals, and hard constraints.
 
-## Running the project
+### 1. Information Passed to the LLM
+- **Agent Profile**: Role, persona/personality (`Aggressive`, `Collaborative`, `Risk-averse`), strategic goals, negotiation objectives, and hard constraint limits (`Maximum $X` / `Minimum $Y`).
+- **Negotiation State**: Current round index, maximum rounds, status (`in_progress`, `agreement`, `rejected`, `deadlock`).
+- **Complete Negotiation History**: Full chronological history of previous offers, counteroffers, decisions, and turn rationales.
+- **Opponent's Latest Offer**: Most recent bid received from the counterparty.
+
+### 2. Agent Reasoning Function (`generate_agent_response`)
+Located in `src/engine/agentInterface.js`:
+```js
+const result = await generate_agent_response(
+  agent_profile,
+  negotiation_state,
+  conversation_history,
+  opponent_offer
+);
+```
+
+### 3. Structured Negotiation Response Output
+The LLM response contains:
+- `decision`: `"accept"` | `"counteroffer"` | `"reject"`
+- `proposed_offer`: Numeric offer value (e.g. `$46,887`)
+- `reasoning`: Natural-language justification incorporating persona, goals, constraints, history length, and opponent move.
+- `negotiation_parameters`: Object containing `concession_rate`, `target_value`, `distance_to_constraint`, `round`, and `strategy_notes`.
+
+### 4. Orchestrator Execution Flow
+Connected turn-by-turn flow in `src/engine/orchestrator.js`:
+```
+Orchestrator
+ └─> Get Current Agent (Agent ID)
+ └─> Load Agent Profile (Role, Persona, Goal, Constraints)
+ └─> Load Negotiation State (Round, Max Rounds, Status)
+ └─> Pass Conversation History (All previous turns)
+ └─> Send Opponent Offer to LLM
+ └─> Generate Agent Response (via generate_agent_response)
+ └─> Update Negotiation State (apply offer, decision, & parameters)
+ └─> Pass Turn to Next Agent
+```
+
+---
+
+## 🛠️ Stack
+
+- **React 19 + Vite** — Frontend application interface.
+- **Tailwind CSS** — Modern dark UI theme with custom glassmorphism and state indicators.
+- **JavaScript (ES Modules)** — Documented via JSDoc typedefs in `src/types/negotiation.js`.
+- **Node.js Test Engine** — Automated test suite for multi-round AI negotiations.
+
+---
+
+## 🚀 Running the Project & Test Suite
 
 ```bash
+# Install dependencies
 npm install
+
+# Run Vite development server
 npm run dev       # http://localhost:5173
+
+# Run Vendor Pricing Negotiation Test (LLM Reasoning Layer)
+node src/engine/testVendorPricing.js
+
+# Production build & preview
 npm run build     # production build → dist/
-npm run preview   # serve the production build
-npm run lint       # oxlint — 0 errors on this codebase
+npm run preview   # serve production build
+npm run lint      # oxlint code verification
 ```
 
-## Project structure
+---
+
+## 🧪 Vendor Pricing Negotiation Test Results
+
+Running `node src/engine/testVendorPricing.js` executes a 5-round negotiation between:
+- **Buyer**: Procurement Manager (Persona: `Risk-averse`, Goal: `"Lowest possible unit price"`, Constraint: `Maximum $50,000`)
+- **Vendor**: Sales Representative (Persona: `Aggressive`, Goal: `"Maximize profit margin"`, Constraint: `Minimum $42,000`)
+
+### Output Summary:
+- **Round 1**: Buyer anchors at $42,500. Vendor counters at $47,720 (Aggressive 10% concession rate).
+- **Round 2**: Buyer counters at $43,805 (Risk-averse 25% concession rate). Vendor counters at $47,329.
+- **Round 3**: Buyer counters at $44,686. Vendor counters at $47,065.
+- **Round 4**: Buyer counters at $45,281. Vendor counters at $46,887.
+- **Round 5**: Buyer receives $46,887, evaluates it against $50,000 maximum constraint limit and accepts the deal!
+- **Constraint Enforcement**: 0 violations (Buyer never exceeded $50,000; Vendor never went below $42,000).
+
+---
+
+## 📁 Project Structure
 
 ```
 src/
+  engine/
+    llmReasoning.js       # LLM Reasoning Engine & prompt builder
+    agentInterface.js     # generate_agent_response interface
+    orchestrator.js       # State orchestrator & turn manager
+    negotiationState.js   # State transitions & applyOffer
+    decisionLogic.js      # Constraint extraction & concession logic
+    offer.js              # Standard offer & response shape
+    testVendorPricing.js  # Automated multi-round test suite
   components/
-    TopNavigation.jsx
-    Sidebar.jsx
-    ScenarioSelector.jsx
-    ScenarioDescription.jsx
-    AgentCard.jsx
-    AgentHeader.jsx
-    GoalSection.jsx
-    ConstraintList.jsx
-    PersonalityBadge.jsx
-    ConfigurationStatus.jsx
-    StartNegotiationButton.jsx
-    LoadingState.jsx
-    ErrorState.jsx
-    EmptyState.jsx
+    NegotiationSessionPanel.jsx
+    ...
   pages/
-    AgentConfiguration.jsx
+    NegotiationArena.jsx
+    ...
   data/
-    scenarios.js          # approved demo data (vendor pricing only)
+    scenarios.js          # Scenario definitions & personas
   services/
-    scenarioService.js     # data access + validation + orchestrator handoff
-  hooks/
-    useScenarioConfiguration.js
+    scenarioService.js    # Data access & validation
   types/
-    negotiation.js         # JSDoc typedefs for Scenario / Agent / Handoff
+    negotiation.js        # JSDoc typedefs for negotiation engine
 ```
-
-## Scenario data
-
-Only **Vendor Pricing Negotiation** ships with real persona data, per the
-approved demo data in the spec. **Job Offer Negotiation** and **Project
-Budget Allocation** are wired into the selector and data model
-(`src/data/scenarios.js`) but intentionally carry no invented agent data —
-selecting them shows an empty state ("coming soon") until the team supplies
-real personas. This keeps the data-driven architecture ready for drop-in
-without fabricating values.
-
-## Orchestrator handoff
-
-`Start Negotiation` validates the current scenario's two agents (name, role,
-goal, ≥1 constraint, personality all present), then builds:
-
-```json
-{
-  "scenario_id": "vendor_pricing",
-  "agents": [
-    { "id": "buyer", "name": "Buyer", "role": "Procurement Manager", "goal": "Lowest possible unit price", "constraints": ["Maximum $50,000"], "personality": "Risk-averse" },
-    { "id": "vendor", "name": "Vendor", "role": "Sales Representative", "goal": "Maximize profit margin", "constraints": ["Minimum $42,000"], "personality": "Aggressive" }
-  ]
-}
-```
-
-There is no Negotiation Arena route in this repo yet, so on click the UI
-shows this handoff object inline instead of navigating — swap the body of
-`handleStartNegotiation` in `src/pages/AgentConfiguration.jsx` for a router
-push (or a call into the Orchestrator's entry point) once that module exists.
-No LLM or negotiation logic is called from the UI.
-
-## States implemented
-
-- **Loading** — skeleton agent cards + "Loading agent personas..."
-- **Error** — "Unable to load agent configuration." with a Retry button
-  (triggered by requesting an unknown scenario id; wire real fetch failures
-  into `scenarioService.js` the same way)
-- **Empty** — shown when a scenario has no agent data yet
-- **Success** — two agent cards, configuration status banner, enabled CTA
-
-## Verified
-
-- `npm run build` — clean production build, no errors
-- `npm run lint` (oxlint) — 0 errors, 1 informational warning on the standard
-  data-fetching `useEffect` pattern
-- Scenario switching re-renders agent cards with no page reload
-- Desktop: two cards side-by-side; mobile (< lg breakpoint): stacked cards,
-  no horizontal scroll; sidebar collapses behind a menu button
-- Personality is always shown as icon **+ text label**, never color alone
-- Keyboard focus is visible on the scenario select, nav links, and buttons
-
-## Suggested Git workflow (Member 3 — UI/Frontend)
-
-```bash
-git checkout -b member3-ui
-git add frontend/   # or wherever this package lives in the monorepo
-git commit -m "Implement agent configuration UI"
-```
-
-## My UI contribution (for submission writeup)
-
-Built the complete Agent Configuration screen: scenario selector driving a
-data-driven two-card agent layout, a reusable `AgentCard` composed of
-smaller presentational pieces (`AgentHeader`, `GoalSection`,
-`ConstraintList`, `PersonalityBadge`), loading/error/empty states, client-side
-configuration validation, and a `StartNegotiationButton` that assembles and
-surfaces the structured handoff object the Orchestrator will consume. No
-negotiation logic, LLM calls, or agent communication is implemented here —
-this module's job ends at producing a valid, structured configuration.

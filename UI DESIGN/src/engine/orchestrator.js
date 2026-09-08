@@ -1,4 +1,3 @@
-
 import {
   NEGOTIATION_STATUS,
   DECISIONS,
@@ -17,24 +16,12 @@ import {
 } from "./decisionLogic.js";
 
 import {
-  buildAgentInput,
   generate_agent_response,
 } from "./agentInterface.js";
 
 /**
  * Maximum number of complete negotiation rounds.
- *
  * One complete round contains both agent turns.
- *
- * Example:
- *
- * Round 1:
- *   Agent 1 -> Offer
- *   Agent 2 -> Response
- *
- * Round 2:
- *   Agent 1 -> Offer
- *   Agent 2 -> Response
  */
 const MAX_ROUNDS = 8;
 
@@ -49,28 +36,12 @@ export class Orchestrator {
     this.state = createNegotiationState(scenario);
 
     /**
-     * Store the effective negotiation position
-     * of every agent.
-     *
-     * Example:
-     *
-     * {
-     *   candidate: {
-     *     direction: "maximize",
-     *     limit: 100000
-     *   },
-     *   employer: {
-     *     direction: "minimize",
-     *     limit: 95000
-     *   }
-     * }
+     * Store the effective negotiation position of every agent.
      */
     this.positions = {};
 
     for (const agent of scenario.agents) {
-      const derived = deriveLimitFromConstraints(
-        agent.constraints,
-      );
+      const derived = deriveLimitFromConstraints(agent.constraints);
 
       this.positions[agent.id] =
         derived ?? {
@@ -80,9 +51,7 @@ export class Orchestrator {
     }
 
     // Store the order in which agents take turns.
-    this.agentOrder = scenario.agents.map(
-      (agent) => agent.id,
-    );
+    this.agentOrder = scenario.agents.map((agent) => agent.id);
 
     // The first agent starts every new round.
     this.firstAgentId = this.agentOrder[0] ?? null;
@@ -90,8 +59,6 @@ export class Orchestrator {
 
   /**
    * Returns the complete current negotiation state.
-   *
-   * @returns {import("../types/negotiation").NegotiationState}
    */
   getState() {
     return this.state;
@@ -120,69 +87,25 @@ export class Orchestrator {
 
   /**
    * Returns the next agent after the supplied agent.
-   *
-   * Example:
-   *
-   * Candidate -> Employer
-   * Employer  -> Candidate
-   *
-   * @param {string} currentAgentId
-   * @returns {string|null}
    */
   getNextAgent(currentAgentId) {
-    const index = this.agentOrder.indexOf(
-      currentAgentId,
-    );
+    const index = this.agentOrder.indexOf(currentAgentId);
 
-    if (
-      index === -1 ||
-      this.agentOrder.length === 0
-    ) {
+    if (index === -1 || this.agentOrder.length === 0) {
       return null;
     }
 
-    return this.agentOrder[
-      (index + 1) % this.agentOrder.length
-    ];
+    return this.agentOrder[(index + 1) % this.agentOrder.length];
   }
 
   /**
-   * Determines which negotiation round
-   * the current agent belongs to.
-   *
-   * Round convention:
-   *
-   * Initial:
-   *   Round 0 -> Agent 1
-   *
-   * Agent 1 acts:
-   *   Round 1 -> Agent 2
-   *
-   * Agent 2 acts:
-   *   Round 1 -> Agent 1
-   *
-   * Agent 1 acts:
-   *   Round 2 -> Agent 2
-   *
-   * Agent 2 acts:
-   *   Round 2 -> Agent 1
-   *
-   * @param {string} agentId
-   * @returns {number}
+   * Determines which negotiation round the current agent belongs to.
    */
   getRoundForCurrentTurn(agentId) {
-    // First move of the negotiation.
     if (this.state.current_round === 0) {
       return 1;
     }
 
-    /**
-     * When the first agent acts again,
-     * a new round begins.
-     *
-     * The second agent stays inside
-     * the current round.
-     */
     if (agentId === this.firstAgentId) {
       return this.state.current_round + 1;
     }
@@ -191,11 +114,7 @@ export class Orchestrator {
   }
 
   /**
-   * Checks whether the current agent
-   * is starting a new round.
-   *
-   * @param {string} agentId
-   * @returns {boolean}
+   * Checks whether the current agent is starting a new round.
    */
   isStartingNewRound(agentId) {
     return (
@@ -205,120 +124,85 @@ export class Orchestrator {
   }
 
   /**
-   * Advances the negotiation by exactly
-   * ONE agent turn.
+   * Advances the negotiation by exactly ONE agent turn.
    *
-   * One step() = one agent action.
+   * Task 5 Implementation Flow:
+   * Orchestrator
+   * → Get Current Agent
+   * → Load Agent Profile
+   * → Load Negotiation State
+   * → Pass Conversation History
+   * → Send Opponent Offer to LLM
+   * → Generate Agent Response
+   * → Update Negotiation State
+   * → Pass Turn to Next Agent
    *
-   * Normally:
-   *
-   * Step 1 -> Agent 1, Round 1
-   * Step 2 -> Agent 2, Round 1
-   * Step 3 -> Agent 1, Round 2
-   * Step 4 -> Agent 2, Round 2
-   *
-   * @returns {import("../types/negotiation").NegotiationState}
+   * @returns {Promise<import("../types/negotiation").NegotiationState>}
    */
-  step() {
-    /**
-     * Do nothing if the negotiation
-     * has already reached a terminal state.
-     */
+  async step() {
     if (
-      this.state.status ===
-        NEGOTIATION_STATUS.AGREEMENT ||
-      this.state.status ===
-        NEGOTIATION_STATUS.REJECTED ||
-      this.state.status ===
-        NEGOTIATION_STATUS.DEADLOCK ||
-      this.state.status ===
-        NEGOTIATION_STATUS.COMPLETED
+      this.state.status === NEGOTIATION_STATUS.AGREEMENT ||
+      this.state.status === NEGOTIATION_STATUS.REJECTED ||
+      this.state.status === NEGOTIATION_STATUS.DEADLOCK ||
+      this.state.status === NEGOTIATION_STATUS.COMPLETED
     ) {
       return this.state;
     }
 
-    const agentId =
-      this.state.current_agent_turn;
+    // Step 1: Get Current Agent
+    const agentId = this.state.current_agent_turn;
+    if (!agentId) return this.state;
 
-    if (!agentId) {
-      return this.state;
-    }
+    const position = this.positions[agentId];
+    if (!position) return this.state;
 
-    const position =
-      this.positions[agentId];
+    // Step 2: Load Agent Profile
+    const agent = this.scenario.agents.find((item) => item.id === agentId);
+    if (!agent) return this.state;
 
-    if (!position) {
-      return this.state;
-    }
+    const agentProfile = {
+      id: agent.id,
+      name: agent.name,
+      role: agent.role,
+      personality: agent.personality ?? "Collaborative",
+      goal: agent.goal,
+      constraints: agent.constraints,
+      negotiation_objectives: agent.goal,
+      direction: position.direction,
+      limit: position.limit,
+    };
 
-    const agent = this.scenario.agents.find(
-      (item) => item.id === agentId,
-    );
+    const round = this.getRoundForCurrentTurn(agentId);
 
-    if (!agent) {
-      return this.state;
-    }
-
-    /**
-     * Determine the actual round.
-     *
-     * Important:
-     * We do NOT simply increment the round
-     * after every agent action.
-     */
-    const round =
-      this.getRoundForCurrentTurn(agentId);
-
-    /**
-     * Safety check.
-     *
-     * If the calculated round is greater than
-     * the maximum allowed rounds, the negotiation
-     * ends in deadlock.
-     */
+    // Safety check for MAX_ROUNDS
     if (round > MAX_ROUNDS) {
       this.state = {
         ...this.state,
-        status:
-          NEGOTIATION_STATUS.DEADLOCK,
+        status: NEGOTIATION_STATUS.DEADLOCK,
         current_agent_turn: null,
       };
-
       return this.state;
     }
 
-    /**
-     * ---------------------------------------------------------
-     * OPENING MOVE
-     * ---------------------------------------------------------
-     *
-     * If there is no current offer, the current agent
-     * creates the opening anchor offer.
-     */
+    // OPENING MOVE (No incoming opponent offer)
     if (!this.state.current_offer) {
-      const value = anchorOffer(
-        position.direction,
-        position.limit,
-      );
-
-      const personality =
-        agent.personality ?? "Unknown";
+      const value = anchorOffer(position.direction, position.limit);
+      const personality = agent.personality ?? "Unknown";
 
       const offer = createOffer({
         agent_id: agentId,
         round,
         value,
-        reason:
-          `Opening anchor offer based on ` +
-          `the ${personality} personality.`,
+        reason: `Opening anchor offer as ${agent.role} with ${personality} persona, pursuing goal: "${agent.goal}".`,
+        decision: DECISIONS.COUNTEROFFER,
+        parameters: {
+          anchor_value: value,
+          limit: position.limit,
+          direction: position.direction,
+        },
       });
 
-      /**
-       * The other agent responds in
-       * the SAME negotiation round.
-       */
-      const nextAgent =
-        this.getNextAgent(agentId);
+      const nextAgent = this.getNextAgent(agentId);
 
       this.state = applyOffer(
         this.state,
@@ -330,84 +214,39 @@ export class Orchestrator {
       return this.state;
     }
 
-    /**
-     * ---------------------------------------------------------
-     * RESPONSE MOVE
-     * ---------------------------------------------------------
-     *
-     * The current agent evaluates the
-     * incoming offer.
-     */
-    const incoming =
-      this.state.current_offer;
+    // Step 3: Load Negotiation State & Step 4: Pass Conversation History & Step 5: Send Opponent Offer to LLM
+    const opponentOffer = this.state.current_offer;
+    const conversationHistory = [...(this.state.history ?? [])];
 
-    /**
-     * Find the current agent's most recent offer.
-     *
-     * This is used as the agent's previous
-     * negotiating position.
-     */
-    const ownLastOffer =
-      [...this.state.history]
-        .reverse()
-        .find(
-          (offer) =>
-            offer.agent_id === agentId,
-        );
+    const negotiationState = {
+      current_round: round,
+      max_rounds: MAX_ROUNDS,
+      status: this.state.status,
+    };
 
-    const ownLastValue = ownLastOffer
-      ? ownLastOffer.value
-      : anchorOffer(
-          position.direction,
-          position.limit,
-        );
-
-    /**
-     * ---------------------------------------------------------
-     * AGENT DECISION INTERFACE (LLM / RULE-BASED)
-     * ---------------------------------------------------------
-     *
-     * 1. Build standardized agent input structure (Task 3)
-     * 2. Pass input to agent response generator (Task 4)
-     */
-    const agentInput = buildAgentInput(
-      agent,
-      this.scenario,
-      this.state,
+    // Step 6: Generate Agent Response via LLM Reasoning Engine
+    const llmResponse = await generate_agent_response(
+      agentProfile,
+      negotiationState,
+      conversationHistory,
+      opponentOffer,
     );
 
-    const result = generate_agent_response(
-      agentInput,
-      {
-        direction: position.direction,
-        limit: position.limit,
-        ownLastValue,
-        round,
-        maxRounds: MAX_ROUNDS,
-      },
-    );
+    const decision = llmResponse.decision;
+    const reasoning = llmResponse.reasoning || llmResponse.reason;
+    const parameters = llmResponse.negotiation_parameters || {};
 
-    /**
-     * ---------------------------------------------------------
-     * ACCEPT
-     * ---------------------------------------------------------
-     */
-    if (
-      result.decision === DECISIONS.ACCEPT
-    ) {
+    // Step 7: Update Negotiation State based on LLM Decision
+    if (decision === DECISIONS.ACCEPT) {
       const offer = createOffer({
         agent_id: agentId,
         round,
-        value: incoming.value,
-        reason: result.reason,
+        value: opponentOffer.value,
+        reason: reasoning,
+        decision: DECISIONS.ACCEPT,
+        parameters,
       });
 
-      /**
-       * Agreement has been reached.
-       *
-       * There is no next agent because
-       * the negotiation is finished.
-       */
       this.state = applyOffer(
         this.state,
         offer,
@@ -418,33 +257,23 @@ export class Orchestrator {
       return this.state;
     }
 
-    /**
-     * ---------------------------------------------------------
-     * REJECT
-     * ---------------------------------------------------------
-     */
-    if (
-      result.decision === DECISIONS.REJECT
-    ) {
+    if (decision === DECISIONS.REJECT) {
+      const ownLastOffer = [...conversationHistory]
+        .reverse()
+        .find((o) => o.agent_id === agentId);
+      const ownLastValue = ownLastOffer
+        ? ownLastOffer.value
+        : position.limit;
+
       const offer = createOffer({
         agent_id: agentId,
         round,
         value: ownLastValue,
-        reason: result.reason,
+        reason: reasoning,
+        decision: DECISIONS.REJECT,
+        parameters,
       });
 
-      /**
-       * IMPORTANT:
-       *
-       * REJECTED and DEADLOCK are different states.
-       *
-       * REJECTED:
-       *   An agent explicitly rejects the offer.
-       *
-       * DEADLOCK:
-       *   Maximum rounds are reached without
-       *   reaching an agreement.
-       */
       this.state = applyOffer(
         this.state,
         offer,
@@ -455,38 +284,25 @@ export class Orchestrator {
       return this.state;
     }
 
-    /**
-     * ---------------------------------------------------------
-     * COUNTEROFFER
-     * ---------------------------------------------------------
-     */
-    const nextValue =
-      Number.isFinite(result.nextValue)
-        ? result.nextValue
-        : incoming.value;
+    // COUNTEROFFER
+    const proposedOffer =
+      llmResponse.proposed_offer !== undefined
+        ? llmResponse.proposed_offer
+        : llmResponse.nextValue !== undefined
+        ? llmResponse.nextValue
+        : opponentOffer.value;
 
     const offer = createOffer({
       agent_id: agentId,
       round,
-      value: nextValue,
-      reason: result.reason,
+      value: proposedOffer,
+      reason: reasoning,
+      decision: DECISIONS.COUNTEROFFER,
+      parameters,
     });
 
-    /**
-     * Move to the next agent.
-     *
-     * Example:
-     *
-     * Candidate -> Employer
-     *
-     * Employer -> Candidate
-     *
-     * When Candidate becomes active again,
-     * getRoundForCurrentTurn() starts the
-     * next round.
-     */
-    const nextAgent =
-      this.getNextAgent(agentId);
+    // Step 8: Pass Turn to Next Agent
+    const nextAgent = this.getNextAgent(agentId);
 
     this.state = applyOffer(
       this.state,
@@ -501,50 +317,30 @@ export class Orchestrator {
   /**
    * Runs the complete negotiation automatically.
    *
-   * Since one round contains two agent turns:
-   *
-   * MAX_ROUNDS * number of agents
-   *
-   * is the maximum number of steps.
-   *
-   * @returns {import("../types/negotiation").NegotiationState}
+   * @returns {Promise<import("../types/negotiation").NegotiationState>}
    */
-  runToCompletion() {
+  async runToCompletion() {
     let guard = 0;
-
-    const MAX_STEPS =
-      MAX_ROUNDS *
-      this.agentOrder.length;
+    const MAX_STEPS = MAX_ROUNDS * this.agentOrder.length;
 
     while (
-      this.state.status !==
-        NEGOTIATION_STATUS.AGREEMENT &&
-      this.state.status !==
-        NEGOTIATION_STATUS.REJECTED &&
-      this.state.status !==
-        NEGOTIATION_STATUS.DEADLOCK &&
-      this.state.status !==
-        NEGOTIATION_STATUS.COMPLETED &&
+      this.state.status !== NEGOTIATION_STATUS.AGREEMENT &&
+      this.state.status !== NEGOTIATION_STATUS.REJECTED &&
+      this.state.status !== NEGOTIATION_STATUS.DEADLOCK &&
+      this.state.status !== NEGOTIATION_STATUS.COMPLETED &&
       guard < MAX_STEPS
     ) {
-      this.step();
+      await this.step();
       guard += 1;
     }
 
-    /**
-     * If all allowed steps have been used
-     * and the negotiation is still active,
-     * mark it as DEADLOCK.
-     */
     if (
       guard >= MAX_STEPS &&
-      this.state.status ===
-        NEGOTIATION_STATUS.IN_PROGRESS
+      this.state.status === NEGOTIATION_STATUS.IN_PROGRESS
     ) {
       this.state = {
         ...this.state,
-        status:
-          NEGOTIATION_STATUS.DEADLOCK,
+        status: NEGOTIATION_STATUS.DEADLOCK,
         current_agent_turn: null,
       };
     }

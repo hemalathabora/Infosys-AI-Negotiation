@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import Base, engine
-from app.api import agents, negotiations, scenarios
+from app.api import agents, negotiations, scenarios, analytics, guide
 
 # Setup logging
 logging.basicConfig(
@@ -35,6 +35,8 @@ app.add_middleware(
 app.include_router(agents.router)
 app.include_router(negotiations.router)
 app.include_router(scenarios.router)
+app.include_router(analytics.router)
+app.include_router(guide.router)
 
 @app.get("/")
 def root():

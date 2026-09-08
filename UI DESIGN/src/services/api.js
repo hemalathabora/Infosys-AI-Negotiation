@@ -94,3 +94,43 @@ export async function getBackendNegotiationState(negotiationId) {
   }
   return await response.json();
 }
+
+/**
+ * Fetches preset scenarios from the backend API.
+ */
+export async function fetchBackendScenarios() {
+  const response = await fetch(`${API_BASE_URL}/scenarios`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch scenarios from backend.");
+  }
+  return await response.json();
+}
+
+/**
+ * Fetches negotiation analytics, concession timeline, and totals from the backend.
+ * @param {string} negotiationId
+ */
+export async function getBackendAnalytics(negotiationId) {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/analytics`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch negotiation analytics from backend.");
+  }
+  return await response.json();
+}
+
+/**
+ * Queries the AI Guide Bot assistant backend endpoint.
+ * @param {string} query
+ * @param {string} [scenarioId]
+ */
+export async function queryBackendGuideBot(query, scenarioId = "vendor_pricing") {
+  const response = await fetch(`${API_BASE_URL}/guide/query`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, scenario_id: scenarioId })
+  });
+  if (!response.ok) {
+    throw new Error("Failed to query AI Guide Bot on backend.");
+  }
+  return await response.json();
+}

@@ -11,24 +11,75 @@ DEFAULT_SCENARIOS = {
     "vendor_pricing": {
         "scenario_id": "vendor_pricing",
         "scenario_name": "Vendor Pricing Negotiation",
+        "description": "Buyer and Vendor negotiate the price of a bulk components order while balancing budget, profit, and acceptable terms.",
         "agents": [
             {
                 "id": "buyer",
                 "name": "Buyer Agent",
                 "role": "buyer",
-                "persona": "Aggressive but professional negotiator",
-                "goals": ["Get the lowest possible price", "Complete the purchase"],
-                "constraints": {"maximum_price": 85000, "quantity": 100},
-                "negotiation_objectives": ["Target price is 75000", "Never exceed maximum price"]
+                "persona": "Risk-averse",
+                "goals": ["Lowest possible unit price"],
+                "constraints": {"maximum_price": 50000, "quantity": 100},
+                "negotiation_objectives": ["Target price is 42500", "Maximum $50,000 budget limit"]
             },
             {
                 "id": "vendor",
                 "name": "Vendor Agent",
                 "role": "vendor",
-                "persona": "Firm but willing to compromise",
-                "goals": ["Maximize profit", "Close the deal"],
-                "constraints": {"minimum_price": 80000, "quantity": 100},
-                "negotiation_objectives": ["Target price is 95000", "Never accept below 80000"]
+                "persona": "Aggressive",
+                "goals": ["Maximize profit margin"],
+                "constraints": {"minimum_price": 42000, "quantity": 100},
+                "negotiation_objectives": ["Target price is 48000", "Minimum $42,000 price floor"]
+            }
+        ]
+    },
+    "job_offer": {
+        "scenario_id": "job_offer",
+        "scenario_name": "Job Offer Negotiation",
+        "description": "Candidate and Employer negotiate salary and start terms for a new role while balancing compensation expectations against budget limits.",
+        "agents": [
+            {
+                "id": "candidate",
+                "name": "Candidate",
+                "role": "Job Candidate",
+                "persona": "Collaborative",
+                "goals": ["Maximize total compensation and benefits"],
+                "constraints": {"minimum_price": 95000},
+                "negotiation_objectives": ["Target salary is $105,000", "Minimum $95,000 base salary"]
+            },
+            {
+                "id": "employer",
+                "name": "Employer",
+                "role": "Hiring Manager",
+                "persona": "Risk-averse",
+                "goals": ["Secure the candidate within approved budget"],
+                "constraints": {"maximum_price": 110000},
+                "negotiation_objectives": ["Target salary is $98,000", "Maximum $110,000 budget limit"]
+            }
+        ]
+    },
+    "project_budget": {
+        "scenario_id": "project_budget",
+        "scenario_name": "Project Budget Allocation",
+        "description": "Department Head and Finance Director negotiate how much budget to allocate to a new initiative.",
+        "agents": [
+            {
+                "id": "department_head",
+                "name": "Department Head",
+                "role": "Department Head",
+                "persona": "Aggressive",
+                "goals": ["Secure maximum budget for the initiative"],
+                "constraints": {"minimum_price": 80000},
+                "negotiation_objectives": ["Target allocation is $90,000", "Minimum $80,000 allocation"]
+            },
+            {
+                "id": "finance_director",
+                "name": "Finance Director",
+                "role": "Finance Director",
+                "persona": "Collaborative",
+                "goals": ["Control company-wide spending"],
+                "constraints": {"maximum_price": 60000},
+                "negotiation_objectives": ["Target allocation is $55,000", "Maximum $60,000 allocation"]
             }
         ]
     }

@@ -223,7 +223,7 @@ export default function NegotiationArena({
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-300">Current Offer Value</p>
             <p className="text-3xl font-extrabold text-white tracking-tight">
               {state.current_offer
-                ? `$${Math.round(state.current_offer.value).toLocaleString()}`
+                ? `$${Math.round(state.current_offer.value ?? state.current_offer.price ?? 0).toLocaleString()}`
                 : "Pending Start"}
             </p>
           </div>

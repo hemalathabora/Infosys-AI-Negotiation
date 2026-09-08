@@ -109,11 +109,15 @@ class NegotiationOrchestrator:
         if hasattr(offer_val, "model_dump"):
             proposed_offer = offer_val.model_dump(exclude_none=True)
         elif isinstance(offer_val, dict):
-            proposed_offer = offer_val
+            proposed_offer = dict(offer_val)
         elif price_scalar is not None:
-            proposed_offer = {"price": price_scalar}
+            proposed_offer = {"price": price_scalar, "value": price_scalar}
         else:
-            proposed_offer = {"price": extract_offer_price(opponent_offer) or 0.0}
+            proposed_offer = {"price": extract_offer_price(opponent_offer) or 0.0, "value": extract_offer_price(opponent_offer) or 0.0}
+
+        if price_scalar is not None:
+            proposed_offer["value"] = price_scalar
+            proposed_offer["price"] = price_scalar
 
         # Step 9: Save History
         history_item = {

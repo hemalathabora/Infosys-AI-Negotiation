@@ -348,11 +348,12 @@ Generate your strategic structured JSON response now as {agent_profile.get('name
 
     try:
         if provider == "gemini":
+            model_name = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-3.6-flash"
             try:
                 from google import genai
                 client = genai.Client(api_key=api_key)
                 res = client.models.generate_content(
-                    model=settings.LLM_MODEL or "gemini-3.6-flash",
+                    model=model_name,
                     contents=f"{system_prompt}\n\n{user_prompt}"
                 )
                 raw_response_text = res.text
@@ -360,7 +361,7 @@ Generate your strategic structured JSON response now as {agent_profile.get('name
                 logger.warning(f"google.genai SDK call failed ({e1}), trying google.generativeai fallback...")
                 import google.generativeai as genai_legacy
                 genai_legacy.configure(api_key=api_key)
-                model = genai_legacy.GenerativeModel(settings.LLM_MODEL or "gemini-3.6-flash")
+                model = genai_legacy.GenerativeModel(model_name)
                 res = model.generate_content(f"{system_prompt}\n\n{user_prompt}")
                 raw_response_text = res.text
 

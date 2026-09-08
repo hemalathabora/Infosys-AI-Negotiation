@@ -1,4 +1,4 @@
-import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
+import NegotiationSessionPanel from "../components/negotiation/NegotiationSessionPanel";
 
 function AgentPanel({ agent, isTurn, side }) {
   const isLeft = side === "left";

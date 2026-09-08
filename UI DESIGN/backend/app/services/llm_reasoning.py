@@ -8,6 +8,9 @@ from app.schemas.response import LLMStructuredResponse
 
 logger = logging.getLogger("negotiation_engine")
 logger.setLevel(logging.INFO)
+logging.getLogger("google_genai").setLevel(logging.ERROR)
+logging.getLogger("google_genai.models").setLevel(logging.ERROR)
+
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s")
@@ -266,6 +269,17 @@ def mock_llm_reasoning(
             parameters={"minimum_price": min_price, "previous_ask": last_own_price}
         )
 
+_cached_gemini_client = None
+_cached_api_key = None
+
+def get_gemini_client(api_key: str):
+    global _cached_gemini_client, _cached_api_key
+    if _cached_gemini_client is None or _cached_api_key != api_key:
+        from google import genai
+        _cached_gemini_client = genai.Client(api_key=api_key)
+        _cached_api_key = api_key
+    return _cached_gemini_client
+
 def build_system_prompt(agent_profile: Dict[str, Any]) -> str:
     """Builds system prompt for the specified agent persona & profile."""
     name = agent_profile.get("name", "Negotiation Agent")
@@ -288,16 +302,17 @@ Your Specific Negotiation Objectives:
 {json.dumps(objectives, indent=2)}
 
 CRITICAL INSTRUCTIONS:
-1. You must negotiate according to your persona, goals, objectives, and constraints.
-2. You MUST NOT violate your numeric constraints (e.g. Buyer must NEVER exceed maximum price; Vendor must NEVER drop below minimum price).
-3. You must output JSON ONLY matching this exact schema:
+1. Negotiate according to your persona, goals, objectives, and constraints.
+2. You MUST NOT violate numeric constraints (Buyer must NEVER exceed maximum price limit; Vendor must NEVER drop below minimum price limit).
+3. CONVERGENCE RULES: Make active, realistic concessions (~15% to 35% of the gap per turn). If the opponent's offer is within your budget/limit or reasonably close, select 'accept' promptly to complete the negotiation smoothly.
+4. You must output JSON ONLY matching this exact schema:
 {{
   "decision": "counter" | "accept" | "reject",
   "offer": {{
     "price": <numeric_value>,
     "quantity": <numeric_quantity>
   }},
-  "reasoning": "<concise explanation of your move>",
+  "reasoning": "<concise 1-2 sentence explanation of your move>",
   "parameters": {{
     "target_price": <value>,
     "maximum_price": <value>,
@@ -348,22 +363,38 @@ Generate your strategic structured JSON response now as {agent_profile.get('name
 
     try:
         if provider == "gemini":
-            model_name = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-3.6-flash"
-            try:
-                from google import genai
-                client = genai.Client(api_key=api_key)
-                res = client.models.generate_content(
-                    model=model_name,
-                    contents=f"{system_prompt}\n\n{user_prompt}"
-                )
-                raw_response_text = res.text
-            except Exception as e1:
-                logger.warning(f"google.genai SDK call failed ({e1}), trying google.generativeai fallback...")
-                import google.generativeai as genai_legacy
-                genai_legacy.configure(api_key=api_key)
-                model = genai_legacy.GenerativeModel(model_name)
-                res = model.generate_content(f"{system_prompt}\n\n{user_prompt}")
-                raw_response_text = res.text
+            from google.genai import types
+            client = get_gemini_client(api_key)
+
+            configured_model = os.environ.get("LLM_MODEL") or settings.LLM_MODEL or "gemini-2.0-flash"
+            # Known fast production models
+            valid_models = ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"]
+            
+            if configured_model in valid_models:
+                candidate_models = [configured_model] + [m for m in valid_models if m != configured_model]
+            else:
+                candidate_models = valid_models + [configured_model]
+
+            last_error = None
+            for m in candidate_models:
+                try:
+                    res = client.models.generate_content(
+                        model=m,
+                        contents=f"{system_prompt}\n\n{user_prompt}",
+                        config=types.GenerateContentConfig(
+                            response_mime_type="application/json",
+                            temperature=0.2
+                        )
+                    )
+                    raw_response_text = res.text
+                    last_error = None
+                    break
+                except Exception as ex:
+                    last_error = ex
+                    logger.warning(f"Gemini API model '{m}' request failed ({ex}). Trying next candidate...")
+
+            if last_error and not raw_response_text:
+                raise last_error
 
         elif provider == "openai":
             import openai

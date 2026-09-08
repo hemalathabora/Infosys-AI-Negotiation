@@ -1,6 +1,6 @@
 // Designed by TEAM 4
-import { Orchestrator } from "./orchestrator.js";
-import { scenarios } from "../data/scenarios.js";
+import { Orchestrator } from "../../src/engine/orchestrator.js";
+import { scenarios } from "../../src/data/scenarios.js";
 
 async function runVendorPricingTest() {
   console.log("==========================================================================");

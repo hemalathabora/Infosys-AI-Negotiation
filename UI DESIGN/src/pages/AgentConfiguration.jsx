@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import ScenarioDescription from "../components/ScenarioDescription";
-import AgentCard from "../components/AgentCard";
-import StartNegotiationButton from "../components/StartNegotiationButton";
-import ReadyBanner from "../components/ReadyBanner";
-import LoadingState from "../components/LoadingState";
-import ErrorState from "../components/ErrorState";
-import EmptyState from "../components/EmptyState";
-import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
+import ScenarioDescription from "../components/negotiation/ScenarioDescription";
+import AgentCard from "../components/agent/AgentCard";
+import StartNegotiationButton from "../components/negotiation/StartNegotiationButton";
+import ReadyBanner from "../components/common/ReadyBanner";
+import LoadingState from "../components/common/LoadingState";
+import ErrorState from "../components/common/ErrorState";
+import EmptyState from "../components/common/EmptyState";
+import NegotiationSessionPanel from "../components/negotiation/NegotiationSessionPanel";
 
 import { useScenarioConfiguration } from "../hooks/useScenarioConfiguration.js";
 import { useNegotiationEngine } from "../hooks/useNegotiationEngine.js";

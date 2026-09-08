@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import CinematicLoader from "./components/CinematicLoader";
-import TopNavigation from "./components/TopNavigation";
-import Sidebar from "./components/Sidebar";
+import CinematicLoader from "./components/common/CinematicLoader";
+import TopNavigation from "./components/layout/TopNavigation";
+import Sidebar from "./components/layout/Sidebar";
 
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";

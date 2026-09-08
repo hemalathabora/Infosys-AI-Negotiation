@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import GuideBotButton from "./guide/GuideBotButton.jsx";
-import GuideChatPanel from "./guide/GuideChatPanel.jsx";
-import GuidedTour from "./guide/GuidedTour.jsx";
-import { getNavigationSuggestion } from "../services/guideBotService.js";
-import { useGuideBot } from "../hooks/useGuideBot.js";
-import { useGuidedTour } from "../hooks/useGuidedTour.js";
+import GuideBotButton from "./GuideBotButton.jsx";
+import GuideChatPanel from "./GuideChatPanel.jsx";
+import GuidedTour from "./GuidedTour.jsx";
+import { getNavigationSuggestion } from "../../services/guideBotService.js";
+import { useGuideBot } from "../../hooks/useGuideBot.js";
+import { useGuidedTour } from "../../hooks/useGuidedTour.js";
 
 export default function GuideBot({ currentPage = "Dashboard" }) {
   const { isOpen, setIsOpen, messages, input, setInput, submitPrompt, quickQuestions } = useGuideBot(currentPage);

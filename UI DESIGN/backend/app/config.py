@@ -6,6 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_DB_PATH = BASE_DIR / "negotiation.db"
 
 class Settings(BaseSettings):
+    # LLM Configuration
     LLM_PROVIDER: str = "gemini"
     LLM_API_KEY: str = ""
     LLM_MODEL: str = "gemini-2.0-flash"
@@ -22,7 +23,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        return self.CORS_ORIGINS
 
 settings = Settings()
 

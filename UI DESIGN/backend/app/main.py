@@ -1,20 +1,37 @@
 import logging
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
 from app.config import settings
 from app.database import Base, engine
 from app.api import agents, negotiations, scenarios, analytics, guide
 
-# Setup logging
+
+# ============================================================
+# Logging Configuration
+# ============================================================
+
 logging.basicConfig(
     level=logging.INFO,
     format="[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
 )
+
 logger = logging.getLogger("negotiation_backend")
 
-# Create database tables on startup
+
+# ============================================================
+# Database Initialization
+# ============================================================
+
+# Create database tables when the application starts
 Base.metadata.create_all(bind=engine)
+
+
+# ============================================================
+# FastAPI Application
+# ============================================================
 
 app = FastAPI(
     title="AI Negotiation Engine API",
@@ -22,7 +39,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS configuration
+
+# ============================================================
+# CORS Configuration
+# ============================================================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
@@ -31,12 +52,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API Routers
+
+# ============================================================
+# API Routers
+# ============================================================
+
 app.include_router(agents.router)
 app.include_router(negotiations.router)
 app.include_router(scenarios.router)
 app.include_router(analytics.router)
 app.include_router(guide.router)
+
+
+# ============================================================
+# Root Endpoint
+# ============================================================
 
 @app.get("/")
 def root():
@@ -46,24 +76,48 @@ def root():
         "version": "1.0.0"
     }
 
+
+# ============================================================
+# Health Check Endpoint
+# ============================================================
+
 @app.get("/api/health")
 def health_check():
     return {
         "status": "healthy",
         "llm_provider": settings.LLM_PROVIDER,
+        "llm_model": settings.LLM_MODEL,
         "database": settings.DATABASE_URL
     }
 
+
+# ============================================================
+# Global Exception Handler
+# ============================================================
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Global exception caught on {request.url}: {exc}", exc_info=True)
+    logger.error(
+        f"Global exception caught on {request.url}: {exc}",
+        exc_info=True
+    )
+
     return JSONResponse(
         status_code=500,
-        content={"detail": "An internal server error occurred.", "error": str(exc)}
+        content={
+            "detail": "An internal server error occurred.",
+            "error": str(exc)
+        }
     )
+
+
+# ============================================================
+# Run Application Directly
+# ============================================================
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host=settings.HOST,

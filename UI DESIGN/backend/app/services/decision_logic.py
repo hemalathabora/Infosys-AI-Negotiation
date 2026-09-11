@@ -175,9 +175,9 @@ def evaluate_offer(
     direction: str,
     target: float,
     limit: float,
-    incoming_value: float,
+    incoming_value: Optional[float],
     own_last_value: Optional[float] = None,
-    previous_offers: Optional[List[float]] = None,
+    previous_offers: Optional[List[Any]] = None,
     round_num: int = 1,
     max_rounds: int = 5,
     constraints: Any = None,
@@ -186,7 +186,6 @@ def evaluate_offer(
     Evaluate the opponent's offer before making a decision.
 
     The evaluation considers:
-
     - Agent goal
     - Negotiation direction
     - Target value
@@ -195,113 +194,101 @@ def evaluate_offer(
     - Current negotiation round
     - Previous offers
     - Agent's previous offer
-
-    Returns an evaluation object that can later be passed
-    to the decision engine and LLM reasoning engine.
     """
-
     goal_direction = derive_direction_from_goal(
         goal,
         direction
     )
 
-    # If constraints are explicitly supplied, use them
-    # to determine the hard negotiation boundary.
     constraint_info = None
-
     if constraints is not None:
-        constraint_info = derive_limit_from_constraints(
-            constraints
-        )
-
+        constraint_info = derive_limit_from_constraints(constraints)
         if constraint_info is not None:
             goal_direction = constraint_info["direction"]
             limit = float(constraint_info["limit"])
 
-    target = _extract_target_value(
-        goal,
-        target
-    )
+    target = _extract_target_value(goal, target)
 
-    incoming_value = float(incoming_value)
+    # Handle opening turn where opponent offer is None
+    if incoming_value is None:
+        if own_last_value is None:
+            own_last_value = target
+        return {
+            "classification": "opening_turn",
+            "within_limit": True,
+            "direction": goal_direction,
+            "goal": goal,
+            "target_value": target,
+            "limit": limit,
+            "opponent_value": None,
+            "own_last_value": float(own_last_value),
+            "target_gap": 0.0,
+            "current_gap": 0.0,
+            "close_to_target": False,
+            "round_num": round_num,
+            "max_rounds": max_rounds,
+            "previous_offers": [],
+            "previous_movement": 0.0,
+            "constraints": constraint_info,
+        }
+
+    incoming_val = float(incoming_value)
 
     if own_last_value is None:
         own_last_value = target
+    own_last_val = float(own_last_value)
 
-    own_last_value = float(own_last_value)
+    cleaned_prev_offers = []
+    if previous_offers:
+        for po in previous_offers:
+            if isinstance(po, (int, float)):
+                cleaned_prev_offers.append(float(po))
+            elif isinstance(po, dict):
+                v = po.get("price", po.get("value"))
+                if v is not None:
+                    cleaned_prev_offers.append(float(v))
 
-    previous_offers = (
-        [float(value) for value in previous_offers]
-        if previous_offers
-        else []
-    )
-
-    # Check whether the opponent's offer violates
-    # the agent's hard constraint.
     within_limit = (
-        incoming_value <= limit
+        incoming_val <= limit
         if goal_direction == "minimize"
-        else incoming_value >= limit
+        else incoming_val >= limit
     )
 
-    # Difference between opponent offer and target.
-    target_gap = abs(
-        incoming_value - target
-    )
-
-    # Difference between current own position
-    # and opponent's offer.
-    current_gap = abs(
-        incoming_value - own_last_value
-    )
+    target_gap = abs(incoming_val - target)
+    current_gap = abs(incoming_val - own_last_val)
 
     comparison_base = max(
         abs(limit),
         abs(target),
-        abs(incoming_value),
+        abs(incoming_val),
         1.0
     )
 
     close_to_target = (
-        target_gap
-        <= comparison_base * ACCEPTANCE_TOLERANCE
+        target_gap <= comparison_base * ACCEPTANCE_TOLERANCE
     )
 
-    # Determine how favorable the opponent offer is.
     if goal_direction == "minimize":
-
-        if incoming_value <= target:
+        if incoming_val <= target:
             classification = "very_favorable"
-
-        elif incoming_value <= limit:
+        elif incoming_val <= limit:
             classification = "negotiable"
-
         else:
             classification = "unacceptable"
-
     else:
-
-        if incoming_value >= target:
+        if incoming_val >= target:
             classification = "very_favorable"
-
-        elif incoming_value >= limit:
+        elif incoming_val >= limit:
             classification = "negotiable"
-
         else:
             classification = "unacceptable"
 
-    # If the offer is very close to the target,
-    # make the evaluation explicit.
     if within_limit and close_to_target:
         classification = "very_favorable"
 
-    # Calculate previous movement.
     previous_movement = 0.0
-
-    if previous_offers:
-        previous_movement = (
-            incoming_value - previous_offers[-1]
-        )
+    if cleaned_prev_offers:
+        previous_movement = incoming_val - cleaned_prev_offers[-1]
 
     return {
         "classification": classification,
@@ -310,16 +297,105 @@ def evaluate_offer(
         "goal": goal,
         "target_value": target,
         "limit": limit,
-        "opponent_value": incoming_value,
-        "own_last_value": own_last_value,
+        "opponent_value": incoming_val,
+        "own_last_value": own_last_val,
         "target_gap": round(target_gap, 2),
         "current_gap": round(current_gap, 2),
         "close_to_target": close_to_target,
         "round_num": round_num,
         "max_rounds": max_rounds,
-        "previous_offers": previous_offers,
+        "previous_offers": cleaned_prev_offers,
         "previous_movement": round(previous_movement, 2),
         "constraints": constraint_info,
+    }
+
+
+def generate_counteroffer(
+    own_last_value: float,
+    incoming_value: float,
+    limit: float,
+    direction: str,
+    personality: str = "Collaborative",
+    round_num: int = 1,
+    max_rounds: int = 5,
+) -> Dict[str, Any]:
+    """
+    Generate a counteroffer based on the difference between opponent's offer
+    and agent's current position, staying within constraints and using personality.
+    """
+    rate = CONCESSION_RATE.get(personality, 0.25)
+    
+    # Adjust concession rate slightly as negotiation progresses
+    progress_factor = min(round_num / max(max_rounds, 1), 1.0)
+    adjusted_rate = min(rate + 0.10 * progress_factor, 0.50)
+
+    gap = incoming_value - own_last_value
+    step = gap * adjusted_rate
+    next_val = own_last_value + step
+
+    if direction == "minimize":
+        next_val = min(next_val, limit)
+    else:
+        next_val = max(next_val, limit)
+
+    return {
+        "counter_value": round(next_val, 2),
+        "concession_rate": round(adjusted_rate, 2),
+        "raw_step": round(step, 2),
+        "clamped_due_to_limit": (next_val == limit and (own_last_value + step != limit))
+    }
+
+
+def track_concession(
+    initial_value: float,
+    current_value: float,
+    previous_value: Optional[float] = None,
+    limit: Optional[float] = None,
+    direction: str = "minimize",
+    max_allowed_step_pct: float = 0.50
+) -> Dict[str, Any]:
+    """
+    Tracks concession progress from initial position to current position,
+    records movement, and checks for excessive concessions.
+    """
+    initial_val = float(initial_value)
+    current_val = float(current_value)
+    prev_val = float(previous_value) if previous_value is not None else initial_val
+
+    total_movement = abs(current_val - initial_val)
+    turn_movement = abs(current_val - prev_val)
+
+    total_allowed = 0.0
+    concession_pct = 0.0
+    if limit is not None:
+        total_allowed = abs(float(limit) - initial_val)
+        if total_allowed > 0:
+            concession_pct = min((total_movement / total_allowed) * 100.0, 100.0)
+
+    # Check if movement is in expected concession direction
+    concession_valid = True
+    if direction == "minimize":
+        # Buyer moves UP toward limit
+        if current_val < prev_val:
+            concession_valid = False
+    else:
+        # Vendor moves DOWN toward limit
+        if current_val > prev_val:
+            concession_valid = False
+
+    is_excessive = False
+    if total_allowed > 0 and turn_movement > (total_allowed * max_allowed_step_pct):
+        is_excessive = True
+
+    return {
+        "initial_value": initial_val,
+        "current_value": current_val,
+        "previous_value": prev_val,
+        "total_concession": round(total_movement, 2),
+        "turn_concession": round(turn_movement, 2),
+        "concession_percentage": round(concession_pct, 2),
+        "is_excessive": is_excessive,
+        "concession_valid": concession_valid,
     }
 
 
@@ -335,11 +411,7 @@ def rule_based_decide(
 ) -> Dict[str, Any]:
     """
     Pure rule-based decision fallback engine.
-
-    This function keeps the existing decision behavior
-    while using the offer evaluation logic.
     """
-
     goal_direction = derive_direction_from_goal(
         goal,
         direction
@@ -358,7 +430,6 @@ def rule_based_decide(
     )
 
     within_limit = evaluation["within_limit"]
-
     gap = evaluation["current_gap"]
 
     comparison_base = max(
@@ -371,7 +442,7 @@ def rule_based_decide(
         gap <= comparison_base * ACCEPTANCE_TOLERANCE
     )
 
-    if within_limit and close_enough:
+    if within_limit and (close_enough or evaluation["classification"] == "very_favorable"):
         return {
             "decision": "accept",
             "next_value": incoming_value,
@@ -398,38 +469,24 @@ def rule_based_decide(
             "evaluation": evaluation,
         }
 
-    rate = CONCESSION_RATE.get(
-        personality,
-        0.20
+    counter_res = generate_counteroffer(
+        own_last_value=own_last_value,
+        incoming_value=incoming_value,
+        limit=limit,
+        direction=goal_direction,
+        personality=personality,
+        round_num=round_num,
+        max_rounds=max_rounds
     )
 
-    next_value = (
-        own_last_value
-        + rate * (
-            incoming_value
-            - own_last_value
-        )
-    )
-
-    if goal_direction == "minimize":
-        next_value = min(
-            next_value,
-            limit
-        )
-    else:
-        next_value = max(
-            next_value,
-            limit
-        )
+    next_value = counter_res["counter_value"]
 
     return {
         "decision": "counter",
-        "next_value": round(next_value, 2),
+        "next_value": next_value,
         "reasoning": (
-            f"Countered at {round(next_value, 2)}. "
-            f"Persona '{personality}' concedes "
-            f"{int(rate * 100)}% of gap toward "
-            f"{incoming_value}."
+            f"Countered at {next_value}. "
+            f"Persona '{personality}' concedes toward {incoming_value}."
         ),
         "evaluation": evaluation,
-    }
+    }

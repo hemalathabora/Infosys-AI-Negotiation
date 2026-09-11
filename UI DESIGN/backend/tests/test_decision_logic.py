@@ -244,3 +244,87 @@ def test_rule_based_decision_contains_evaluation():
         result["evaluation"]["opponent_value"]
         == 47000
     )
+
+
+def test_generate_counteroffer_personalities():
+    """
+    Test counteroffer generation across Aggressive, Collaborative, and Risk-averse personalities.
+    """
+    from app.services.decision_logic import generate_counteroffer
+
+    # Buyer at 42,500 receives vendor offer of 48,000 with limit 50,000
+    agg = generate_counteroffer(42500, 48000, 50000, "minimize", "Aggressive", round_num=1)
+    collab = generate_counteroffer(42500, 48000, 50000, "minimize", "Collaborative", round_num=1)
+    risk = generate_counteroffer(42500, 48000, 50000, "minimize", "Risk-averse", round_num=1)
+
+    # Aggressive makes smaller concession than Collaborative
+    assert agg["counter_value"] < collab["counter_value"]
+    assert risk["counter_value"] <= collab["counter_value"]
+    assert agg["counter_value"] <= 50000.0
+    assert collab["counter_value"] <= 50000.0
+
+
+def test_track_concession_metrics():
+    """
+    Test concession tracking calculation, movement, and excessive step check.
+    """
+    from app.services.decision_logic import track_concession
+
+    metrics = track_concession(
+        initial_value=42500,
+        current_value=45000,
+        previous_value=42500,
+        limit=50000,
+        direction="minimize"
+    )
+
+    assert metrics["total_concession"] == 2500.0
+    assert metrics["turn_concession"] == 2500.0
+    assert metrics["concession_percentage"] == 33.33
+    assert metrics["concession_valid"] is True
+    assert metrics["is_excessive"] is False
+
+
+def test_decisions_favorable_negotiable_unacceptable():
+    """
+    Test Accept, Counter, and Reject decisions based on offer evaluation.
+    """
+    # 1. Accept favorable offer
+    accept_res = rule_based_decide(
+        goal="Lowest price",
+        direction="minimize",
+        limit=50000,
+        personality="Collaborative",
+        own_last_value=42500,
+        incoming_value=41000,
+        round_num=1,
+        max_rounds=5
+    )
+    assert accept_res["decision"] == "accept"
+
+    # 2. Counter negotiable offer
+    counter_res = rule_based_decide(
+        goal="Lowest price",
+        direction="minimize",
+        limit=50000,
+        personality="Collaborative",
+        own_last_value=42500,
+        incoming_value=47000,
+        round_num=2,
+        max_rounds=5
+    )
+    assert counter_res["decision"] == "counter"
+    assert counter_res["next_value"] <= 50000.0
+
+    # 3. Reject unacceptable offer at max round
+    reject_res = rule_based_decide(
+        goal="Lowest price",
+        direction="minimize",
+        limit=50000,
+        personality="Collaborative",
+        own_last_value=42500,
+        incoming_value=60000,
+        round_num=5,
+        max_rounds=5
+    )
+    assert reject_res["decision"] == "reject"

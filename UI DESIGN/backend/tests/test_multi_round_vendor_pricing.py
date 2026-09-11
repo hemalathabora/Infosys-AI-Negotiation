@@ -92,3 +92,77 @@ async def test_multi_round_vendor_pricing_simulation():
 
     # 5. Validate eventual termination (accepted, rejected, or completed)
     assert orch.status in ["accepted", "rejected", "completed", "active"]
+
+
+@pytest.mark.asyncio
+async def test_very_favorable_offer_triggers_accept():
+    """
+    Test that when Vendor presents a very favorable offer (<= Buyer target),
+    the Buyer Agent immediately accepts.
+    """
+    orch = NegotiationOrchestrator(
+        negotiation_id="test_fav_offer",
+        scenario_id="vendor_pricing",
+        agents=[BUYER_PROFILE, VENDOR_PROFILE],
+        max_rounds=5,
+        current_round=1,
+        current_agent_turn="buyer_agent",
+        status="active",
+        current_offer={"price": 74000, "quantity": 100} # Favorable offer below Buyer's 75,000 target
+    )
+
+    res = await orch.run_turn()
+    turn_log = res["turn_log"]
+
+    assert turn_log["decision"] == "accept"
+    assert orch.status == "accepted"
+
+
+@pytest.mark.asyncio
+async def test_partially_acceptable_offer_triggers_counter():
+    """
+    Test that when Vendor presents a partially acceptable offer (within max price limit but above target),
+    the Buyer Agent generates a counteroffer.
+    """
+    orch = NegotiationOrchestrator(
+        negotiation_id="test_partial_offer",
+        scenario_id="vendor_pricing",
+        agents=[BUYER_PROFILE, VENDOR_PROFILE],
+        max_rounds=5,
+        current_round=1,
+        current_agent_turn="buyer_agent",
+        status="active",
+        current_offer={"price": 82000, "quantity": 100} # Within 85,000 max, but above 75,000 target
+    )
+
+    res = await orch.run_turn()
+    turn_log = res["turn_log"]
+
+    assert turn_log["decision"] == "counter"
+    assert turn_log["proposed_offer"]["price"] <= 85000.0
+
+
+@pytest.mark.asyncio
+async def test_unacceptable_offer_triggers_reject():
+    """
+    Test that when an unacceptable offer exceeding constraints persists at final round,
+    the agent rejects the proposal.
+    """
+    orch = NegotiationOrchestrator(
+        negotiation_id="test_unacceptable_offer",
+        scenario_id="vendor_pricing",
+        agents=[BUYER_PROFILE, VENDOR_PROFILE],
+        max_rounds=3,
+        current_round=2, # Will increment to final round 3 on buyer's turn
+        current_agent_turn="buyer_agent",
+        status="active",
+        current_offer={"price": 95000, "quantity": 100} # Exceeds Buyer's 85,000 budget limit
+    )
+
+    res = await orch.run_turn()
+    turn_log = res["turn_log"]
+
+    assert turn_log["decision"] == "reject"
+    assert orch.status == "rejected"
+
+

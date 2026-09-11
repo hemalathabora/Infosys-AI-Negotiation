@@ -58,13 +58,14 @@ class NegotiationOrchestrator:
 
     async def run_turn(self) -> Dict[str, Any]:
         """
-        Executes one turn of negotiation according to the Orchestrator flow.
+        Executes one turn of negotiation according to the 7-step Orchestrator flow:
+        Opponent Offer -> Evaluate Offer -> Accept/Counter/Reject -> Generate Response -> Update Negotiation State -> Track Concession -> Next Turn
         """
         if self.status in ["accepted", "agreement", "rejected", "completed", "deadlock", "cancelled"]:
             logger.info(f"Negotiation {self.negotiation_id} is already in terminal state '{self.status}'. No turn run.")
             return self.get_state_dict()
 
-        # Step 1: Get Current Agent
+        # Step 1: Get Current Agent & Opponent Offer
         agent = self.get_current_agent()
         if not agent:
             raise ValueError(f"No active agent turn found for negotiation {self.negotiation_id}")
@@ -91,7 +92,7 @@ class NegotiationOrchestrator:
         history_context = list(self.history)
         opponent_offer = self.current_offer
 
-        # Step 6: Generate Agent Response via LLM Engine
+        # Step 2, 3, 4: Evaluate Offer, Accept/Counter/Reject decision & Generate LLM Response
         llm_response = await generate_agent_response(
             agent_profile=agent,
             negotiation_state=state_context,
@@ -119,7 +120,7 @@ class NegotiationOrchestrator:
             proposed_offer["value"] = price_scalar
             proposed_offer["price"] = price_scalar
 
-        # Step 9: Save History
+        # Step 5 & 6: Save History, Update State & Track Concession
         history_item = {
             "agent_id": agent_id,
             "round": self.current_round,
@@ -136,7 +137,7 @@ class NegotiationOrchestrator:
         self.previous_offer = self.current_offer
         self.current_offer = proposed_offer
 
-        # Step 8: Termination check
+        # Step 7: Check Termination & Switch to Next Turn
         is_terminated, final_status = self.check_termination(decision)
 
         if is_terminated:

@@ -1,4 +1,8 @@
 from typing import List, Dict, Any
+from app.services.concession_tracking import (
+    generate_concession_analysis,
+    extract_scalar_price
+)
 
 def build_concession_timeline(history: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
     """
@@ -45,41 +49,76 @@ def build_concession_timeline(history: List[Dict[str, Any]]) -> Dict[str, List[D
 
     return timeline
 
-def total_concession_by_agent(timeline: Dict[str, List[Dict[str, Any]]]) -> Dict[str, float]:
-    """Sum of absolute round-over-round moves per agent."""
-    totals: Dict[str, float] = {}
-    for agent_id, entries in timeline.items():
-        total_delta = sum(abs(e.get("delta") or 0.0) for e in entries)
-        totals[agent_id] = round(total_delta, 2)
-    return totals
 
 def calculate_negotiation_analytics(state: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Comprehensive Analytics engine calculating concession velocity, convergence index, and performance metrics.
+    Steps 10, 13, 14, 15: Comprehensive Analytics Engine.
+    Uses real negotiation history and agent profiles to calculate authoritative concession metrics,
+    rate of concession decay, convergence rate, and per-agent analysis.
     """
     history = state.get("history", [])
+    participating_agents = state.get("participating_agents", [])
     timeline = build_concession_timeline(history)
-    concession_totals = total_concession_by_agent(timeline)
 
-    # Calculate gap convergence
-    offers_with_values = []
+    # Perform full concession analysis per agent
+    agent_analytics: Dict[str, Dict[str, Any]] = {}
+    concession_totals: Dict[str, float] = {}
+
+    for agent in participating_agents:
+        agent_id = agent.get("id")
+        if not agent_id:
+            continue
+        analysis = generate_concession_analysis(agent, history, state)
+        agent_analytics[agent_id] = analysis
+        concession_totals[agent_id] = analysis["total_concession"]
+
+    # Fallback for agents in history not explicitly in participating_agents list
+    by_agent: Dict[str, List[Dict[str, Any]]] = {}
+    for offer in history:
+        aid = offer.get("agent_id")
+        if aid and aid not in agent_analytics:
+            by_agent.setdefault(aid, []).append(offer)
+
+    for aid, offers in by_agent.items():
+        role = "buyer" if ("buyer" in aid.lower() or "1" in aid) else "vendor"
+        fallback_profile = {"id": aid, "role": role, "persona": "Collaborative"}
+        analysis = generate_concession_analysis(fallback_profile, history, state)
+        agent_analytics[aid] = analysis
+        concession_totals[aid] = analysis["total_concession"]
+
+    # Calculate gap convergence across distinct agents
+    agent_offers_map: Dict[str, List[float]] = {}
     for turn in history:
-        v = turn.get("value")
-        if v is None and isinstance(turn.get("proposed_offer"), dict):
-            v = turn.get("proposed_offer", {}).get("price")
+        aid = turn.get("agent_id")
+        if not aid:
+            continue
+        v = extract_scalar_price(turn.get("proposed_offer"))
+        if v is None:
+            v = turn.get("value")
         if v is not None:
-            offers_with_values.append(float(v))
+            agent_offers_map.setdefault(aid, []).append(float(v))
 
-    opening_gap = abs(offers_with_values[1] - offers_with_values[0]) if len(offers_with_values) >= 2 else 0.0
-    latest_gap = abs(offers_with_values[-1] - offers_with_values[-2]) if len(offers_with_values) >= 2 else 0.0
-    convergence_rate = round(((opening_gap - latest_gap) / opening_gap * 100), 1) if opening_gap > 0 else 100.0
+    agent_ids = list(agent_offers_map.keys())
+    if len(agent_ids) >= 2:
+        a1_offers = agent_offers_map[agent_ids[0]]
+        a2_offers = agent_offers_map[agent_ids[1]]
+        opening_gap = abs(a1_offers[0] - a2_offers[0])
+        latest_gap = abs(a1_offers[-1] - a2_offers[-1])
+        convergence_rate = round(((opening_gap - latest_gap) / opening_gap * 100), 1) if opening_gap > 0 else 100.0
+    else:
+        opening_gap = 0.0
+        latest_gap = 0.0
+        convergence_rate = 0.0
 
     return {
         "negotiation_id": state.get("negotiation_id"),
+        "scenario_id": state.get("scenario_id"),
         "total_rounds": state.get("current_round", 0),
         "status": state.get("status"),
+        "mode": state.get("mode"),
         "timeline": timeline,
         "concession_totals": concession_totals,
+        "agent_analytics": agent_analytics,
         "opening_gap": round(opening_gap, 2),
         "latest_gap": round(latest_gap, 2),
         "convergence_rate_percent": max(0.0, min(100.0, convergence_rate)),

@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 import { DECISIONS } from "../types/negotiation.js";
 
@@ -11,8 +11,6 @@ const CONCESSION_RATE = {
   Collaborative: 0.35,
   "Risk-averse": 0.25,
 };
-
-const ACCEPTANCE_TOLERANCE = 0.03;
 
 /**
  * Extract negotiation direction and hard limit
@@ -179,20 +177,25 @@ export function decide({
     1,
   );
 
-  const closeEnough =
-    gap <= comparisonBase * ACCEPTANCE_TOLERANCE;
+  const isTightGap = gap <= comparisonBase * 0.005 || gap <= 10;
+  const isCloseGap = gap <= comparisonBase * 0.035;
 
   /**
    * ACCEPT
    *
-   * The offer satisfies the hard constraint
-   * and is sufficiently close to the agent's position.
+   * The offer satisfies the hard constraint and either:
+   * 1. Gap is virtually zero (tight gap <= 0.5% or <= $10), OR
+   * 2. After at least 3 bargaining rounds, offers have converged (gap <= 3.5%), OR
+   * 3. Final round (round >= maxRounds) reached and offer satisfies hard limit.
    */
-  if (withinOwnLimit && closeEnough) {
+  if (
+    withinOwnLimit &&
+    (isTightGap || (round >= 4 && isCloseGap) || round >= (maxRounds || 5))
+  ) {
     return {
       decision: DECISIONS.ACCEPT,
       reason:
-        `Accepted ${incomingValue} because it satisfies ` +
+        `Accepted ${incomingValue} in Round ${round} because it satisfies ` +
         `the goal "${goal}" and stays within the ` +
         `${goalDirection === "minimize" ? "maximum" : "minimum"} ` +
         `constraint of ${limit}.`,
@@ -206,7 +209,7 @@ export function decide({
    * and the offer still violates the hard constraint,
    * the agent rejects it.
    */
-  if (!withinOwnLimit && round >= maxRounds) {
+  if (!withinOwnLimit && round >= (maxRounds || 5)) {
     return {
       decision: DECISIONS.REJECT,
       reason:
@@ -223,28 +226,38 @@ export function decide({
    * gap the agent is willing to concede.
    */
   const rate =
-    CONCESSION_RATE[personality] ?? 0.2;
+    CONCESSION_RATE[personality] ?? 0.25;
 
   let nextValue =
     ownLastValue +
     rate * (incomingValue - ownLastValue);
 
+  // Guarantee a minimum step to ensure continuous offer evolution across rounds
+  const minStep = Math.max(comparisonBase * 0.01, 100);
+  if (Math.abs(nextValue - ownLastValue) < minStep) {
+    if (goalDirection === "minimize") {
+      nextValue = Math.min(ownLastValue + minStep, incomingValue);
+    } else {
+      nextValue = Math.max(ownLastValue - minStep, incomingValue);
+    }
+  }
+
   /**
    * Never cross the agent's hard constraint.
    */
   if (goalDirection === "minimize") {
-    nextValue = Math.min(nextValue, limit);
+    nextValue = Math.min(Math.round(nextValue), limit);
   } else {
-    nextValue = Math.max(nextValue, limit);
+    nextValue = Math.max(Math.round(nextValue), limit);
   }
 
   return {
     decision: DECISIONS.COUNTEROFFER,
     nextValue,
     reason:
-      `Countered at ${nextValue}. The ${personality} ` +
+      `Countered at ${nextValue} in Round ${round}. The ${personality} ` +
       `personality concedes ${(rate * 100).toFixed(0)}% ` +
       `of the gap toward ${incomingValue}, while pursuing ` +
-      `the goal "${goal}" and respecting the constraint of ${limit}.`,
+      `the goal "${goal}" and respecting the constraint limit of ${limit}.`,
   };
 }

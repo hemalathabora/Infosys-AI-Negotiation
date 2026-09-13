@@ -27,11 +27,14 @@ export function useGuidedTour(currentPage = "Dashboard") {
       element.scrollIntoView({ behavior: "smooth", block: "center" });
 
       const bounds = element.getBoundingClientRect();
-      setHighlightStyle({
+      const style = {
         top: Math.max(bounds.top - 8, 12),
         left: Math.max(bounds.left - 10, 12),
         width: Math.min(bounds.width + 20, window.innerWidth - 24),
         height: Math.min(bounds.height + 20, window.innerHeight - 24),
+      };
+      requestAnimationFrame(() => {
+        setHighlightStyle(style);
       });
     }
   }, [currentStep, isTourActive]);

@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import ScenarioDescription from "../components/negotiation/ScenarioDescription";
-import AgentCard from "../components/agent/AgentCard";
-import StartNegotiationButton from "../components/negotiation/StartNegotiationButton";
-import ReadyBanner from "../components/common/ReadyBanner";
-import LoadingState from "../components/common/LoadingState";
-import ErrorState from "../components/common/ErrorState";
-import EmptyState from "../components/common/EmptyState";
-import NegotiationSessionPanel from "../components/negotiation/NegotiationSessionPanel";
+import ScenarioDescription from "../components/ScenarioDescription";
+import AgentCard from "../components/AgentCard";
+import StartNegotiationButton from "../components/StartNegotiationButton";
+import ReadyBanner from "../components/ReadyBanner";
+import LoadingState from "../components/LoadingState";
+import ErrorState from "../components/ErrorState";
+import EmptyState from "../components/EmptyState";
+import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
 
 import { useScenarioConfiguration } from "../hooks/useScenarioConfiguration.js";
 import { useNegotiationEngine } from "../hooks/useNegotiationEngine.js";
@@ -68,13 +68,27 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
 
   const negotiation = useNegotiationEngine();
   const [view, setView] = useState("grid");
+  const [isStarting, setIsStarting] = useState(false);
 
-  function handleStartNegotiation() {
-    if (!configurationValid || !selectedScenario) return;
-    if (onNegotiationStart) {
-      onNegotiationStart(selectedScenario);
-    } else {
-      negotiation.start(selectedScenario);
+  // Milestone 3: Participant Mode ("simulation" | "practice") & Human Role Selection
+  const [mode, setMode] = useState("simulation"); 
+  const [humanRole, setHumanRole] = useState("");
+
+  const activeHumanRole = humanRole || (agents[0]?.role || "buyer");
+
+  async function handleStartNegotiation() {
+    if (!configurationValid || !selectedScenario || isStarting) return;
+    setIsStarting(true);
+    try {
+      if (onNegotiationStart) {
+        await onNegotiationStart(selectedScenario, mode, activeHumanRole);
+      } else {
+        await negotiation.start(selectedScenario, mode, activeHumanRole);
+      }
+    } catch (err) {
+      console.error("Error starting negotiation session:", err);
+    } finally {
+      setIsStarting(false);
     }
   }
 
@@ -93,6 +107,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
       negotiation.reset();
     }
     selectScenario(scenarioId);
+    setHumanRole(""); // reset role for scenario
   }
 
   const agentChecks = agents.map(
@@ -128,9 +143,78 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                 Configure Negotiation Session
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
-                Select an economic scenario, tune agent boundary parameters, and deploy to the orchestrator.
+                Select an economic scenario, choose Simulation or Practice mode, tune parameters, and deploy.
               </p>
             </div>
+          </div>
+
+          {/* Mode Switcher Banner */}
+          <div className="rounded-2xl border border-[#302F39] bg-[#201F25] p-5 shadow-sm space-y-4 font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                  Session Mode Selection
+                </p>
+                <h3 className="text-base font-bold text-white">Choose How You Negotiate</h3>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-xl border border-[#3A3944] bg-[#17161B] p-1">
+                <button
+                  type="button"
+                  onClick={() => setMode("simulation")}
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                    mode === "simulation"
+                      ? "bg-emerald-500 text-slate-950 shadow-md font-extrabold"
+                      : "text-slate-300 hover:text-white"
+                  }`}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                  Simulation Mode (AI ↔ AI)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMode("practice")}
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+                    mode === "practice"
+                      ? "bg-emerald-500 text-slate-950 shadow-md font-extrabold"
+                      : "text-slate-300 hover:text-white"
+                  }`}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Practice Mode (Human ↔ AI)
+                </button>
+              </div>
+            </div>
+
+            {mode === "practice" && agents.length > 0 && (
+              <div className="flex items-center gap-3 pt-2 border-t border-[#2D2C36] text-xs">
+                <span className="font-mono font-bold text-slate-400">Select Your Human Role:</span>
+                <div className="flex items-center gap-2">
+                  {agents.map((agent) => (
+                    <button
+                      key={agent.id}
+                      type="button"
+                      onClick={() => setHumanRole(agent.role)}
+                      className={`rounded-xl border px-3 py-1.5 font-bold transition-all cursor-pointer ${
+                        activeHumanRole.toLowerCase() === agent.role.toLowerCase()
+                          ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm"
+                          : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                      }`}
+                    >
+                      Human: {agent.name} ({agent.role})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Symmetrical 3-Step Progress Grid */}
@@ -320,7 +404,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
               <div className="lg:col-span-5 h-full">
                 <StartNegotiationButton
                   disabled={!configurationValid}
-                  isStarting={false}
+                  isStarting={isStarting}
                   onClick={handleStartNegotiation}
                 />
               </div>

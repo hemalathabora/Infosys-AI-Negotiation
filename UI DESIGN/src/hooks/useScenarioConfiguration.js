@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 
 import { useCallback, useEffect, useState } from "react";
 
@@ -121,7 +121,11 @@ export function useScenarioConfiguration() {
    * Load the default/current scenario.
    */
   useEffect(() => {
-    loadScenario(selectedScenarioId);
+    if (selectedScenarioId) {
+      Promise.resolve().then(() => {
+        loadScenario(selectedScenarioId);
+      });
+    }
   }, [selectedScenarioId, loadScenario]);
 
   /**

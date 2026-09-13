@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-import CinematicLoader from "./components/common/CinematicLoader";
-import TopNavigation from "./components/layout/TopNavigation";
-import Sidebar from "./components/layout/Sidebar";
+import CinematicLoader from "./components/CinematicLoader";
+import TopNavigation from "./components/TopNavigation";
+import Sidebar from "./components/Sidebar";
 
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
@@ -34,19 +34,29 @@ export default function App() {
   useEffect(() => {
     if (!negotiation.state || !activeScenario) return;
 
-    const { status, current_round, current_offer, history: offerHistory } = negotiation.state;
-    if (status === "agreement" || status === "deadlock") {
-      const isAgreement = status === "agreement";
+    const { status, current_round, current_offer, mode } = negotiation.state;
+    const isDone =
+      status === "agreement" ||
+      status === "accepted" ||
+      status === "rejected" ||
+      status === "deadlock" ||
+      status === "completed" ||
+      status === "finished";
+
+    if (isDone) {
+      const isAgreement = status === "agreement" || status === "accepted";
       const agentNames = activeScenario.agents.map((a) => a.name).join(" vs ");
-      const finalVal = current_offer?.value;
-      const settlementStr = finalVal ? `$${Math.round(finalVal).toLocaleString()}` : "N/A";
+      const finalVal = current_offer ? (current_offer.price ?? current_offer.value ?? null) : null;
+      const finalNum = Number(finalVal);
+      const settlementStr = Number.isFinite(finalNum) ? `$${Math.round(finalNum).toLocaleString()}` : "N/A";
       const sessionData = {
         id: `session-${Date.now()}`,
         scenario: activeScenario.scenario_name || activeScenario.name,
         scenario_id: activeScenario.scenario_id,
         agents: agentNames,
         rounds: current_round,
-        result: isAgreement ? "Agreement" : "Deadlock",
+        mode: mode || "Normal Mode",
+        result: isAgreement ? "Agreement" : status === "rejected" ? "Rejected" : "Deadlock",
         utility: isAgreement ? "90%" : "40%",
         settlement: settlementStr,
         date: "Just now",
@@ -54,7 +64,7 @@ export default function App() {
       };
       addSession(sessionData);
     }
-  }, [negotiation.state?.status, activeScenario, addSession]);
+  }, [negotiation.state, activeScenario, addSession]);
 
 
   /* ============================================================
@@ -86,9 +96,9 @@ export default function App() {
         return (
           <div data-guide="agent-configuration-shell" className="flex-1">
             <AgentConfiguration
-              onNegotiationStart={(scenario) => {
+              onNegotiationStart={async (scenario, mode, humanRole) => {
                 setActiveScenario(scenario);
-                negotiation.start(scenario);
+                await negotiation.start(scenario, mode, humanRole);
                 setActivePage("Negotiation Arena");
               }}
               onNegotiationReset={negotiation.reset}
@@ -220,6 +230,12 @@ export default function App() {
           onClose={() => setSidebarOpen(false)}
           activePage={activePage}
           onNavigate={setActivePage}
+          stats={stats}
+          history={history}
+          activeScenario={activeScenario}
+          negotiation={negotiation}
+          onClearHistory={clearHistory}
+          onReplayIntro={handleReplayIntro}
         />
 
 

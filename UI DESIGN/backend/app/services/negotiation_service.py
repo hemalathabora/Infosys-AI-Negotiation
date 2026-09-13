@@ -15,7 +15,7 @@ DEFAULT_SCENARIOS = {
         "agents": [
             {
                 "id": "buyer",
-                "name": "Buyer Agent",
+                "name": "Alex Morgan",
                 "role": "buyer",
                 "persona": "Risk-averse",
                 "goals": ["Lowest possible unit price"],
@@ -24,7 +24,7 @@ DEFAULT_SCENARIOS = {
             },
             {
                 "id": "vendor",
-                "name": "Vendor Agent",
+                "name": "Daniel Carter",
                 "role": "vendor",
                 "persona": "Aggressive",
                 "goals": ["Maximize profit margin"],
@@ -40,8 +40,8 @@ DEFAULT_SCENARIOS = {
         "agents": [
             {
                 "id": "candidate",
-                "name": "Candidate",
-                "role": "Job Candidate",
+                "name": "Sarah Mitchell",
+                "role": "candidate",
                 "persona": "Collaborative",
                 "goals": ["Maximize total compensation and benefits"],
                 "constraints": {"minimum_price": 95000},
@@ -49,8 +49,8 @@ DEFAULT_SCENARIOS = {
             },
             {
                 "id": "employer",
-                "name": "Employer",
-                "role": "Hiring Manager",
+                "name": "Michael Anderson",
+                "role": "employer",
                 "persona": "Risk-averse",
                 "goals": ["Secure the candidate within approved budget"],
                 "constraints": {"maximum_price": 110000},
@@ -61,12 +61,12 @@ DEFAULT_SCENARIOS = {
     "project_budget": {
         "scenario_id": "project_budget",
         "scenario_name": "Project Budget Allocation",
-        "description": "Department Head and Finance Director negotiate how much budget to allocate to a new initiative.",
+        "description": "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative.",
         "agents": [
             {
                 "id": "department_head",
-                "name": "Department Head",
-                "role": "Department Head",
+                "name": "Olivia Bennett",
+                "role": "department_head",
                 "persona": "Aggressive",
                 "goals": ["Secure maximum budget for the initiative"],
                 "constraints": {"minimum_price": 80000},
@@ -74,8 +74,8 @@ DEFAULT_SCENARIOS = {
             },
             {
                 "id": "finance_director",
-                "name": "Finance Director",
-                "role": "Finance Director",
+                "name": "James Wilson",
+                "role": "finance_director",
                 "persona": "Collaborative",
                 "goals": ["Control company-wide spending"],
                 "constraints": {"maximum_price": 60000},
@@ -102,6 +102,11 @@ def get_or_create_default_agents(db: Session) -> List[Dict[str, Any]]:
             db.add(db_agent)
             db.commit()
             db.refresh(db_agent)
+        else:
+            db_agent.name = default_agent["name"]
+            db_agent.role = default_agent["role"]
+            db.commit()
+            db.refresh(db_agent)
         agents.append(db_agent.to_dict())
     return agents
 
@@ -109,19 +114,25 @@ def create_negotiation_session(
     db: Session,
     scenario_id: str = "vendor_pricing",
     agent_profiles: Optional[List[Dict[str, Any]]] = None,
-    max_rounds: int = 8
+    max_rounds: int = 5,
+    mode: str = "simulation",
+    human_role: Optional[str] = None
 ) -> NegotiationOrchestrator:
     negotiation_id = str(uuid.uuid4())
 
     if not agent_profiles:
-        # Check if agents exist in DB or fallback to default vendor pricing agents
-        agent_profiles = get_or_create_default_agents(db)
+        if scenario_id in DEFAULT_SCENARIOS:
+            agent_profiles = DEFAULT_SCENARIOS[scenario_id]["agents"]
+        else:
+            agent_profiles = get_or_create_default_agents(db)
 
     # Save initial negotiation state to DB
     initial_turn = agent_profiles[0]["id"] if agent_profiles else "buyer"
     db_neg = NegotiationModel(
         negotiation_id=negotiation_id,
         scenario_id=scenario_id,
+        mode=mode,
+        human_role=human_role,
         current_round=0,
         max_rounds=max_rounds,
         current_agent_turn=initial_turn,
@@ -130,6 +141,7 @@ def create_negotiation_session(
     db_neg.participating_agents = agent_profiles
     db_neg.current_offer = None
     db_neg.previous_offer = None
+    db_neg.deadlock_info = {}
 
     db.add(db_neg)
     db.commit()
@@ -143,9 +155,12 @@ def create_negotiation_session(
         current_round=0,
         current_agent_turn=initial_turn,
         status="active",
+        mode=mode,
+        human_role=human_role,
         current_offer=None,
         previous_offer=None,
-        history=[]
+        history=[],
+        deadlock_info={}
     )
 
 def load_orchestrator(db: Session, negotiation_id: str) -> Optional[NegotiationOrchestrator]:
@@ -168,9 +183,12 @@ def load_orchestrator(db: Session, negotiation_id: str) -> Optional[NegotiationO
         current_round=db_neg.current_round,
         current_agent_turn=db_neg.current_agent_turn,
         status=db_neg.status,
+        mode=getattr(db_neg, "mode", "simulation") or "simulation",
+        human_role=getattr(db_neg, "human_role", None),
         current_offer=db_neg.current_offer,
         previous_offer=db_neg.previous_offer,
-        history=history
+        history=history,
+        deadlock_info=getattr(db_neg, "deadlock_info", {}) or {}
     )
 
 def save_orchestrator_state(db: Session, orch: NegotiationOrchestrator):
@@ -183,6 +201,9 @@ def save_orchestrator_state(db: Session, orch: NegotiationOrchestrator):
     db_neg.status = orch.status
     db_neg.current_offer = orch.current_offer
     db_neg.previous_offer = orch.previous_offer
+    db_neg.mode = orch.mode
+    db_neg.human_role = orch.human_role
+    db_neg.deadlock_info = orch.deadlock_info
 
     # Save any new history items
     existing_count = db.query(NegotiationMessageModel).filter(

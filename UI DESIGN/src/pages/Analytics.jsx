@@ -32,14 +32,24 @@ function Metric({ label, value, detail, badge }) {
 /**
  * Offer Trajectory Bar Component
  */
+function extractVal(offer) {
+  if (offer === null || offer === undefined) return 0;
+  if (typeof offer === "number") return offer;
+  if (typeof offer === "object") {
+    return offer.value ?? offer.price ?? offer.proposed_offer?.price ?? 0;
+  }
+  return 0;
+}
+
 function OfferBar({ offer, maxValue, agent, index }) {
-  const width = maxValue ? Math.max(8, (offer.value / maxValue) * 100) : 8;
+  const val = extractVal(offer);
+  const width = maxValue ? Math.max(8, (val / maxValue) * 100) : 8;
   const isFirst = index === 0;
 
   return (
     <div className="grid grid-cols-[100px_1fr_92px] items-center gap-3 text-xs sm:grid-cols-[140px_1fr_110px]">
       <div className="truncate font-medium text-white font-sans">
-        R{offer.round} · {agent?.name || "Agent"}
+        R{offer.round || 1} · {agent?.name || offer.agent_id || "Agent"}
       </div>
       <div className="h-2.5 overflow-hidden rounded-full bg-[#1A191E] border border-[#2D2C36]">
         <div
@@ -54,7 +64,7 @@ function OfferBar({ offer, maxValue, agent, index }) {
         />
       </div>
       <div className="text-right font-mono font-bold text-white">
-        {formatValue(offer.value)}
+        {formatValue(val)}
       </div>
     </div>
   );
@@ -64,7 +74,8 @@ function OfferBar({ offer, maxValue, agent, index }) {
  * Bid Convergence & Saturation SVG Graph Component
  */
 function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2Name = "Party 02 (Vendor)" }) {
-  const [hoverPoint, setHoverPoint] = useState(null);
+  const [_hoverPoint, _setHoverPoint] = useState(null);
+  const safeHistory = Array.isArray(history) ? history : [];
 
   // Generate smooth saturation data if history is short
   const samplePoints = [
@@ -77,17 +88,17 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
 
   // Derive points from real history or fallback
   let points = [];
-  if (history.length >= 2) {
-    let p1Val = history[0]?.value || 42000;
-    let p2Val = history[1]?.value || 58000;
+  if (safeHistory.length >= 2) {
+    let p1Val = extractVal(safeHistory[0]) || 42000;
+    let p2Val = extractVal(safeHistory[1]) || 58000;
 
-    const maxRounds = Math.max(...history.map((h) => h.round), 1);
+    const maxRounds = Math.max(...safeHistory.map((h) => h.round || 1), 1);
     for (let r = 1; r <= maxRounds; r++) {
-      const p1Offer = history.find((h) => h.round === r && (h.agent_id === "buyer" || h.agent_id?.includes("1") || history.indexOf(h) % 2 === 0));
-      const p2Offer = history.find((h) => h.round === r && (h.agent_id === "vendor" || h.agent_id?.includes("2") || history.indexOf(h) % 2 === 1));
+      const p1Offer = safeHistory.find((h) => h.round === r && (h.agent_id === "buyer" || h.agent_id?.includes("1") || safeHistory.indexOf(h) % 2 === 0));
+      const p2Offer = safeHistory.find((h) => h.round === r && (h.agent_id === "vendor" || h.agent_id?.includes("2") || safeHistory.indexOf(h) % 2 === 1));
 
-      if (p1Offer) p1Val = p1Offer.value;
-      if (p2Offer) p2Val = p2Offer.value;
+      if (p1Offer) p1Val = extractVal(p1Offer);
+      if (p2Offer) p2Val = extractVal(p2Offer);
 
       points.push({
         round: r,
@@ -303,10 +314,16 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
     vendor: 8000,
   };
 
-  const isAgreement = state.status === "agreement";
-  const maxValue = Math.max(...state.history.map((offer) => offer.value), 1);
-  const firstOffer = state.history[0]?.value;
-  const finalOffer = state.current_offer?.value || 50000;
+  const offerHistory = Array.isArray(state?.history) ? state.history : [];
+  const safeHistory = Array.isArray(history) ? history : [];
+
+  const isAgreement = state.status === "agreement" || state.status === "accepted";
+  const activeMode = state.mode || state.execution_mode || "Normal Mode";
+  const isLlmMode = activeMode === "LLM Mode" || String(activeMode).toLowerCase().includes("llm");
+
+  const maxValue = Math.max(...offerHistory.map((offer) => extractVal(offer)), 1);
+  const firstOffer = offerHistory[0] ? extractVal(offerHistory[0]) : 42000;
+  const finalOffer = state.current_offer ? extractVal(state.current_offer) : 50000;
   const totalMovement = Object.values(concessionTotals).reduce((sum, value) => sum + value, 0);
 
   return (
@@ -331,19 +348,72 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               </p>
             </div>
 
-            <div className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-mono font-bold ${
-              isAgreement
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm"
-                : "border-amber-500/30 bg-amber-500/10 text-amber-400"
-            }`}>
-              <span className={isAgreement ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
-              {isAgreement ? "AGREEMENT SATURATED" : "SESSION DEADLOCK"}
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* MODE BADGE */}
+              <div className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-mono font-bold ${
+                isLlmMode
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-sm"
+                  : "border-indigo-500/40 bg-indigo-500/10 text-indigo-300 shadow-sm"
+              }`}>
+                <span className={`h-2 w-2 rounded-full ${isLlmMode ? "bg-emerald-400 animate-pulse" : "bg-indigo-400"}`} />
+                Performed by: {activeMode}
+              </div>
+
+              {/* STATUS BADGE */}
+              <div className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-mono font-bold ${
+                isAgreement
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm"
+                  : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+              }`}>
+                <span className={isAgreement ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
+                {isAgreement ? "AGREEMENT SATURATED" : "SESSION DEADLOCK"}
+              </div>
             </div>
           </div>
         </header>
 
+        {/* EXPLICIT MODE EXECUTION BANNER */}
+        <section className={`rounded-2xl border p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono ${
+          isLlmMode
+            ? "border-emerald-500/40 bg-[#14261F]"
+            : "border-[#353344] bg-[#1E1D28]"
+        }`}>
+          <div className="flex items-center gap-3.5">
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border font-bold text-xs ${
+              isLlmMode ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-300" : "border-indigo-400/50 bg-indigo-500/20 text-indigo-300"
+            }`}>
+              {isLlmMode ? "LLM" : "NORM"}
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                EXECUTION PROTOCOL MODE TELEMETRY
+              </p>
+              <p className="text-sm sm:text-base font-extrabold text-white font-sans mt-0.5">
+                Operation Performed By: <span className={isLlmMode ? "text-emerald-400 font-black" : "text-indigo-300 font-black"}>{activeMode}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-slate-400 font-body">Reasoning Engine:</span>
+            <span className={`rounded-lg border px-3 py-1 font-bold ${
+              isLlmMode
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                : "border-indigo-500/40 bg-indigo-500/15 text-indigo-200"
+            }`}>
+              {isLlmMode ? "LLM Mode (Generative AI Reasoning)" : "Normal Mode (Rule-Based Concession Engine)"}
+            </span>
+          </div>
+        </section>
+
         {/* 2. SYMMETRICAL METRICS GRID */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-stretch">
+          <Metric
+            label="Engine Mode"
+            value={activeMode}
+            detail={isLlmMode ? "LLM Reasoning Active" : "Rule Engine Active"}
+            badge={isLlmMode ? "Gemini AI" : "Deterministic"}
+          />
           <Metric
             label="Outcome Result"
             value={isAgreement ? "Agreement" : "Deadlock"}
@@ -410,7 +480,7 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               </div>
 
               <div className="space-y-3.5 pt-1">
-                {state.history.map((offer, idx) => {
+                {offerHistory.map((offer, idx) => {
                   const agent = currentScenario.agents.find((a) => a.id === offer.agent_id);
                   return (
                     <OfferBar
@@ -431,25 +501,52 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
             <div className="space-y-5">
               <div className="border-b border-[#2B2A33] pb-3">
                 <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
-                  CONCESSION ANALYSIS
+                  CONCESSION ANALYSIS & BOUNDARIES
                 </p>
                 <h2 className="text-lg font-bold text-white font-sans">
-                  Agent Flexibility Metrics
+                  Agent Flexibility & Decay Telemetry
                 </h2>
               </div>
 
               <div className="space-y-4">
                 {currentScenario.agents.map((agent) => {
-                  const moved = concessionTotals[agent.id] ?? 8000;
+                  const agentAnalysis = negotiation?.agent_analytics?.[agent.id] || negotiation?.agent_analytics?.[agent.name];
+                  const moved = agentAnalysis?.total_concession ?? concessionTotals[agent.id] ?? 8000;
+                  const initPos = agentAnalysis?.initial_position;
+                  const targetPos = agentAnalysis?.target_position;
+                  const currPos = agentAnalysis?.current_position;
+                  const decayRate = agentAnalysis?.rate_of_concession_decay;
+                  const remainingCap = agentAnalysis?.remaining_concession_capacity;
+                  const interpretation = agentAnalysis?.interpretation;
+
                   return (
-                    <div key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-2">
-                      <div className="flex items-center justify-between">
+                    <div key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-3 font-mono">
+                      <div className="flex items-center justify-between border-b border-[#2D2C36] pb-2">
                         <span className="text-sm font-bold text-white font-sans">{agent.name}</span>
-                        <span className="font-mono text-xs text-emerald-400 font-bold">
-                          Moved {formatValue(moved)}
+                        <span className="text-xs text-emerald-400 font-bold">
+                          True Concession: {formatValue(moved)}
                         </span>
                       </div>
-                      <p className="text-xs text-textSecondary font-body">Role: {agent.role} ({agent.personality})</p>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
+                        <div>Initial: <span className="font-bold text-white">{formatValue(initPos)}</span></div>
+                        <div>Target: <span className="font-bold text-white">{formatValue(targetPos)}</span></div>
+                        <div>Current: <span className="font-bold text-white">{formatValue(currPos)}</span></div>
+                        <div>Capacity Left: <span className="font-bold text-indigo-300">{formatValue(remainingCap)}</span></div>
+                      </div>
+
+                      <div className="border-t border-[#2D2C36] pt-2 text-[11px] flex items-center justify-between">
+                        <span className="text-slate-400">Rate of Concession Decay:</span>
+                        <span className="font-bold text-white">
+                          {decayRate !== null && decayRate !== undefined ? `${decayRate}%` : "Insufficient rounds"}
+                        </span>
+                      </div>
+
+                      {interpretation && (
+                        <p className="text-[11px] font-sans text-indigo-300 italic pt-1 border-t border-[#2D2C36]/50 leading-relaxed">
+                          "{interpretation}"
+                        </p>
+                      )}
                     </div>
                   );
                 })}
@@ -469,6 +566,73 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
           </div>
 
         </section>
+
+        {/* 5. SESSION HISTORY & ENGINE MODE AUDIT TABLE */}
+        {safeHistory.length > 0 && (
+          <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#2B2A33] pb-3">
+              <div>
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  HISTORICAL TELEMETRY AUDIT
+                </p>
+                <h3 className="text-lg font-bold text-white font-sans">
+                  Session Execution Mode Breakdown
+                </h3>
+              </div>
+              <p className="text-xs text-textMuted font-body">
+                Audit record showing whether operations were performed by Normal Mode or LLM Mode
+              </p>
+            </div>
+
+            <div className="overflow-x-auto rounded-xl border border-[#2D2C36] bg-[#1A191E]">
+              <table className="w-full text-left text-xs font-body">
+                <thead>
+                  <tr className="border-b border-[#2D2C36] bg-[#17161B] font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                    <th className="px-4 py-3.5">Scenario</th>
+                    <th className="px-4 py-3.5">Parties</th>
+                    <th className="px-4 py-3.5">Executed By (Mode)</th>
+                    <th className="px-4 py-3.5">Rounds</th>
+                    <th className="px-4 py-3.5">Result</th>
+                    <th className="px-4 py-3.5">Settlement</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#2B2A33]">
+                  {safeHistory.map((item, idx) => {
+                    const itemMode = item.mode || "Normal Mode";
+                    const isItemLlm = itemMode === "LLM Mode" || String(itemMode).toLowerCase().includes("llm");
+                    return (
+                      <tr key={item.id || idx} className="hover:bg-[#201F25] transition-colors">
+                        <td className="px-4 py-3.5 font-semibold text-white">{item.scenario}</td>
+                        <td className="px-4 py-3.5 text-slate-300">{item.agents}</td>
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-mono text-[11px] font-bold ${
+                            isItemLlm
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                              : "border-indigo-500/40 bg-indigo-500/10 text-indigo-300"
+                          }`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${isItemLlm ? "bg-emerald-400" : "bg-indigo-400"}`} />
+                            {itemMode}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 font-mono text-slate-400">{item.rounds}</td>
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${
+                            item.result === "Agreement"
+                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                              : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
+                          }`}>
+                            {item.result}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 font-mono font-extrabold text-emerald-400">{item.settlement || "N/A"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
       </div>
     </main>

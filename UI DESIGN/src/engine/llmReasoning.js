@@ -85,11 +85,14 @@ export async function executeLLMReasoning(agentProfile, negotiationState, conver
   const apiKey = (typeof process !== "undefined" && (process.env?.GEMINI_API_KEY || process.env?.VITE_GEMINI_API_KEY)) ||
                  (typeof import.meta !== "undefined" && import.meta.env?.VITE_GEMINI_API_KEY);
 
-  if (apiKey) {
+  const isValidGeminiKey = apiKey && typeof apiKey === "string" && apiKey.startsWith("AIzaSy");
+
+  if (isValidGeminiKey) {
     try {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout ? AbortSignal.timeout(2500) : undefined,
         body: JSON.stringify({
           contents: [
             { role: "user", parts: [{ text: `${prompts.systemPrompt}\n\n${prompts.userPrompt}` }] }
@@ -134,7 +137,7 @@ function generateContextAwareFallback(agentProfile, negotiationState, conversati
   const goal = agentProfile.goal || agentProfile.negotiation_objectives || "Negotiate optimal terms";
   const role = agentProfile.role || agentProfile.name || "Negotiator";
   const round = negotiationState.current_round || 1;
-  const maxRounds = negotiationState.max_rounds || 8;
+  const maxRounds = negotiationState.max_rounds || 5;
 
   // History analysis
   const history = conversationHistory || [];
@@ -150,7 +153,9 @@ function generateContextAwareFallback(agentProfile, negotiationState, conversati
   const withinLimit = direction === "minimize" ? incomingValue <= limit : incomingValue >= limit;
   const gap = Math.abs(ownLastValue - incomingValue);
   const baseVal = Math.max(Math.abs(limit), Math.abs(incomingValue), 1);
-  const closeEnough = gap <= baseVal * 0.035;
+  
+  const isTightGap = gap <= baseVal * 0.005 || gap <= 10;
+  const isCloseGap = gap <= baseVal * 0.035;
 
   let decision = DECISIONS.COUNTEROFFER;
   let proposed_offer = ownLastValue;
@@ -161,8 +166,8 @@ function generateContextAwareFallback(agentProfile, negotiationState, conversati
   else if (personality === "Risk-averse") concession_rate = 0.25;
   else if (personality === "Collaborative") concession_rate = 0.35;
 
-  // Decision logic: ACCEPT
-  if (withinLimit && (closeEnough || round >= maxRounds - 1)) {
+  // Decision logic: ACCEPT (Requires round >= 4 or tight gap <= 0.5% or max rounds reached)
+  if (withinLimit && (isTightGap || (round >= 4 && isCloseGap) || round >= maxRounds)) {
     decision = DECISIONS.ACCEPT;
     proposed_offer = incomingValue;
     reasoning = `As ${role} (${personality}), I accept your offer of $${incomingValue.toLocaleString()} in Round ${round}. It satisfies my goal ("${goal}") and remains within my constraint boundary of $${limit.toLocaleString()}.`;
@@ -171,13 +176,23 @@ function generateContextAwareFallback(agentProfile, negotiationState, conversati
   else if (!withinLimit && round >= maxRounds) {
     decision = DECISIONS.REJECT;
     proposed_offer = ownLastValue;
-    reasoning = `As ${role} (${personality}), I must reject the offer of $${incomingValue.toLocaleString()} in Round ${round}. After ${history.length} negotiation moves, the proposal violates my constraint boundary of $${limit.toLocaleString()}.`;
+    reasoning = `As ${role} (${personality}), I must reject the offer of $${incomingValue.toLocaleString()} at final Round ${round}. After ${history.length} negotiation moves, the proposal violates my constraint boundary of $${limit.toLocaleString()}.`;
   } 
   // Decision logic: COUNTEROFFER
   else {
     decision = DECISIONS.COUNTEROFFER;
-    const rawNext = ownLastValue + concession_rate * (incomingValue - ownLastValue);
+    let rawNext = ownLastValue + concession_rate * (incomingValue - ownLastValue);
     
+    // Guarantee minimum step to ensure continuous offer evolution across rounds
+    const minStep = Math.max(baseVal * 0.01, 100);
+    if (Math.abs(rawNext - ownLastValue) < minStep) {
+      if (direction === "minimize") {
+        rawNext = Math.min(ownLastValue + minStep, incomingValue);
+      } else {
+        rawNext = Math.max(ownLastValue - minStep, incomingValue);
+      }
+    }
+
     // Strict constraint enforcement: Never cross limit
     if (direction === "minimize") {
       proposed_offer = Math.min(Math.round(rawNext), limit);
@@ -213,13 +228,40 @@ function generateContextAwareFallback(agentProfile, negotiationState, conversati
 
 function validateAndNormalizeResponse(parsed, agentProfile, opponentOffer) {
   let decision = String(parsed.decision).toLowerCase();
+  if (decision === "counter") decision = DECISIONS.COUNTEROFFER;
   if (![DECISIONS.ACCEPT, DECISIONS.COUNTEROFFER, DECISIONS.REJECT].includes(decision)) {
     decision = DECISIONS.COUNTEROFFER;
   }
 
+  const constraints = agentProfile.constraints || [];
+  const derived = deriveLimitFromConstraints(constraints);
+  const direction = agentProfile.direction || (derived ? derived.direction : deriveDirectionFromGoal(agentProfile.goal, "minimize"));
+  const limit = agentProfile.limit !== undefined ? agentProfile.limit : (derived ? derived.limit : (direction === "minimize" ? 50000 : 42000));
+
   let proposed_offer = Number(parsed.proposed_offer);
-  if (isNaN(proposed_offer)) {
-    proposed_offer = opponentOffer ? opponentOffer.value : 50000;
+  const oppPrice = opponentOffer ? (opponentOffer.price ?? opponentOffer.value ?? null) : null;
+
+  // Hard Constraint Validation for Accept decision
+  if (decision === DECISIONS.ACCEPT && oppPrice !== null) {
+    if (direction === "minimize" && oppPrice > limit) {
+      decision = DECISIONS.COUNTEROFFER;
+      proposed_offer = limit;
+    } else if (direction === "maximize" && oppPrice < limit) {
+      decision = DECISIONS.COUNTEROFFER;
+      proposed_offer = limit;
+    }
+  }
+
+  // Hard Constraint Validation for Counteroffer proposed_offer clamp
+  if (decision === DECISIONS.COUNTEROFFER) {
+    if (isNaN(proposed_offer)) {
+      proposed_offer = oppPrice !== null ? oppPrice : limit;
+    }
+    if (direction === "minimize" && proposed_offer > limit) {
+      proposed_offer = limit;
+    } else if (direction === "maximize" && proposed_offer < limit) {
+      proposed_offer = limit;
+    }
   }
 
   return {

@@ -8,11 +8,13 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000
  * Creates and starts a new negotiation session on the backend.
  * @param {import('../types/negotiation').Scenario} scenario
  */
-export async function createNegotiationSession(scenario) {
+export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null) {
   const payload = {
     scenario_id: scenario.scenario_id,
     scenario_name: scenario.scenario_name || scenario.name,
     description: scenario.description,
+    mode: mode,
+    human_role: humanRole,
     agents: scenario.agents.map((agent) => ({
       id: agent.id,
       name: agent.name,
@@ -30,7 +32,7 @@ export async function createNegotiationSession(scenario) {
       }),
       negotiation_objectives: [agent.goal]
     })),
-    max_rounds: 8
+    max_rounds: 5
   };
 
   const response = await fetch(`${API_BASE_URL}/negotiations`, {
@@ -42,6 +44,33 @@ export async function createNegotiationSession(scenario) {
   if (!response.ok) {
     const errText = await response.text();
     throw new Error(`Failed to create backend negotiation session: ${errText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Submits a human participant turn in Practice Mode.
+ * @param {string} negotiationId
+ * @param {Object} offer
+ * @param {string} [message]
+ * @param {string} [decision]
+ */
+export async function submitPracticeTurn(negotiationId, offer, message = "", decision = "counter") {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/practice-turn`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      participant_id: "human",
+      offer,
+      message,
+      decision
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to submit human practice turn: ${errText}`);
   }
 
   return await response.json();

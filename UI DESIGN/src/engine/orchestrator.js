@@ -19,11 +19,17 @@ import {
   generate_agent_response,
 } from "./agentInterface.js";
 
+import {
+  calculateConcession,
+  getAgentInitialPosition,
+  getAgentPreviousPosition,
+} from "./concessionTracking.js";
+
 /**
  * Maximum number of complete negotiation rounds.
  * One complete round contains both agent turns.
  */
-const MAX_ROUNDS = 8;
+const MAX_ROUNDS = 5;
 
 export class Orchestrator {
   /**
@@ -61,6 +67,14 @@ export class Orchestrator {
    * Returns the complete current negotiation state.
    */
   getState() {
+    return this.state;
+  }
+
+  /**
+   * Safely updates the internal negotiation state.
+   */
+  updateState(newState) {
+    this.state = newState;
     return this.state;
   }
 
@@ -189,6 +203,14 @@ export class Orchestrator {
       const value = anchorOffer(position.direction, position.limit);
       const personality = agent.personality ?? "Unknown";
 
+      const concession_data = calculateConcession(
+        agentProfile,
+        null,
+        value,
+        negotiationState,
+        value
+      );
+
       const offer = createOffer({
         agent_id: agentId,
         round,
@@ -199,6 +221,7 @@ export class Orchestrator {
           anchor_value: value,
           limit: position.limit,
           direction: position.direction,
+          concession_data,
         },
       });
 
@@ -224,6 +247,9 @@ export class Orchestrator {
       status: this.state.status,
     };
 
+    const initPos = getAgentInitialPosition(conversationHistory, agentId);
+    const prevPos = getAgentPreviousPosition(conversationHistory, agentId);
+
     // Step 6: Generate Agent Response via LLM Reasoning Engine
     const llmResponse = await generate_agent_response(
       agentProfile,
@@ -238,6 +264,15 @@ export class Orchestrator {
 
     // Step 7: Update Negotiation State based on LLM Decision
     if (decision === DECISIONS.ACCEPT) {
+      const concession_data = calculateConcession(
+        agentProfile,
+        prevPos,
+        opponentOffer.value,
+        negotiationState,
+        initPos
+      );
+      parameters.concession_data = concession_data;
+
       const offer = createOffer({
         agent_id: agentId,
         round,
@@ -265,6 +300,15 @@ export class Orchestrator {
         ? ownLastOffer.value
         : position.limit;
 
+      const concession_data = calculateConcession(
+        agentProfile,
+        prevPos,
+        ownLastValue,
+        negotiationState,
+        initPos
+      );
+      parameters.concession_data = concession_data;
+
       const offer = createOffer({
         agent_id: agentId,
         round,
@@ -291,6 +335,15 @@ export class Orchestrator {
         : llmResponse.nextValue !== undefined
         ? llmResponse.nextValue
         : opponentOffer.value;
+
+    const concession_data = calculateConcession(
+      agentProfile,
+      prevPos,
+      proposedOffer,
+      negotiationState,
+      initPos
+    );
+    parameters.concession_data = concession_data;
 
     const offer = createOffer({
       agent_id: agentId,

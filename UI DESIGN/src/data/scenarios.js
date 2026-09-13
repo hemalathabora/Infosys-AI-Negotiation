@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 /**
  * Scenario data store.
  *
@@ -21,16 +21,16 @@ export const scenarios = {
     agents: [
       {
         id: "buyer",
-        name: "Buyer",
-        role: "Procurement Manager",
+        name: "Alex Morgan",
+        role: "Buyer Agent",
         goal: "Lowest possible unit price",
         constraints: [{ text: "Maximum $50,000", defaultValue: 50000 }],
         personality: "Risk-averse",
       },
       {
         id: "vendor",
-        name: "Vendor",
-        role: "Sales Representative",
+        name: "Daniel Carter",
+        role: "Vendor Agent",
         goal: "Maximize profit margin",
         constraints: [{ text: "Minimum $42,000", defaultValue: 42000 }],
         personality: "Aggressive",
@@ -46,17 +46,16 @@ export const scenarios = {
     agents: [
       {
         id: "candidate",
-// Implemented by TEAM 4
-        name: "Candidate",
-        role: "Job Candidate",
+        name: "Sarah Mitchell",
+        role: "Job Candidate Agent",
         goal: "Maximize total compensation and benefits",
         constraints: [{ text: "Minimum $95,000 base salary", defaultValue: 95000 }],
         personality: "Collaborative",
       },
       {
         id: "employer",
-        name: "Employer",
-        role: "Hiring Manager",
+        name: "Michael Anderson",
+        role: "Hiring Manager Agent",
         goal: "Secure the candidate within approved budget",
         constraints: [{ text: "Maximum $110,000 base salary", defaultValue: 110000 }],
         personality: "Risk-averse",
@@ -67,21 +66,21 @@ export const scenarios = {
     scenario_id: "project_budget",
     scenario_name: "Project Budget Allocation",
     description:
-      "Department Head and Finance Director negotiate how much budget to allocate to a new initiative while balancing departmental needs against company-wide spending limits.",
+      "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative while balancing departmental needs against company-wide spending limits.",
     isConfigured: true,
     agents: [
       {
         id: "department_head",
-        name: "Department Head",
-        role: "Department Head",
+        name: "Olivia Bennett",
+        role: "Department Head Agent",
         goal: "Secure maximum budget for the initiative",
         constraints: [{ text: "Minimum $80,000 allocation", defaultValue: 80000 }],
         personality: "Aggressive",
       },
       {
         id: "finance_director",
-        name: "Finance Director",
-        role: "Finance Director",
+        name: "James Wilson",
+        role: "Finance Manager Agent",
         goal: "Control company-wide spending",
         constraints: [{ text: "Maximum $60,000 allocation", defaultValue: 60000 }],
         personality: "Collaborative",

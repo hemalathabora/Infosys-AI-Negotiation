@@ -7,7 +7,15 @@ const STATUS_META = {
     label: "In Progress",
     classes: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
   },
+  active: {
+    label: "In Progress",
+    classes: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+  },
   agreement: {
+    label: "Agreement",
+    classes: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold",
+  },
+  accepted: {
     label: "Agreement",
     classes: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold",
   },
@@ -23,6 +31,10 @@ const STATUS_META = {
     label: "Completed",
     classes: "bg-[#222129] text-white border-[#302F39]",
   },
+  finished: {
+    label: "Completed",
+    classes: "bg-[#222129] text-white border-[#302F39]",
+  },
 };
 
 function StatusBadge({ status }) {
@@ -34,17 +46,28 @@ function StatusBadge({ status }) {
   );
 }
 
-function formatValue(value) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) {
-    return "—";
-  }
-  return `$${Math.round(value).toLocaleString()}`;
+function formatValue(offer) {
+  if (offer === null || offer === undefined) return "—";
+  const raw = (typeof offer === "object")
+    ? (offer.price ?? offer.value ?? offer.proposed_offer?.price ?? offer.proposed_offer?.value ?? null)
+    : offer;
+  const num = Number(raw);
+  if (!Number.isFinite(num)) return "—";
+  return `$${Math.round(num).toLocaleString()}`;
 }
 
 function agentLabel(agents = [], agentId) {
-  if (!agentId) return "No active turn";
+  if (!agentId) return "Finish";
   const agent = agents.find((item) => item.id === agentId);
   return agent?.name ?? agent?.role ?? agentId;
+}
+
+function getTurnRound(history = [], index = 0) {
+  const item = history[index];
+  if (!item) return 1;
+  const agentId = item.agent_id;
+  const sameAgentCount = history.slice(0, index).filter((h) => h.agent_id === agentId).length;
+  return sameAgentCount + 1;
 }
 
 export default function NegotiationSessionPanel({
@@ -62,18 +85,21 @@ export default function NegotiationSessionPanel({
   const agents = scenario?.agents ?? [];
   const isDone =
     state.status === "agreement" ||
+    state.status === "accepted" ||
     state.status === "rejected" ||
     state.status === "deadlock" ||
-    state.status === "completed";
+    state.status === "completed" ||
+    state.status === "finished";
 
-  const currentTurn = state.current_agent_turn
-    ? agentLabel(agents, state.current_agent_turn)
-    : isDone
-      ? "No active turn"
+  const currentTurn = isDone
+    ? "Finish"
+    : state.current_agent_turn
+      ? agentLabel(agents, state.current_agent_turn)
       : "Waiting...";
 
   const statusMessage = (() => {
     switch (state.status) {
+      case "accepted":
       case "agreement":
         return "Negotiation successfully reached an agreement.";
       case "rejected":
@@ -81,13 +107,18 @@ export default function NegotiationSessionPanel({
       case "deadlock":
         return "Negotiation ended because the maximum rounds were reached without agreement.";
       case "completed":
+      case "finished":
         return "Negotiation has been completed.";
+      case "active":
       case "in_progress":
         return "Agents are currently negotiating.";
       default:
         return "Negotiation has not started.";
     }
   })();
+
+  const modeLabel = state.mode || state.execution_mode || "Normal Mode";
+  const isLlmMode = modeLabel === "LLM Mode" || String(modeLabel).toLowerCase().includes("llm");
 
   return (
     <div className="space-y-6 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md">
@@ -102,11 +133,20 @@ export default function NegotiationSessionPanel({
             {scenario?.name || scenario?.scenario_name || "Negotiation Session"}
           </h3>
           <p className="mt-0.5 font-body text-xs text-textSecondary">
-            Simulated turn execution with concession tracking and rule-based decision evaluation.
+            Simulated turn execution with concession tracking and decision evaluation.
           </p>
         </div>
 
-        <StatusBadge status={state.status} />
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 font-mono text-xs font-semibold ${
+            isLlmMode
+              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+              : "border-indigo-500/40 bg-indigo-500/10 text-indigo-300"
+          }`}>
+            Mode: {modeLabel}
+          </span>
+          <StatusBadge status={state.status} />
+        </div>
       </div>
 
       {/* STATUS BANNER */}
@@ -130,12 +170,12 @@ export default function NegotiationSessionPanel({
 
         <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Previous Offer</p>
-          <p className="text-lg font-bold text-slate-300">{formatValue(state.previous_offer?.value)}</p>
+          <p className="text-lg font-bold text-slate-300">{formatValue(state.previous_offer)}</p>
         </div>
 
         <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Latest Offer</p>
-          <p className="text-lg font-bold text-emerald-400">{formatValue(state.current_offer?.value)}</p>
+          <p className="text-lg font-bold text-emerald-400">{formatValue(state.current_offer)}</p>
         </div>
       </div>
 
@@ -209,11 +249,11 @@ export default function NegotiationSessionPanel({
               </thead>
               <tbody className="divide-y divide-[#2B2A33]">
                 {state.history.map((offer, index) => (
-                  <tr key={`${offer.agent_id}-${offer.round}-${index}`} className="transition-colors hover:bg-white/[0.03]">
-                    <td className="px-4 py-3 font-mono font-semibold text-slate-400">R{offer.round}</td>
+                  <tr key={`${offer.agent_id}-${index}`} className="transition-colors hover:bg-white/[0.03]">
+                    <td className="px-4 py-3 font-mono font-semibold text-slate-400">R{getTurnRound(state.history, index)}</td>
                     <td className="px-4 py-3 font-semibold text-white">{agentLabel(agents, offer.agent_id)}</td>
                     <td className="px-4 py-3 font-mono font-extrabold text-emerald-400">{formatValue(offer.value)}</td>
-                    <td className="px-4 py-3 text-slate-300">{offer.reason || "No rationale provided."}</td>
+                    <td className="px-4 py-3 text-slate-300">{offer.reasoning || offer.reason || "No rationale provided."}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,4 +1,4 @@
-﻿// Designed by TEAM 4
+// Designed by TEAM 4
 import { scenarios } from "./scenarios.js";
 
 export const dashboardStats = {
@@ -18,12 +18,14 @@ export const activeNegotiation = {
   agreementProbability: 72,
   agents: [
     {
-      name: "Buyer",
+      name: "Alex Morgan",
+      role: "Buyer Agent",
       personality: "Risk-Averse",
       position: "$48,000",
     },
     {
-      name: "Vendor",
+      name: "Daniel Carter",
+      role: "Vendor Agent",
       personality: "Aggressive",
       position: "$52,000",
     },
@@ -33,7 +35,7 @@ export const activeNegotiation = {
 export const recentNegotiations = [
   {
     scenario: "Vendor Pricing",
-    agents: "Buyer vs Vendor",
+    agents: "Alex Morgan vs Daniel Carter",
     mode: "Simulation",
     rounds: 6,
     result: "Agreement",
@@ -41,7 +43,7 @@ export const recentNegotiations = [
   },
   {
     scenario: "Job Offer",
-    agents: "Candidate vs Employer",
+    agents: "Sarah Mitchell vs Michael Anderson",
     mode: "Practice",
     rounds: 8,
     result: "Agreement",
@@ -49,7 +51,7 @@ export const recentNegotiations = [
   },
   {
     scenario: "Project Budget",
-    agents: "Department Head vs Finance Director",
+    agents: "Olivia Bennett vs James Wilson",
     mode: "Simulation",
     rounds: 8,
     result: "Deadlock",
@@ -57,7 +59,7 @@ export const recentNegotiations = [
   },
   {
     scenario: "Vendor Pricing",
-    agents: "Buyer vs Vendor",
+    agents: "Alex Morgan vs Daniel Carter",
     mode: "Simulation",
     rounds: 5,
     result: "In Progress",
@@ -67,8 +69,8 @@ export const recentNegotiations = [
 
 export const agentPerformance = [
   {
-    name: "Buyer",
-    role: "Procurement Manager",
+    name: "Alex Morgan",
+    role: "Buyer Agent",
     personality: "Risk-Averse",
     totalNegotiations: 16,
     successRate: 78,
@@ -76,9 +78,8 @@ export const agentPerformance = [
     style: "Budget-first",
   },
   {
-    name: "Vendor",
-// Implemented by TEAM 4
-    role: "Sales Representative",
+    name: "Daniel Carter",
+    role: "Vendor Agent",
     personality: "Aggressive",
     totalNegotiations: 14,
     successRate: 68,
@@ -86,8 +87,8 @@ export const agentPerformance = [
     style: "Anchor-led",
   },
   {
-    name: "Candidate",
-    role: "Job Candidate",
+    name: "Sarah Mitchell",
+    role: "Job Candidate Agent",
     personality: "Collaborative",
     totalNegotiations: 12,
     successRate: 82,
@@ -95,8 +96,8 @@ export const agentPerformance = [
     style: "Value-focused",
   },
   {
-    name: "Employer",
-    role: "Hiring Manager",
+    name: "Michael Anderson",
+    role: "Hiring Manager Agent",
     personality: "Risk-Averse",
     totalNegotiations: 11,
     successRate: 74,

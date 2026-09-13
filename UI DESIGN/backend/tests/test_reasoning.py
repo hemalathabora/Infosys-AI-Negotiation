@@ -33,7 +33,7 @@ def test_constraint_validation_buyer_exceeds():
 
     valid, msg, adjusted = validate_agent_constraints(agent_profile, invalid_llm_res)
     assert valid is False
-    assert "violates maximum price constraint" in msg
+    assert "violates maximum constraint" in msg
     assert extract_offer_price(adjusted.offer) == 85000.0
 
 def test_constraint_validation_vendor_below_minimum():
@@ -50,7 +50,7 @@ def test_constraint_validation_vendor_below_minimum():
 
     valid, msg, adjusted = validate_agent_constraints(agent_profile, invalid_llm_res)
     assert valid is False
-    assert "violates minimum price constraint" in msg
+    assert "violates minimum floor" in msg
     assert extract_offer_price(adjusted.offer) == 80000.0
 
 @pytest.mark.asyncio

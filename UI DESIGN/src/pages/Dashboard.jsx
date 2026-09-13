@@ -22,14 +22,14 @@ export default function Dashboard({
     : "Vendor Pricing Negotiation";
 
   const agent1 = activeScenario?.agents?.[0] || {
-    name: "Buyer",
-    role: "Procurement Manager",
+    name: "Alex Morgan",
+    role: "Buyer Agent",
     personality: "Risk-Averse",
   };
 
   const agent2 = activeScenario?.agents?.[1] || {
-    name: "Vendor",
-    role: "Sales Representative",
+    name: "Daniel Carter",
+    role: "Vendor Agent",
     personality: "Aggressive",
   };
 
@@ -313,6 +313,83 @@ export default function Dashboard({
                   style={{ width: `${Math.min(100, Math.max(15, currentRound * 14))}%` }}
                 />
               </div>
+            </div>
+
+            {/* Live Concession Tracking Widget */}
+            <div className="rounded-xl border border-indigo-500/20 bg-[#1A191E] p-4 space-y-3">
+              <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-300">
+                    Live Concession Velocity & Boundary Tracking
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onNavigate("Negotiation Arena")}
+                  className="text-[11px] font-mono text-indigo-400 hover:underline"
+                >
+                  View Full Arena →
+                </button>
+              </div>
+
+              {negotiation?.timeline && Object.keys(negotiation.timeline).length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
+                  {Object.entries(negotiation.timeline).map(([agentId, entries]) => {
+                    const agentAnalytics = negotiation.agent_analytics?.[agentId];
+                    const totalMoved = agentAnalytics?.total_concession ?? negotiation.concessionTotals?.[agentId] ?? 0;
+                    const decayRate = agentAnalytics?.rate_of_concession_decay;
+                    const remainingCap = agentAnalytics?.remaining_concession_capacity;
+                    const agentObj = activeScenario?.agents?.find((a) => a.id === agentId);
+                    const agentName = agentObj?.name || agentId;
+                    return (
+                      <div key={agentId} className="rounded-lg border border-[#2D2C36] bg-[#201F25] p-3 space-y-2">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-bold text-white font-sans">{agentName}</span>
+                          <span className="font-semibold text-emerald-400">
+                            True Concession Sum: ${Math.round(totalMoved).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-[#2D2C36] pt-1.5">
+                          <span>
+                            Decay Rate: {decayRate !== null && decayRate !== undefined ? `${decayRate}%` : "Insufficient rounds"}
+                          </span>
+                          {remainingCap !== undefined && (
+                            <span className="text-indigo-300">
+                              Capacity Left: ${Math.round(remainingCap).toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-1 text-[10px] pt-1">
+                          {entries.map((entry, idx) => (
+                            <span key={idx} className="rounded bg-[#17161B] px-2 py-0.5 border border-[#302F39] text-slate-300">
+                              R{entry.round}: ${Math.round(entry.value).toLocaleString()}
+                              {entry.delta !== null && entry.delta !== undefined && (
+                                <span className={entry.delta === 0 ? "text-slate-500" : "text-emerald-400"}>
+                                  {" "}({entry.delta > 0 ? "+" : ""}${Math.round(entry.delta).toLocaleString()})
+                                </span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-4 text-center">
+                  <p className="text-xs text-textMuted font-mono">
+                    No concession data available yet. Concession tracking activates during live agent turns.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate("Negotiation Arena")}
+                    className="mt-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 font-sans"
+                  >
+                    Start or Step Turn in Negotiation Arena →
+                  </button>
+                </div>
+              )}
             </div>
 
           </div>

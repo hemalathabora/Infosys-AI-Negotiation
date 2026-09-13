@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 function formatValue(value) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "N/A";
   return `$${Math.round(value).toLocaleString()}`;
@@ -25,8 +23,8 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
     name: "Vendor Pricing Negotiation",
     description: "Enterprise software licensing agreement negotiation between procurement buyer and vendor sales representative.",
     agents: [
-      { id: "buyer", name: "Party 01 (Buyer)", role: "Procurement Manager", personality: "Risk-averse", goal: "Minimize annual contract spend below $50,000 baseline." },
-      { id: "vendor", name: "Party 02 (Vendor)", role: "Sales Representative", personality: "Aggressive", goal: "Maximize deal margin above $50,000 floor." },
+      { id: "buyer", name: "Alex Morgan", role: "Buyer Agent", personality: "Risk-averse", goal: "Minimize annual contract spend below $50,000 baseline." },
+      { id: "vendor", name: "Daniel Carter", role: "Vendor Agent", personality: "Aggressive", goal: "Maximize deal margin above $50,000 floor." },
     ],
   };
 
@@ -51,7 +49,7 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
   const state = negotiation?.state || defaultState;
   const concessionTotals = negotiation?.concessionTotals || { buyer: 8000, vendor: 8000 };
 
-  const isAgreement = state.status === "agreement";
+  const isAgreement = state.status === "agreement" || state.status === "accepted";
   const finalOffer = state.current_offer?.value || 50000;
   const openingOffer = state.history[0]?.value || 42000;
   const totalConcessions = Object.values(concessionTotals).reduce((sum, v) => sum + v, 0);
@@ -179,13 +177,13 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
           <ReportSection eyebrow="02 / PARTIES" title="Agent Mandates & Concessions">
             <div className="space-y-3">
               {currentScenario.agents.map((agent) => {
-                const moved = concessionTotals[agent.id] ?? 8000;
+                const moved = negotiation?.agent_analytics?.[agent.id]?.total_concession ?? concessionTotals[agent.id] ?? 8000;
                 return (
                   <div key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-bold text-white font-sans">{agent.name}</p>
                       <span className="font-mono text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase">
-                        Moved {formatValue(moved)}
+                        True Concession: {formatValue(moved)}
                       </span>
                     </div>
                     <p className="text-xs text-textSecondary font-body">Role: {agent.role} ({agent.personality})</p>

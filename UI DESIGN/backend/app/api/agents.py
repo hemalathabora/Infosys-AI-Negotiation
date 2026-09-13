@@ -1,8 +1,6 @@
 import uuid
 from typing import List
-# pyrefly: ignore [missing-import]
 from fastapi import APIRouter, Depends, HTTPException, status
-# pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.agent import AgentModel
@@ -54,8 +52,21 @@ def get_agent(agent_id: str, db: Session = Depends(get_db)):
     """Get agent profile by ID."""
     db_agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
     if not db_agent:
+        get_or_create_default_agents(db)
+        db_agent = db.query(AgentModel).filter(AgentModel.id == agent_id).first()
+    if not db_agent:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Agent with ID '{agent_id}' not found."
         )
+    from app.services.negotiation_service import DEFAULT_SCENARIOS
+    for scen in DEFAULT_SCENARIOS.values():
+        for da in scen["agents"]:
+            if da["id"] == agent_id:
+                if db_agent.name != da["name"] or db_agent.role != da["role"]:
+                    db_agent.name = da["name"]
+                    db_agent.role = da["role"]
+                    db.commit()
+                    db.refresh(db_agent)
+                break
     return AgentProfileResponse(**db_agent.to_dict())

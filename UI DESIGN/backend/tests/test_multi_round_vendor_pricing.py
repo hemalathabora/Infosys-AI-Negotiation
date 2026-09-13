@@ -26,8 +26,7 @@ VENDOR_PROFILE = {
 @pytest.mark.asyncio
 async def test_multi_round_vendor_pricing_simulation():
     """
-    Automated Multi-Round Vendor Pricing Negotiation Test (Requirement 11).
-    Simulates at least 3-5 rounds of negotiation between Buyer and Vendor.
+    Requirement 7: Multi-Round Vendor Pricing Negotiation Test (3-5 rounds).
     Validates turn switches, round increments, constraint enforcement, and history context memory.
     """
     orch = NegotiationOrchestrator(
@@ -61,12 +60,12 @@ async def test_multi_round_vendor_pricing_simulation():
 
         if turn_log["agent_id"] == "buyer_agent":
             if offer_price is not None:
-                # Requirement: Buyer must NEVER exceed maximum price of 85,000
+                # Buyer must NEVER exceed maximum price of 85,000
                 assert offer_price <= 85000.0, f"Buyer exceeded maximum price limit! Offer: {offer_price}"
                 previous_buyer_offers.append(offer_price)
         elif turn_log["agent_id"] == "vendor_agent":
             if offer_price is not None:
-                # Requirement: Vendor must NEVER go below minimum price of 80,000
+                # Vendor must NEVER go below minimum price of 80,000
                 assert offer_price >= 80000.0, f"Vendor went below minimum price floor! Offer: {offer_price}"
                 previous_vendor_offers.append(offer_price)
 
@@ -83,32 +82,30 @@ async def test_multi_round_vendor_pricing_simulation():
 
     # 4. Validate offers changed based on negotiation history
     if len(previous_buyer_offers) >= 2:
-        # Buyer should generally increase or maintain offer within max budget
         assert previous_buyer_offers[-1] >= previous_buyer_offers[0]
 
     if len(previous_vendor_offers) >= 2:
-        # Vendor should generally decrease or maintain offer within min floor
         assert previous_vendor_offers[-1] <= previous_vendor_offers[0]
 
-    # 5. Validate eventual termination (accepted, rejected, or completed)
+    # 5. Validate eventual termination
     assert orch.status in ["accepted", "rejected", "completed", "active"]
 
 
 @pytest.mark.asyncio
-async def test_very_favorable_offer_triggers_accept():
+async def test_vendor_pricing_favorable_offer():
     """
-    Test that when Vendor presents a very favorable offer (<= Buyer target),
-    the Buyer Agent immediately accepts.
+    Requirement 7: Test Favorable Offer in Vendor Pricing scenario.
+    When vendor receives an offer at/above their target price of 95,000, vendor should ACCEPT.
     """
     orch = NegotiationOrchestrator(
-        negotiation_id="test_fav_offer",
+        negotiation_id="test_favorable",
         scenario_id="vendor_pricing",
         agents=[BUYER_PROFILE, VENDOR_PROFILE],
         max_rounds=5,
         current_round=1,
-        current_agent_turn="buyer_agent",
-        status="active",
-        current_offer={"price": 74000, "quantity": 100} # Favorable offer below Buyer's 75,000 target
+        current_agent_turn="vendor_agent",
+        current_offer={"price": 96000, "quantity": 100},  # Buyer offered 96k (above vendor target 95k)
+        status="active"
     )
 
     res = await orch.run_turn()
@@ -119,44 +116,45 @@ async def test_very_favorable_offer_triggers_accept():
 
 
 @pytest.mark.asyncio
-async def test_partially_acceptable_offer_triggers_counter():
+async def test_vendor_pricing_partially_acceptable_offer():
     """
-    Test that when Vendor presents a partially acceptable offer (within max price limit but above target),
-    the Buyer Agent generates a counteroffer.
+    Requirement 7: Test Partially Acceptable Offer in Vendor Pricing scenario.
+    When buyer offers 82,000 (above vendor min floor 80k, below target 95k), vendor should COUNTER.
     """
     orch = NegotiationOrchestrator(
-        negotiation_id="test_partial_offer",
+        negotiation_id="test_partially_acceptable",
         scenario_id="vendor_pricing",
         agents=[BUYER_PROFILE, VENDOR_PROFILE],
         max_rounds=5,
         current_round=1,
-        current_agent_turn="buyer_agent",
-        status="active",
-        current_offer={"price": 82000, "quantity": 100} # Within 85,000 max, but above 75,000 target
+        current_agent_turn="vendor_agent",
+        current_offer={"price": 82000, "quantity": 100},
+        status="active"
     )
 
     res = await orch.run_turn()
     turn_log = res["turn_log"]
 
     assert turn_log["decision"] == "counter"
-    assert turn_log["proposed_offer"]["price"] <= 85000.0
+    assert turn_log["proposed_offer"]["price"] >= 80000  # Vendor respects minimum floor
+    assert orch.status == "active"
 
 
 @pytest.mark.asyncio
-async def test_unacceptable_offer_triggers_reject():
+async def test_vendor_pricing_unacceptable_offer():
     """
-    Test that when an unacceptable offer exceeding constraints persists at final round,
-    the agent rejects the proposal.
+    Requirement 7: Test Unacceptable Offer at final round in Vendor Pricing scenario.
+    When buyer offers 70,000 (below vendor minimum floor of 80,000) at max round, vendor should REJECT.
     """
     orch = NegotiationOrchestrator(
-        negotiation_id="test_unacceptable_offer",
+        negotiation_id="test_unacceptable",
         scenario_id="vendor_pricing",
         agents=[BUYER_PROFILE, VENDOR_PROFILE],
         max_rounds=3,
-        current_round=2, # Will increment to final round 3 on buyer's turn
-        current_agent_turn="buyer_agent",
-        status="active",
-        current_offer={"price": 95000, "quantity": 100} # Exceeds Buyer's 85,000 budget limit
+        current_round=3,
+        current_agent_turn="vendor_agent",
+        current_offer={"price": 70000, "quantity": 100},  # Below 80k minimum floor
+        status="active"
     )
 
     res = await orch.run_turn()
@@ -164,5 +162,3 @@ async def test_unacceptable_offer_triggers_reject():
 
     assert turn_log["decision"] == "reject"
     assert orch.status == "rejected"
-
-

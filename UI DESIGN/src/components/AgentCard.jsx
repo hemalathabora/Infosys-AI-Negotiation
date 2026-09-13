@@ -1,4 +1,3 @@
-import { useState } from "react";
 import AgentHeader, { AgentIdentity } from "./AgentHeader";
 import GoalSection from "./GoalSection";
 import ConstraintList from "./ConstraintList";

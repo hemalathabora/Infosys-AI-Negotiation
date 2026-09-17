@@ -35,8 +35,10 @@ export class Orchestrator {
   /**
    * @param {import("../types/negotiation").Scenario} scenario
    */
-  constructor(scenario) {
+  constructor(scenario, mode = "simulation", humanRole = null) {
     this.scenario = scenario;
+    this.mode = mode;
+    this.humanRole = humanRole;
 
     // Create the initial negotiation state.
     this.state = createNegotiationState(scenario);
@@ -58,6 +60,14 @@ export class Orchestrator {
 
     // Store the order in which agents take turns.
     this.agentOrder = scenario.agents.map((agent) => agent.id);
+
+    if (mode === "practice") {
+      for (const agent of scenario.agents) {
+        agent.participant_type = humanRole && agent.role?.toLowerCase() === humanRole.toLowerCase()
+          ? "human"
+          : "ai";
+      }
+    }
 
     // The first agent starts every new round.
     this.firstAgentId = this.agentOrder[0] ?? null;
@@ -202,6 +212,12 @@ export class Orchestrator {
     if (!this.state.current_offer) {
       const value = anchorOffer(position.direction, position.limit);
       const personality = agent.personality ?? "Unknown";
+      const negotiationState = {
+        current_round: round,
+        max_rounds: MAX_ROUNDS,
+        status: this.state.status,
+        history: this.state.history ?? [],
+      };
 
       const concession_data = calculateConcession(
         agentProfile,

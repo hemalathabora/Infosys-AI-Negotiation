@@ -250,6 +250,16 @@ table {
     box-shadow: none !important;
   }
 
+  #root > div,
+  #root > div > div,
+  #root > div > div > div,
+  #root > div > div > div > main {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
   /* Card containers in print mode */
   .rounded-2xl,
   .rounded-xl,
@@ -308,4 +318,4 @@ table {
     size: A4 portrait;
     margin: 15mm 15mm 15mm 15mm;
   }
-}
+}

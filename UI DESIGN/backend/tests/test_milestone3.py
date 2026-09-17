@@ -51,6 +51,27 @@ def test_detect_deadlock_non_overlapping():
     assert res["resolution_possible"] is False
     assert res["suggested_action"] == "declare_breakdown"
 
+
+def test_project_budget_non_overlapping_constraints():
+    agents = DEFAULT_SCENARIOS["project_budget"]["agents"]
+    has_overlap, message, lower_bound, upper_bound = check_constraint_overlap(agents)
+
+    assert has_overlap is False
+    assert lower_bound is None
+    assert upper_bound is None
+    assert "non-overlapping" in message.lower()
+
+    result = detect_deadlock(
+        negotiation_state={"current_round": 1, "current_offer": {"price": 80000}},
+        history=[],
+        agents=agents,
+        scenario_id="project_budget",
+        max_rounds=5,
+    )
+    assert result["is_deadlock"] is True
+    assert result["resolution_possible"] is False
+    assert result["suggested_action"] == "declare_breakdown"
+
 def test_detect_deadlock_repeated_offers():
     agents = DEFAULT_SCENARIOS["vendor_pricing"]["agents"]
     history = [

@@ -35,6 +35,15 @@ export function useNegotiationEngine() {
       return;
     }
 
+    // Establish a fresh engine boundary before any async session request.
+    // This prevents a prior backend ID or local orchestrator from handling
+    // turns if a user starts a new negotiation without visiting Reset first.
+    setOrchestrator(null);
+    setBackendSessionId(null);
+    setState(null);
+    setHasStarted(false);
+    setIsRunning(false);
+
     try {
       // Determine active engine mode from backend settings
       let engineMode = "Normal Mode";
@@ -67,7 +76,7 @@ export function useNegotiationEngine() {
       }
 
       // 2. Fallback to local JS Orchestrator (Normal Mode)
-      const orch = new Orchestrator(scenario);
+      const orch = new Orchestrator(scenario, mode, humanRole);
       const initialState = orch.getState();
 
       setOrchestrator(orch);
@@ -96,6 +105,11 @@ export function useNegotiationEngine() {
       return;
     }
 
+    const submittedPrice = Number(offer?.price ?? offer?.value);
+    if (!Number.isFinite(submittedPrice) || submittedPrice <= 0) {
+      throw new Error("Offer value must be a finite number greater than 0.");
+    }
+
     setIsRunning(true);
     try {
       if (backendSessionId) {
@@ -111,7 +125,7 @@ export function useNegotiationEngine() {
         const currentAgentId = currentState.current_agent_turn;
         const round = orchestrator.getRoundForCurrentTurn(currentAgentId);
 
-        const priceVal = Number(offer?.price ?? offer?.value ?? 0);
+        const priceVal = submittedPrice;
         const agentObj = orchestrator.scenario.agents.find((a) => a.id === currentAgentId) || { id: currentAgentId, role: "Human Negotiator" };
 
         const prevPos = getAgentPreviousPosition(currentState.history || [], currentAgentId);
@@ -215,6 +229,7 @@ export function useNegotiationEngine() {
       s === NEGOTIATION_STATUS.AGREEMENT ||
       s === NEGOTIATION_STATUS.REJECTED ||
       s === NEGOTIATION_STATUS.DEADLOCK ||
+      s === "breakdown" ||
       s === NEGOTIATION_STATUS.COMPLETED ||
       s === "accepted" ||
       s === "completed"

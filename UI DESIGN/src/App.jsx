@@ -192,7 +192,7 @@ export default function App() {
           TOP NAVIGATION
       ======================================================= */}
 
-      <header className="shrink-0">
+      <header className="shrink-0 print:hidden">
 
         <TopNavigation
           onMenuToggle={() =>

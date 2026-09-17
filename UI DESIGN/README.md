@@ -104,10 +104,6 @@ Orchestrator
 - `POST /api/agents` — Create a custom agent profile.
 - `GET /api/agents/{id}` — Get specific agent profile details.
 
-### Analytics & Guide API
-- `GET /api/analytics/{id}` — Retrieve role-aware concession telemetry, decay rates, and ZOPA metrics.
-- `POST /api/guide/query` — Submit user queries to the in-app AI guide assistant.
-
 ---
 
 ## ⚙️ Environment Configuration
@@ -180,8 +176,6 @@ The test verifies that:
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── agents.py
-│   │   │   ├── analytics.py
-│   │   │   ├── guide.py
 │   │   │   ├── negotiations.py
 │   │   │   └── scenarios.py
 │   │   ├── models/
@@ -193,39 +187,27 @@ The test verifies that:
 │   │   │   ├── negotiation.py
 │   │   │   └── response.py
 │   │   ├── services/
-│   │   │   ├── analytics_service.py
-│   │   │   ├── concession_tracking.py
-│   │   │   ├── deadlock_detection.py
-│   │   │   ├── decision_logic.py
-│   │   │   ├── guide_service.py
 │   │   │   ├── llm_reasoning.py
-│   │   │   ├── negotiation_service.py
-│   │   │   ├── offer_evaluation.py
-│   │   │   └── orchestrator.py
+│   │   │   ├── orchestrator.py
+│   │   │   └── negotiation_service.py
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   └── main.py
 │   ├── tests/
 │   │   ├── test_agents.py
-│   │   ├── test_analytics_and_guide.py
-│   │   ├── test_concession_tracking.py
-│   │   ├── test_milestone3.py
-│   │   ├── test_multi_round_vendor_pricing.py
 │   │   ├── test_negotiation.py
-│   │   ├── test_offer_evaluation.py
 │   │   ├── test_orchestrator.py
-│   │   ├── test_practice_mode.py
-│   │   └── test_reasoning.py
+│   │   ├── test_reasoning.py
+│   │   └── test_multi_round_vendor_pricing.py
 │   ├── .env.example
 │   └── requirements.txt
 ├── src/
-│   ├── components/            # Reusable UI components & arena charts
-│   ├── pages/                 # React pages (Dashboard, AgentConfiguration, NegotiationArena, Analytics, Reports)
-│   ├── services/              # Frontend API client (api.js)
-│   ├── hooks/                 # React state hooks (useNegotiationEngine.js)
-│   └── engine/                # Client-side fallback negotiation engine
-├── CONCESSION_ANALYTICS.md    # Math & Telemetry Specifications
-├── CONCESSION_TRACKING.md     # Tracking System Technical Guide
+│   ├── services/
+│   │   └── api.js              # FastAPI frontend client
+│   ├── hooks/
+│   │   └── useNegotiationEngine.js  # React hook connected to backend
+│   └── pages/
+│       └── NegotiationArena.jsx
 ├── .env.example
 ├── .gitignore
 └── README.md

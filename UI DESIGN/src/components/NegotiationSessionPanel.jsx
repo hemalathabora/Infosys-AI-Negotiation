@@ -27,6 +27,14 @@ const STATUS_META = {
     label: "Deadlock",
     classes: "bg-amber-500/15 text-amber-400 border-amber-500/30",
   },
+  breakdown: {
+    label: "Breakdown",
+    classes: "bg-rose-500/15 text-rose-400 border-rose-500/30 font-bold",
+  },
+  cancelled: {
+    label: "Cancelled",
+    classes: "bg-slate-500/15 text-slate-400 border-slate-500/30",
+  },
   completed: {
     label: "Completed",
     classes: "bg-[#222129] text-white border-[#302F39]",
@@ -88,6 +96,8 @@ export default function NegotiationSessionPanel({
     state.status === "accepted" ||
     state.status === "rejected" ||
     state.status === "deadlock" ||
+    state.status === "breakdown" ||
+    state.status === "cancelled" ||
     state.status === "completed" ||
     state.status === "finished";
 
@@ -106,6 +116,10 @@ export default function NegotiationSessionPanel({
         return "An agent rejected the negotiation offer.";
       case "deadlock":
         return "Negotiation ended because the maximum rounds were reached without agreement.";
+      case "breakdown":
+        return state.deadlock_info?.reason || "Negotiation ended due to non-overlapping constraints (no feasible agreement possible).";
+      case "cancelled":
+        return "Negotiation session was cancelled.";
       case "completed":
       case "finished":
         return "Negotiation has been completed.";

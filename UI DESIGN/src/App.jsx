@@ -3,16 +3,27 @@ import { useState, useEffect } from "react";
 import CinematicLoader from "./components/CinematicLoader";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
+import AuthModal from "./components/AuthModal";
+import { AuthProvider } from "./context/AuthContext";
 
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
 import NegotiationArena from "./pages/NegotiationArena";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
+import AuthPage from "./pages/AuthPage";
 import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
 
 export default function App() {
+  return (
+    <AuthProvider>
+      <MainAppContent />
+    </AuthProvider>
+  );
+}
+
+function MainAppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState("Dashboard");
@@ -20,8 +31,16 @@ export default function App() {
   const [loaderKey, setLoaderKey] = useState(1);
   const [showLoader, setShowLoader] = useState(true);
 
+  // Auth Page / Mode State
+  const [authInitialMode, setAuthInitialMode] = useState("signin");
+
   const negotiation = useNegotiationEngine();
   const { history, addSession, stats, clearHistory } = useNegotiationHistory();
+
+  const handleOpenAuthModal = (mode = "signin") => {
+    setAuthInitialMode(mode);
+    setActivePage("AuthPage");
+  };
 
   const handleReplayIntro = () => {
     setLoaderKey((prev) => prev + 1);
@@ -40,6 +59,8 @@ export default function App() {
       status === "accepted" ||
       status === "rejected" ||
       status === "deadlock" ||
+      status === "breakdown" ||
+      status === "cancelled" ||
       status === "completed" ||
       status === "finished";
 
@@ -66,10 +87,6 @@ export default function App() {
     }
   }, [negotiation.state, activeScenario, addSession]);
 
-
-  /* ============================================================
-     PAGE RENDERING
-  ============================================================ */
 
   const renderPage = () => {
     switch (activePage) {
@@ -138,6 +155,14 @@ export default function App() {
           />
         );
 
+      case "AuthPage":
+        return (
+          <AuthPage
+            onNavigate={setActivePage}
+            initialMode={authInitialMode}
+          />
+        );
+
 
       default:
         return (
@@ -202,6 +227,7 @@ export default function App() {
           onThemeChange={setTheme}
           activePage={activePage}
           onReplayIntro={handleReplayIntro}
+          onOpenAuthModal={handleOpenAuthModal}
         />
 
       </header>

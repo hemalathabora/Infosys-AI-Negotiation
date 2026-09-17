@@ -69,8 +69,8 @@ DEFAULT_SCENARIOS = {
                 "role": "department_head",
                 "persona": "Aggressive",
                 "goals": ["Secure maximum budget for the initiative"],
-                "constraints": {"minimum_price": 80000},
-                "negotiation_objectives": ["Target allocation is $90,000", "Minimum $80,000 allocation"]
+                "constraints": {"minimum_price": 75000},
+                "negotiation_objectives": ["Target allocation is $95,000", "Minimum $75,000 allocation"]
             },
             {
                 "id": "finance_director",
@@ -78,8 +78,8 @@ DEFAULT_SCENARIOS = {
                 "role": "finance_director",
                 "persona": "Collaborative",
                 "goals": ["Control company-wide spending"],
-                "constraints": {"maximum_price": 60000},
-                "negotiation_objectives": ["Target allocation is $55,000", "Maximum $60,000 allocation"]
+                "constraints": {"maximum_price": 85000},
+                "negotiation_objectives": ["Target allocation is $70,000", "Maximum $85,000 allocation"]
             }
         ]
     }

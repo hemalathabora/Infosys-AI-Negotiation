@@ -1,0 +1,275 @@
+import hashlib
+import os
+import random
+import datetime
+import secrets
+import logging
+import httpx
+from typing import Optional, Tuple, Dict, Any
+from sqlalchemy.orm import Session
+from app.models.user import User, OTPToken
+from app.services import email_service
+from app.config import settings
+
+logger = logging.getLogger("auth_service")
+
+# Password Hashing Utilities using hashlib pbkdf2_hmac
+def hash_password(password: str) -> str:
+    salt = os.urandom(16)
+    pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+    return salt.hex() + ":" + pwd_hash.hex()
+
+def verify_password(password: str, stored_password_hash: str) -> bool:
+    if not stored_password_hash or ":" not in stored_password_hash:
+        return False
+    try:
+        salt_hex, hash_hex = stored_password_hash.split(":", 1)
+        salt = bytes.fromhex(salt_hex)
+        pwd_hash = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 100000)
+        return pwd_hash.hex() == hash_hex
+    except Exception as e:
+        logger.error(f"Error verifying password: {e}")
+        return False
+
+# Token Generation
+def generate_session_token(user_id: int, email: str) -> str:
+    random_str = secrets.token_urlsafe(32)
+    return f"nego_token_{user_id}_{random_str}"
+
+# OTP Generation & Dispatch
+def create_otp_for_email(db: Session, email: str, purpose: str = "signup", name: str = "User") -> Tuple[str, bool]:
+    # Generate 6-digit OTP code
+    code = f"{random.randint(100000, 999999)}"
+    expires_at = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
+
+    # Invalidate previous unused OTPs for this email
+    db.query(OTPToken).filter(
+        OTPToken.email == email,
+        OTPToken.is_used == False
+    ).update({"is_used": True})
+
+    otp_entry = OTPToken(
+        email=email,
+        code=code,
+        purpose=purpose,
+        expires_at=expires_at,
+        is_used=False
+    )
+    db.add(otp_entry)
+    db.commit()
+    db.refresh(otp_entry)
+
+    logger.info(f"Generated OTP for {email} ({purpose}): [{code}] - Expires at {expires_at}")
+    print(f"\n==========================================")
+    print(f" [OTP NOTIFICATION] Code for {email}: {code}")
+    print(f"==========================================\n")
+
+    # Dispatch via Real SMTP Email Service if configured
+    email_sent, email_msg = email_service._send_smtp_sync(to_email=email, otp_code=code, name=name)
+
+    return code, email_sent
+
+def verify_otp_code(db: Session, email: str, code: str) -> Tuple[bool, str]:
+    cleaned_code = code.strip()
+    otp_record = db.query(OTPToken).filter(
+        OTPToken.email == email,
+        OTPToken.code == cleaned_code,
+        OTPToken.is_used == False
+    ).order_by(OTPToken.created_at.desc()).first()
+
+    if not otp_record:
+        return False, "Invalid or expired OTP code."
+
+    now = datetime.datetime.utcnow()
+    if otp_record.expires_at < now:
+        otp_record.is_used = True
+        db.commit()
+        return False, "OTP code has expired. Please request a new one."
+
+    # Mark as used
+    otp_record.is_used = True
+    db.commit()
+    return True, "OTP verified successfully."
+
+# Real Google OAuth Token Verification
+async def verify_google_oauth_token(id_token_or_access_token: str) -> Optional[Dict[str, Any]]:
+    """
+    Verifies a Google ID Token or Access Token directly with Google's official OAuth servers.
+    """
+    if not id_token_or_access_token:
+        return None
+
+    token = id_token_or_access_token.strip()
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # 1. Try Google ID Token Info Endpoint
+            tokeninfo_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+            res = await client.get(tokeninfo_url)
+
+            if res.status_code == 200:
+                data = res.json()
+                email = data.get("email")
+                if email:
+                    return {
+                        "email": email,
+                        "full_name": data.get("name") or data.get("given_name") or email.split("@")[0],
+                        "avatar_url": data.get("picture"),
+                        "verified": data.get("email_verified") in [True, "true", "True", 1]
+                    }
+
+            # 2. Try Google UserInfo Access Token Endpoint
+            userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+            res2 = await client.get(userinfo_url, headers={"Authorization": f"Bearer {token}"})
+            if res2.status_code == 200:
+                data2 = res2.json()
+                email2 = data2.get("email")
+                if email2:
+                    return {
+                        "email": email2,
+                        "full_name": data2.get("name") or email2.split("@")[0],
+                        "avatar_url": data2.get("picture"),
+                        "verified": data2.get("email_verified") in [True, "true", "True", 1]
+                    }
+    except Exception as exc:
+        logger.error(f"Google OAuth token verification failed: {exc}")
+
+    return None
+
+# Real GitHub OAuth Code Exchange
+async def exchange_github_oauth_code(code: str) -> Optional[Dict[str, Any]]:
+    """
+    Exchanges GitHub OAuth 'code' for access token and fetches authenticated GitHub user profile & primary email.
+    """
+    if not code or not settings.GITHUB_CLIENT_ID or not settings.GITHUB_CLIENT_SECRET:
+        return None
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # Exchange code for token
+            token_url = "https://github.com/login/oauth/access_token"
+            payload = {
+                "client_id": settings.GITHUB_CLIENT_ID,
+                "client_secret": settings.GITHUB_CLIENT_SECRET,
+                "code": code.strip(),
+            }
+            headers = {"Accept": "application/json"}
+            res = await client.post(token_url, json=payload, headers=headers)
+
+            if res.status_code != 200:
+                logger.error(f"GitHub token exchange returned status {res.status_code}: {res.text}")
+                return None
+
+            token_data = res.json()
+            access_token = token_data.get("access_token")
+            if not access_token:
+                logger.error(f"No access token in GitHub response: {token_data}")
+                return None
+
+            # Fetch User Profile
+            auth_header = {"Authorization": f"Bearer {access_token}", "Accept": "application/vnd.github.v3+json"}
+            user_res = await client.get("https://api.github.com/user", headers=auth_header)
+            if user_res.status_code != 200:
+                return None
+
+            github_user = user_res.json()
+            email = github_user.get("email")
+
+            # If primary email is private in profile, fetch from /user/emails
+            if not email:
+                email_res = await client.get("https://api.github.com/user/emails", headers=auth_header)
+                if email_res.status_code == 200:
+                    emails = email_res.json()
+                    primary_email_obj = next((e for e in emails if e.get("primary") and e.get("verified")), None)
+                    if not primary_email_obj and emails:
+                        primary_email_obj = emails[0]
+                    if primary_email_obj:
+                        email = primary_email_obj.get("email")
+
+            if email:
+                return {
+                    "email": email,
+                    "full_name": github_user.get("name") or github_user.get("login"),
+                    "avatar_url": github_user.get("avatar_url"),
+                    "verified": True
+                }
+    except Exception as exc:
+        logger.error(f"GitHub OAuth code exchange failed: {exc}")
+
+    return None
+
+# User Operations
+def get_user_by_email(db: Session, email: str) -> Optional[User]:
+    return db.query(User).filter(User.email == email.strip().lower()).first()
+
+def create_unverified_user(db: Session, full_name: str, email: str, password: str) -> User:
+    email_clean = email.strip().lower()
+    existing = get_user_by_email(db, email_clean)
+    pwd_hash = hash_password(password)
+
+    if existing:
+        if existing.is_verified:
+            raise ValueError("An account with this email already exists and is verified. Please Sign In instead.")
+        # Update existing unverified user credentials
+        existing.full_name = full_name.strip()
+        existing.hashed_password = pwd_hash
+        existing.auth_provider = "email"
+        db.commit()
+        db.refresh(existing)
+        return existing
+
+    user = User(
+        email=email_clean,
+        full_name=full_name.strip(),
+        hashed_password=pwd_hash,
+        auth_provider="email",
+        is_verified=False,
+        avatar_url=None
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+def mark_user_verified(db: Session, user: User) -> User:
+    user.is_verified = True
+    user.last_login = datetime.datetime.utcnow()
+    db.commit()
+    db.refresh(user)
+    return user
+
+def authenticate_or_create_oauth_user(
+    db: Session,
+    provider: str,
+    email: str,
+    full_name: Optional[str] = None,
+    avatar_url: Optional[str] = None
+) -> User:
+    email_clean = email.strip().lower()
+    user = get_user_by_email(db, email_clean)
+
+    name = full_name.strip() if full_name else email_clean.split("@")[0].capitalize()
+    default_avatar = avatar_url or f"https://api.dicebear.com/7.x/bottts/svg?seed={name}"
+
+    if user:
+        # Update last login & verified status (OAuth emails are auto-verified)
+        user.is_verified = True
+        user.last_login = datetime.datetime.utcnow()
+        if not user.avatar_url:
+            user.avatar_url = default_avatar
+        db.commit()
+        db.refresh(user)
+        return user
+
+    user = User(
+        email=email_clean,
+        full_name=name,
+        hashed_password=None,
+        auth_provider=provider.lower(),
+        is_verified=True,
+        avatar_url=default_avatar
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user

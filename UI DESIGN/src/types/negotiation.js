@@ -98,6 +98,8 @@ export const NEGOTIATION_STATUS = {
   AGREEMENT: "agreement",
   REJECTED: "rejected",
   DEADLOCK: "deadlock",
+  BREAKDOWN: "breakdown",
+  CANCELLED: "cancelled",
   COMPLETED: "completed",
 };
 

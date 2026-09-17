@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 export default function TopNavigation({
   onMenuToggle,
@@ -6,8 +8,10 @@ export default function TopNavigation({
   _onThemeChange,
   _activePage,
   onReplayIntro,
+  onOpenAuthModal,
 }) {
   const isDark = theme === "dark";
+  const { isAuthenticated } = useAuth();
 
   return (
     <header
@@ -92,8 +96,26 @@ export default function TopNavigation({
 
         <LlmStatusBadge isDark={isDark} />
 
+        {/* Authentication Button or Profile Dropdown */}
+        {isAuthenticated ? (
+          <UserProfileDropdown isDark={isDark} />
+        ) : (
+          <button
+            type="button"
+            onClick={() => onOpenAuthModal && onOpenAuthModal("signin")}
+            className="flex items-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 transition shadow-sm active:scale-95 cursor-pointer"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            <span>Sign In</span>
+          </button>
+        )}
+
         <div
-          className={`inline-flex items-center rounded-xl border px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase ${
+          className={`hidden sm:inline-flex items-center rounded-xl border px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase ${
             isDark
               ? "border-[#3A3944] bg-[#222129] text-slate-200"
               : "border-slate-300 bg-slate-100 text-slate-800"

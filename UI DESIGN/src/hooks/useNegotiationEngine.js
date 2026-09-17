@@ -215,9 +215,13 @@ export function useNegotiationEngine() {
       s === NEGOTIATION_STATUS.AGREEMENT ||
       s === NEGOTIATION_STATUS.REJECTED ||
       s === NEGOTIATION_STATUS.DEADLOCK ||
+      s === NEGOTIATION_STATUS.BREAKDOWN ||
+      s === NEGOTIATION_STATUS.CANCELLED ||
       s === NEGOTIATION_STATUS.COMPLETED ||
       s === "accepted" ||
-      s === "completed"
+      s === "completed" ||
+      s === "breakdown" ||
+      s === "cancelled"
     );
   }, []);
 

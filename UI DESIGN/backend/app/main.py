@@ -4,7 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import Base, engine
-from app.api import agents, negotiations, scenarios, analytics, guide
+from app.models.user import User, OTPToken  # Ensure SQLAlchemy registers user & otp models
+from app.api import agents, negotiations, scenarios, analytics, guide, auth
 
 # Setup logging
 logging.basicConfig(
@@ -51,6 +52,7 @@ app.add_middleware(
 )
 
 # Include API Routers
+app.include_router(auth.router)
 app.include_router(agents.router)
 app.include_router(negotiations.router)
 app.include_router(scenarios.router)

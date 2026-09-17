@@ -171,6 +171,8 @@ export default function NegotiationArena({
     state.status === "accepted" ||
     state.status === "rejected" ||
     state.status === "deadlock" ||
+    state.status === "breakdown" ||
+    state.status === "cancelled" ||
     state.status === "completed" ||
     state.status === "finished";
 
@@ -287,7 +289,7 @@ export default function NegotiationArena({
         {/* =====================================================
             2. DEADLOCK / BREAKDOWN WARNING BANNER
         ====================================================== */}
-        {state.status === "deadlock" && (
+        {(state.status === "deadlock" || state.status === "breakdown") && (
           <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-200 space-y-3 font-sans shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -295,7 +297,9 @@ export default function NegotiationArena({
                   ⚠
                 </span>
                 <div>
-                  <h3 className="font-extrabold text-amber-300 text-base">Negotiation Stalled / Deadlock Detected</h3>
+                  <h3 className="font-extrabold text-amber-300 text-base">
+                    {state.status === "breakdown" ? "Negotiation Breakdown Detected" : "Negotiation Stalled / Deadlock Detected"}
+                  </h3>
                   <p className="text-xs text-amber-200/90 font-body">
                     {state.deadlock_info?.reason || "No meaningful movement detected within participants' limits."}
                   </p>

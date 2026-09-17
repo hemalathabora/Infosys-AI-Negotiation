@@ -74,7 +74,7 @@ export const scenarios = {
         name: "Olivia Bennett",
         role: "Department Head Agent",
         goal: "Secure maximum budget for the initiative",
-        constraints: [{ text: "Minimum $80,000 allocation", defaultValue: 80000 }],
+        constraints: [{ text: "Minimum $75,000 allocation", defaultValue: 75000 }],
         personality: "Aggressive",
       },
       {
@@ -82,7 +82,7 @@ export const scenarios = {
         name: "James Wilson",
         role: "Finance Manager Agent",
         goal: "Control company-wide spending",
-        constraints: [{ text: "Maximum $60,000 allocation", defaultValue: 60000 }],
+        constraints: [{ text: "Maximum $85,000 allocation", defaultValue: 85000 }],
         personality: "Collaborative",
       },
     ],

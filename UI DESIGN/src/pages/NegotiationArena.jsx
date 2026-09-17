@@ -1,5 +1,6 @@
 import { useState } from "react";
 import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
+import OutcomeScreen from "../components/OutcomeScreen";
 import { getAuthoritativeTarget } from "../engine/concessionTracking.js";
 
 function formatCurrency(val) {
@@ -178,7 +179,7 @@ export default function NegotiationArena({
 
   const isPracticeMode = state.mode === "practice";
   const currentAgentObj = agents.find((a) => a.id === state.current_agent_turn);
-  const isHumanTurn = isPracticeMode && !isDone && (currentAgentObj?.participant_type === "human" || state.current_agent_turn === "buyer");
+  const isHumanTurn = isPracticeMode && !isDone && currentAgentObj?.participant_type === "human";
 
   // Calculate live gap metrics from actual negotiation turn history
   const agent1Id = agents[0]?.id;
@@ -215,8 +216,9 @@ export default function NegotiationArena({
     e.preventDefault();
     setInputError("");
 
-    const priceNum = parseFloat(humanPriceInput);
-    if (isNaN(priceNum) || priceNum <= 0) {
+    const normalizedPrice = String(humanPriceInput).trim();
+    const priceNum = Number(normalizedPrice);
+    if (!normalizedPrice || !Number.isFinite(priceNum) || priceNum <= 0) {
       setInputError("Please enter a valid numeric offer price greater than $0.");
       return;
     }
@@ -274,12 +276,26 @@ export default function NegotiationArena({
 
               <div className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-mono font-bold ${
                 isDone
-                  ? state.status === "deadlock"
+                  ? state.status === "agreement" || state.status === "accepted"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                    : state.status === "rejected"
+                    ? "border-rose-500/40 bg-rose-500/10 text-rose-400"
+                    : state.status === "deadlock" || state.status === "breakdown"
                     ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
                     : "border-[#302F39] bg-[#222129] text-slate-400"
                   : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm"
               }`}>
-                <span className={isDone ? "h-2 w-2 rounded-full bg-slate-500" : "h-2 w-2 rounded-full bg-emerald-400 animate-pulse"} />
+                <span className={`h-2 w-2 rounded-full ${
+                  !isDone
+                    ? "bg-emerald-400 animate-pulse"
+                    : state.status === "agreement" || state.status === "accepted"
+                    ? "bg-emerald-400"
+                    : state.status === "rejected"
+                    ? "bg-rose-400"
+                    : state.status === "deadlock" || state.status === "breakdown"
+                    ? "bg-amber-400"
+                    : "bg-slate-400"
+                }`} />
                 {isDone ? `STATUS: ${state.status.toUpperCase()}` : "NEGOTIATING"}
               </div>
             </div>
@@ -432,7 +448,7 @@ export default function NegotiationArena({
 
                       <div className="space-y-0.5">
                         <span className="text-[10px] text-slate-400 uppercase">Target</span>
-                        <p className="font-bold text-sky-400">{formatCurrency(getAuthoritativeTarget(agent, scenario))}</p>
+                        <p className="font-bold text-sky-400">{formatCurrency(getAuthoritativeTarget(agent))}</p>
                       </div>
 
                       <div className="space-y-0.5">
@@ -690,8 +706,9 @@ export default function NegotiationArena({
                           setInputError("Negotiation session has already ended.");
                           return;
                         }
-                        const priceNum = parseFloat(humanPriceInput);
-                        if (isNaN(priceNum) || priceNum <= 0) {
+                        const normalizedPrice = String(humanPriceInput).trim();
+                        const priceNum = Number(normalizedPrice);
+                        if (!normalizedPrice || !Number.isFinite(priceNum) || priceNum <= 0) {
                           setInputError("Offer value is required. Please enter a valid amount.");
                           return;
                         }
@@ -720,8 +737,10 @@ export default function NegotiationArena({
                           return;
                         }
                         const latestOpponentVal = Number(state.current_offer?.price ?? state.current_offer?.value ?? 0);
-                        const priceNum = !isNaN(parseFloat(humanPriceInput)) && parseFloat(humanPriceInput) > 0 
-                          ? parseFloat(humanPriceInput) 
+                        const normalizedPrice = String(humanPriceInput).trim();
+                        const parsedPrice = Number(normalizedPrice);
+                        const priceNum = Number.isFinite(parsedPrice) && parsedPrice > 0
+                          ? parsedPrice
                           : latestOpponentVal > 0 ? latestOpponentVal : 0;
 
                         if (priceNum <= 0) {
@@ -774,6 +793,18 @@ export default function NegotiationArena({
             onNavigate("Configure Agents");
           }}
         />
+
+        {isDone && (
+          <OutcomeScreen
+            scenario={scenario}
+            state={state}
+            timeline={timeline}
+            onDownloadReport={() => {
+              onNavigate("Reports");
+              window.setTimeout(() => window.print(), 150);
+            }}
+          />
+        )}
 
         {isDone && (
           <div className="flex items-center justify-end gap-3 pt-2">

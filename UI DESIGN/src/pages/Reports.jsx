@@ -1,242 +1,60 @@
-function formatValue(value) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return "N/A";
-  return `$${Math.round(value).toLocaleString()}`;
-}
+import { buildNegotiationReportData, formatCurrency, safeText } from "../services/negotiationReport.js";
 
-function ReportSection({ eyebrow, title, children }) {
-  return (
-    <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-4">
-      <div className="border-b border-[#2B2A33] pb-3">
-        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
-          {eyebrow}
-        </p>
-        <h2 className="text-lg font-bold text-white font-sans">{title}</h2>
-      </div>
-      <div>{children}</div>
-    </section>
-  );
+function decisionClass(decision) {
+  if (decision === "ACCEPT") return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+  if (decision === "REJECT") return "border-rose-500/40 bg-rose-500/10 text-rose-400";
+  return "border-sky-500/40 bg-sky-500/10 text-sky-300";
 }
 
 export default function Reports({ scenario, negotiation, onNavigate }) {
-  // Default fallback data for visual demonstration
-  const defaultScenario = {
-    name: "Vendor Pricing Negotiation",
-    description: "Enterprise software licensing agreement negotiation between procurement buyer and vendor sales representative.",
-    agents: [
-      { id: "buyer", name: "Alex Morgan", role: "Buyer Agent", personality: "Risk-averse", goal: "Minimize annual contract spend below $50,000 baseline." },
-      { id: "vendor", name: "Daniel Carter", role: "Vendor Agent", personality: "Aggressive", goal: "Maximize deal margin above $50,000 floor." },
-    ],
-  };
-
-  const defaultState = {
-    status: "agreement",
-    current_round: 5,
-    history: [
-      { round: 1, agent_id: "buyer", value: 42000, reason: "Initial buyer anchor bid based on budget allocation." },
-      { round: 1, agent_id: "vendor", value: 58000, reason: "Initial vendor ask including premium support SLA." },
-      { round: 2, agent_id: "buyer", value: 45500, reason: "Conceded on 3-year commitment clause." },
-      { round: 2, agent_id: "vendor", value: 54500, reason: "Reduced per-seat licensing cost." },
-      { round: 3, agent_id: "buyer", value: 48000, reason: "Increased SLA commitment terms." },
-      { round: 3, agent_id: "vendor", value: 52000, reason: "Waived implementation service fees." },
-      { round: 4, agent_id: "buyer", value: 49600, reason: "Near equilibrium offer matching target ceiling." },
-      { round: 4, agent_id: "vendor", value: 50400, reason: "Near equilibrium counter-proposal." },
-      { round: 5, agent_id: "buyer", value: 50000, reason: "Final settlement agreement reached." },
-    ],
-    current_offer: { value: 50000 },
-  };
-
-  const currentScenario = scenario || defaultScenario;
-  const state = negotiation?.state || defaultState;
-  const concessionTotals = negotiation?.concessionTotals || { buyer: 8000, vendor: 8000 };
-
-  const isAgreement = state.status === "agreement" || state.status === "accepted";
-  const finalOffer = state.current_offer?.value || 50000;
-  const openingOffer = state.history[0]?.value || 42000;
-  const totalConcessions = Object.values(concessionTotals).reduce((sum, v) => sum + v, 0);
+  const report = buildNegotiationReportData(negotiation?.state, scenario, negotiation?.timeline);
+  const overview = [
+    ["Final Agreement", report.finalAgreement],
+    ["Rounds Elapsed", report.rounds ?? "N/A"],
+    ["Total Recorded Turns", report.turns],
+    ["Negotiation Mode", report.mode],
+  ];
 
   return (
-    <main data-guide="reports-panel" className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
-      <div className="mx-auto max-w-[1500px] space-y-8">
-
-        {/* 1. HEADER */}
-        <header className="border-b border-[#292831] pb-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main data-guide="reports-panel" className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary print:bg-white print:px-0">
+      <div className="mx-auto max-w-[1500px] space-y-6 print:max-w-none">
+        <header className="border-b border-[#292831] pb-6 print:border-slate-900">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-slate-100 animate-pulse" />
-                <p className="text-xs font-mono font-semibold uppercase tracking-widest text-slate-300">
-                  EXECUTIVE SUMMARY & AUDIT REPORT
-                </p>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans">
-                {currentScenario.scenario_name || currentScenario.name}
-              </h1>
-              <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
-                Official audit documentation of party mandates, offer progressions, and deal outcomes.
-              </p>
+              <p className="text-base font-extrabold text-white print:text-slate-900">NEGOMIND AI</p>
+              <p className="mt-1 text-xs text-textSecondary print:text-slate-600">AI-Driven Multi-Agent Negotiation Training & Simulation Platform</p>
+              <p className="mt-5 text-[11px] font-mono font-bold uppercase tracking-widest text-slate-400">NEGOTIATION SUMMARY REPORT</p>
+              <h1 className="mt-1 text-2xl font-extrabold text-white print:text-slate-900">{report.scenarioName}</h1>
+              <p className="mt-1 text-xs text-textSecondary print:text-slate-600">Mode: {report.mode} · Generated: {report.generatedAt}</p>
+              <span className="mt-3 inline-flex rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-bold uppercase text-emerald-400">{report.statusLabel}</span>
             </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => onNavigate("Configure Agents")}
-                className="rounded-xl border border-[#2D2C36] bg-[#201F25] hover:bg-[#2A2933] px-4 py-2.5 text-xs font-bold text-white transition font-sans"
-              >
-                New Negotiation
-              </button>
-              <button
-                type="button"
-                onClick={() => window.print()}
-                className="inline-flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-white text-slate-950 px-4 py-2.5 text-xs font-bold border border-slate-200 shadow-md transition font-sans"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <polyline points="6 9 6 2 18 2 18 9" />
-                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                  <rect x="6" y="14" width="12" height="8" />
-                </svg>
-                Print Executive PDF
-              </button>
+            <div className="flex gap-2 print:hidden">
+              <button type="button" onClick={() => window.print()} className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-950">Download PDF</button>
+              <button type="button" onClick={() => onNavigate("Configure Agents")} className="rounded-xl border border-[#2D2C36] bg-[#201F25] px-4 py-2.5 text-xs font-bold text-white">New Negotiation</button>
             </div>
           </div>
         </header>
 
+        <section className="grid grid-cols-2 gap-3 lg:grid-cols-4 print:grid-cols-4">
+          {overview.map(([label, value]) => <div key={label} className="rounded-xl border border-[#2D2C36] bg-[#201F25] p-4 print:border-slate-300 print:bg-white"><p className="text-[10px] font-mono font-bold uppercase text-slate-400">{label}</p><p className="mt-1 break-words text-lg font-extrabold text-white print:text-slate-900">{safeText(value)}</p></div>)}
+        </section>
 
-        {/* 2. EXECUTIVE OUTCOME BANNER */}
-        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="flex items-center gap-3">
-                <span className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1 text-xs font-mono font-bold ${
-                  isAgreement
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                    : "border-amber-500/30 bg-amber-500/10 text-amber-400"
-                }`}>
-                  <span className={isAgreement ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
-                  {isAgreement ? "AGREEMENT EXECUTED" : "SESSION DEADLOCK"}
-                </span>
-                <span className="font-mono text-xs text-slate-400">Audit ID: #AUD-2026-094</span>
-              </div>
-              <h2 className="text-2xl font-extrabold text-white font-sans">
-                {isAgreement
-                  ? `Contract Successfully Settled at ${formatValue(finalOffer)}`
-                  : "Negotiation Terminated in Deadlock"}
-              </h2>
-              <p className="text-xs sm:text-sm text-textSecondary font-body leading-relaxed">
-                {isAgreement
-                  ? `Both negotiating agents reached saturation equilibrium after ${state.current_round} rounds, converging on a final agreed value with 98.5% Pareto efficiency.`
-                  : "The agents were unable to resolve constraint gaps within the round threshold."}
-              </p>
-            </div>
+        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 print:border-slate-300 print:bg-white">
+          <h2 className="text-lg font-bold text-white print:text-slate-900">Agreement Summary</h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3"><div><p className="label">Final agreement value</p><p className="value text-emerald-400">{report.finalAgreement}</p></div><div><p className="label">Final status</p><p className="value text-white print:text-slate-900">{report.statusLabel}</p></div><div><p className="label">Settlement / terms</p><p className="value text-white print:text-slate-900">{report.finalTerms}</p></div></div>
+          <p className="mt-4 text-sm text-textSecondary print:text-slate-600">{report.outcomeSummary}</p>
+        </section>
 
-            <div className="grid grid-cols-3 gap-4 font-mono text-center border-t lg:border-t-0 lg:border-l border-[#2B2A33] pt-4 lg:pt-0 lg:pl-8">
-              <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Final Value</p>
-                <p className="text-lg font-extrabold text-emerald-400">{formatValue(finalOffer)}</p>
-              </div>
-              <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Rounds</p>
-                <p className="text-lg font-extrabold text-white">{state.current_round}</p>
-              </div>
-              <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Total Offers</p>
-                <p className="text-lg font-extrabold text-white">{state.history.length}</p>
-              </div>
-            </div>
+        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 print:border-slate-300 print:bg-white">
+          <h2 className="text-lg font-bold text-white print:text-slate-900">Agent Objectives & Satisfaction</h2>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            {report.agents.length === 0 ? <p className="text-sm text-slate-400">N/A</p> : report.agents.map((agent) => <article key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-5 print:border-slate-300 print:bg-white"><div className="flex justify-between gap-3 border-b border-[#2B2A33] pb-3"><div><h3 className="font-bold text-white print:text-slate-900">{agent.name}</h3><p className="mt-1 text-xs text-slate-400">{agent.role} · {agent.personality}</p></div><div className="text-right"><p className="label">Satisfaction</p><p className="value text-sky-400">{agent.satisfaction}</p></div></div><p className="mt-4 text-sm text-slate-200 print:text-slate-700"><span className="label">Objective</span>{agent.objective}</p><p className="mt-3 text-sm text-emerald-400"><span className="label">Final position</span>{agent.finalPositionLabel}</p><div className="mt-4 border-t border-[#2B2A33] pt-3"><p className="label">Concession timeline</p><div className="mt-2 space-y-1">{agent.timeline.length === 0 ? <p className="text-xs text-slate-500">N/A</p> : agent.timeline.map((item, index) => <div key={`${agent.id}-${index}`} className="grid grid-cols-[42px_1fr_auto] gap-2 rounded-lg border border-[#3A3944] px-3 py-2 text-xs font-mono print:border-slate-300"><span className="text-slate-400">R{safeText(item.round)}</span><strong className="text-slate-200 print:text-slate-900">{formatCurrency(item.value)}</strong><span className="text-slate-400">Movement: {formatCurrency(item.delta ?? 0)}</span></div>)}</div></div></article>)}
           </div>
         </section>
 
+        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 print:border-slate-300 print:bg-white"><h2 className="text-lg font-bold text-white print:text-slate-900">Concession Timeline</h2><div className="mt-4 grid gap-4 lg:grid-cols-2">{report.agents.map((agent) => <div key={agent.id} className="overflow-x-auto"><p className="mb-2 font-bold text-white print:text-slate-900">{agent.name}</p><div className="flex min-w-max gap-1">{agent.timeline.map((item, index) => <div key={`${agent.id}-timeline-${index}`} className="flex items-start"><div className="min-w-[92px] rounded-lg border border-[#3A3944] bg-[#1A191E] p-3 text-center print:border-slate-300 print:bg-white"><p className="text-[10px] text-slate-400">R{safeText(item.round)}</p><p className="mt-1 font-mono font-bold text-emerald-400">{formatCurrency(item.value)}</p><p className="mt-1 text-[10px] text-slate-400">{formatCurrency(item.delta ?? 0)}</p></div>{index < agent.timeline.length - 1 && <span className="px-1 pt-7 text-slate-500">→</span>}</div>)}</div></div>)}</div></section>
 
-        {/* 3. SYMMETRICAL 2-COLUMN REPORT GRID */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-stretch">
-
-          {/* Section 01: Context & Term Highlights */}
-          <ReportSection eyebrow="01 / CONTEXT & TERMS" title="Scenario Executive Brief">
-            <div className="space-y-5">
-              <p className="text-xs sm:text-sm leading-relaxed text-textSecondary font-body">
-                {currentScenario.description}
-              </p>
-
-              <div className="grid grid-cols-3 gap-3 font-mono">
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                  <p className="text-[10px] uppercase text-slate-400 font-bold">Opening Anchor</p>
-                  <p className="text-sm font-extrabold text-white">{formatValue(openingOffer)}</p>
-                </div>
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                  <p className="text-[10px] uppercase text-slate-400 font-bold">Final Settlement</p>
-                  <p className="text-sm font-extrabold text-emerald-400">{formatValue(finalOffer)}</p>
-                </div>
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-                  <p className="text-[10px] uppercase text-slate-400 font-bold">Concession Sum</p>
-                  <p className="text-sm font-extrabold text-white">{formatValue(totalConcessions)}</p>
-                </div>
-              </div>
-            </div>
-          </ReportSection>
-
-          {/* Section 02: Party Mandates */}
-          <ReportSection eyebrow="02 / PARTIES" title="Agent Mandates & Concessions">
-            <div className="space-y-3">
-              {currentScenario.agents.map((agent) => {
-                const moved = negotiation?.agent_analytics?.[agent.id]?.total_concession ?? concessionTotals[agent.id] ?? 8000;
-                return (
-                  <div key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-white font-sans">{agent.name}</p>
-                      <span className="font-mono text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase">
-                        True Concession: {formatValue(moved)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-textSecondary font-body">Role: {agent.role} ({agent.personality})</p>
-                    <p className="text-xs text-slate-400 font-body italic">Mandate: {agent.goal}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </ReportSection>
-
-        </div>
-
-
-        {/* 4. AUDIT TRAIL TRANSCRIPT */}
-        <ReportSection eyebrow="03 / AUDIT TRAIL" title="Complete Turn-by-Turn Audit Transcript">
-          <div className="overflow-x-auto rounded-xl border border-[#2D2C36] bg-[#1A191E]">
-            <table className="w-full text-left text-xs font-body">
-              <thead>
-                <tr className="border-b border-[#2D2C36] bg-[#17161B] font-mono text-[11px] uppercase tracking-wider text-slate-400">
-                  <th className="px-4 py-3.5">Round</th>
-                  <th className="px-4 py-3.5">Acting Party</th>
-                  <th className="px-4 py-3.5">Offer Position</th>
-                  <th className="px-4 py-3.5">Decision Logic & Reasoning</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#2B2A33]">
-                {state.history.map((offer, idx) => {
-                  const agent = currentScenario.agents.find((a) => a.id === offer.agent_id);
-                  const isP2 = offer.agent_id === "vendor" || idx % 2 === 1;
-
-                  return (
-                    <tr key={idx} className="hover:bg-[#201F25] transition-colors">
-                      <td className="px-4 py-3.5 font-mono text-slate-400 font-bold">R{offer.round}</td>
-                      <td className="px-4 py-3.5 font-bold text-white">
-                        <span className={`inline-flex items-center gap-1.5 ${isP2 ? "text-emerald-400" : "text-slate-200"}`}>
-                          <span className={`h-2 w-2 rounded-full ${isP2 ? "bg-emerald-400" : "bg-white"}`} />
-                          {agent?.name || offer.agent_id}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5 font-mono font-extrabold text-white text-sm">
-                        {formatValue(offer.value)}
-                      </td>
-                      <td className="px-4 py-3.5 text-textSecondary leading-relaxed font-body">
-                        {offer.reason}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </ReportSection>
-
+        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 print:border-slate-300 print:bg-white"><h2 className="text-lg font-bold text-white print:text-slate-900">Complete Negotiation Transcript</h2><div className="mt-4 overflow-x-auto rounded-xl border border-[#2D2C36] print:border-slate-300"><table className="w-full min-w-[950px] text-left text-xs"><thead className="bg-[#17161B] font-mono text-[10px] uppercase text-slate-400 print:bg-slate-100"><tr><th className="px-3 py-3">Turn</th><th className="px-3 py-3">Round</th><th className="px-3 py-3">Agent</th><th className="px-3 py-3">Decision</th><th className="px-3 py-3">Offer</th><th className="px-3 py-3">Concession</th><th className="px-3 py-3">Reasoning</th></tr></thead><tbody className="divide-y divide-[#2B2A33]">{report.transcript.length === 0 ? <tr><td colSpan="7" className="px-3 py-4 text-slate-500">N/A</td></tr> : report.transcript.map((entry) => <tr key={entry.turn} className="align-top"><td className="px-3 py-3 text-slate-400">{entry.turn}</td><td className="px-3 py-3 text-slate-400">R{safeText(entry.round)}</td><td className="px-3 py-3 font-semibold text-white print:text-slate-900">{entry.agent}</td><td className="px-3 py-3"><span className={`inline-flex rounded-md border px-2 py-1 font-mono text-[10px] font-bold ${decisionClass(entry.decision)}`}>{entry.decision}</span></td><td className="px-3 py-3 font-mono font-bold text-emerald-400">{entry.offer}</td><td className="px-3 py-3 font-mono text-slate-300 print:text-slate-700">{entry.concession}</td><td className="max-w-[420px] whitespace-normal break-words px-3 py-3 leading-relaxed text-slate-300 print:text-slate-700">{entry.reasoning}</td></tr>)}</tbody></table></div></section>
       </div>
     </main>
   );

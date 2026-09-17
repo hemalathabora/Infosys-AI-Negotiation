@@ -48,20 +48,24 @@ def check_constraint_overlap(agents: List[Dict[str, Any]]) -> Tuple[bool, str, O
     b_limit = buyer_limit_data["limit"]
     v_limit = vendor_limit_data["limit"]
 
-    # Minimizer (Buyer) maximum budget must be >= Maximizer (Vendor) minimum floor
+    # A feasible agreement must satisfy both agents' directions, regardless
+    # of role names. A minimizer's ceiling must meet a maximizer's floor.
     if buyer_limit_data["direction"] == "minimize" and vendor_limit_data["direction"] == "maximize":
-        if b_limit < v_limit:
-            return (
-                False,
-                f"Non-overlapping constraints: Buyer budget limit (${b_limit:,.2f}) is below Vendor minimum floor (${v_limit:,.2f}).",
-                None,
-                None
-            )
-        return True, "Constraints overlap within feasible range.", v_limit, b_limit
+        lower_bound, upper_bound = v_limit, b_limit
+    elif buyer_limit_data["direction"] == "maximize" and vendor_limit_data["direction"] == "minimize":
+        lower_bound, upper_bound = b_limit, v_limit
+    else:
+        lower_bound, upper_bound = min(b_limit, v_limit), max(b_limit, v_limit)
 
-    lower_b = min(b_limit, v_limit)
-    upper_b = max(b_limit, v_limit)
-    return True, "Constraints overlap within feasible range.", lower_b, upper_b
+    if lower_bound > upper_bound:
+        return (
+            False,
+            f"Non-overlapping constraints: required floor (${lower_bound:,.2f}) exceeds allowed ceiling (${upper_bound:,.2f}).",
+            None,
+            None
+        )
+
+    return True, "Constraints overlap within feasible range.", lower_bound, upper_bound
 
 def detect_deadlock(
     negotiation_state: Dict[str, Any],

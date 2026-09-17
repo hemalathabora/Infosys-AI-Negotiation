@@ -244,8 +244,6 @@ function MainAppContent() {
           flex-1
           overflow-hidden
           bg-[#0C0C0F]
-          p-2 sm:p-3 lg:p-4
-          gap-2 lg:gap-4
         "
       >
 
@@ -274,10 +272,7 @@ function MainAppContent() {
             flex-1
             overflow-y-auto
             overflow-x-hidden
-            rounded-2xl lg:rounded-[20px]
-            border border-[#27262F]
-            bg-[#17161B]
-            shadow-2xl
+            
           "
         >
           {renderPage()}

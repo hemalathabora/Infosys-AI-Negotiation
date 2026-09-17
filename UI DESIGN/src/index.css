@@ -4,6 +4,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 1. Global Reset & Overrides */
+html, body, * {
+  -ms-overflow-style: none !important;  /* IE / Edge */
+  scrollbar-width: none !important;     /* Firefox */
+}
+
+/* 2. WebKit Browsers (Chrome, Safari, Edge, Opera) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
 
 /* ============================================================
    GLOBAL RESET
@@ -25,7 +40,6 @@ html,
 body {
   overflow-x: hidden;
 }
-
 
 /* ============================================================
    BODY & BASE TYPOGRAPHY

@@ -1,9 +1,10 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.negotiation import NegotiationCreate, NegotiationStateResponse, TurnResponse, OfferLog, PracticeTurnRequest
+from app.schemas.negotiation import NegotiationCreate, NegotiationStateResponse, TurnResponse, OfferLog, PracticeTurnRequest, NegotiationSummary
 from app.models.agent import AgentModel
+from app.models.negotiation import NegotiationModel
 from app.services.negotiation_service import (
     create_negotiation_session,
     load_orchestrator,
@@ -13,6 +14,34 @@ from app.services.negotiation_service import (
 )
 
 router = APIRouter(prefix="/api/negotiations", tags=["Negotiations"])
+
+@router.get("", response_model=List[NegotiationSummary])
+def list_negotiations(user_id: Optional[str] = None, db: Session = Depends(get_db)):
+    """Retrieve historical negotiation sessions for a specific user from database."""
+    if not user_id:
+        return []
+
+    query = db.query(NegotiationModel).filter(NegotiationModel.user_id == user_id)
+    records = query.order_by(NegotiationModel.created_at.desc()).all()
+
+    summaries = []
+    for r in records:
+        agents = r.participating_agents
+        agents_str = " vs ".join([a.get("name", "Agent") for a in agents]) if agents else "Agents"
+        scen_name = DEFAULT_SCENARIOS.get(r.scenario_id, {}).get("scenario_name", r.scenario_id.replace("_", " ").title())
+        summaries.append(NegotiationSummary(
+            negotiation_id=r.negotiation_id,
+            scenario_id=r.scenario_id,
+            scenario_name=scen_name,
+            mode=r.mode or "simulation",
+            status=r.status,
+            current_round=r.current_round,
+            max_rounds=r.max_rounds,
+            agents_summary=agents_str,
+            created_at=r.created_at.isoformat() if r.created_at else None,
+            user_id=r.user_id
+        ))
+    return summaries
 
 @router.post("", response_model=NegotiationStateResponse, status_code=status.HTTP_201_CREATED)
 def create_negotiation(payload: NegotiationCreate, db: Session = Depends(get_db)):
@@ -45,10 +74,12 @@ def create_negotiation(payload: NegotiationCreate, db: Session = Depends(get_db)
         agent_profiles=agents_data,
         max_rounds=payload.max_rounds or 5,
         mode=payload.mode or "simulation",
-        human_role=payload.human_role
+        human_role=payload.human_role,
+        user_id=payload.user_id
     )
 
     return NegotiationStateResponse(**orch.get_state_dict())
+
 
 @router.get("/{negotiation_id}", response_model=NegotiationStateResponse)
 def get_negotiation_state(negotiation_id: str, db: Session = Depends(get_db)):

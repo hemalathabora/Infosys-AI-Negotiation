@@ -8,13 +8,14 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000
  * Creates and starts a new negotiation session on the backend.
  * @param {import('../types/negotiation').Scenario} scenario
  */
-export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null) {
+export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null, userId = null) {
   const payload = {
     scenario_id: scenario.scenario_id,
     scenario_name: scenario.scenario_name || scenario.name,
     description: scenario.description,
     mode: mode,
     human_role: humanRole,
+    user_id: userId,
     agents: scenario.agents.map((agent) => ({
       id: agent.id,
       name: agent.name,
@@ -34,6 +35,7 @@ export async function createNegotiationSession(scenario, mode = "simulation", hu
     })),
     max_rounds: 5
   };
+
 
   const response = await fetch(`${API_BASE_URL}/negotiations`, {
     method: "POST",
@@ -163,3 +165,42 @@ export async function queryBackendGuideBot(query, scenarioId = "vendor_pricing")
   }
   return await response.json();
 }
+
+/**
+ * Fetches dashboard analytics dynamically calculated from DB for a specific user.
+ * @param {string} [userId]
+ */
+export async function fetchDashboardAnalytics(userId = null) {
+  const url = userId
+    ? `${API_BASE_URL}/analytics/dashboard?user_id=${encodeURIComponent(userId)}`
+    : `${API_BASE_URL}/analytics/dashboard`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("Dashboard API error:", response.status, errorText);
+    throw new Error("Failed to fetch dashboard analytics.");
+  }
+
+  const data = await response.json();
+  console.log("Dashboard analytics:", data);
+
+  return data;
+}
+
+
+
+/**
+ * Fetches list of negotiation history from database.
+ * @param {string} [userId]
+ */
+export async function fetchNegotiationsList(userId = null) {
+  const url = userId ? `${API_BASE_URL}/negotiations?user_id=${encodeURIComponent(userId)}` : `${API_BASE_URL}/negotiations`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error("Failed to fetch negotiations list from DB.");
+  }
+  return await response.json();
+}
+

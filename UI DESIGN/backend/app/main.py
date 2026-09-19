@@ -18,8 +18,8 @@ from sqlalchemy import inspect, text
 
 # Create database tables on startup & ensure schema migrations
 def init_db():
-    Base.metadata.create_all(bind=engine)
     try:
+        Base.metadata.create_all(bind=engine)
         inspector = inspect(engine)
         if "negotiations" in inspector.get_table_names():
             columns = [c["name"] for c in inspector.get_columns("negotiations")]
@@ -28,11 +28,14 @@ def init_db():
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN mode VARCHAR(50) DEFAULT 'simulation'"))
                 if "human_role" not in columns:
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN human_role VARCHAR(50)"))
+                if "user_id" not in columns:
+                    conn.execute(text("ALTER TABLE negotiations ADD COLUMN user_id VARCHAR(255)"))
                 if "deadlock_info_json" not in columns:
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN deadlock_info_json TEXT"))
                 conn.commit()
     except Exception as e:
-        logger.warning(f"Database schema auto-migration check notice: {e}")
+        logger.error(f"Database initialization notice (check connection parameters in .env): {e}")
+
 
 init_db()
 
@@ -57,7 +60,9 @@ app.include_router(agents.router)
 app.include_router(negotiations.router)
 app.include_router(scenarios.router)
 app.include_router(analytics.router)
+app.include_router(analytics.analytics_router)
 app.include_router(guide.router)
+
 
 @app.get("/")
 def root():

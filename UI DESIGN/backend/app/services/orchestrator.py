@@ -24,6 +24,7 @@ class NegotiationOrchestrator:
         status: str = "active",
         mode: str = "simulation",  # "simulation" | "practice"
         human_role: Optional[str] = None,
+        user_id: Optional[str] = None,
         current_offer: Optional[Dict[str, Any]] = None,
         previous_offer: Optional[Dict[str, Any]] = None,
         history: Optional[List[Dict[str, Any]]] = None,
@@ -33,8 +34,10 @@ class NegotiationOrchestrator:
         self.scenario_id = scenario_id
         self.mode = mode
         self.human_role = human_role
+        self.user_id = user_id
         self.max_rounds = max_rounds
         self.current_round = current_round
+
         self.status = status
         self.current_offer = current_offer
         self.previous_offer = previous_offer
@@ -509,6 +512,7 @@ class NegotiationOrchestrator:
             "scenario_id": self.scenario_id,
             "mode": self.mode,
             "human_role": self.human_role,
+            "user_id": self.user_id,
             "current_round": self.current_round,
             "max_rounds": self.max_rounds,
             "current_agent_turn": self.current_agent_turn,
@@ -520,4 +524,5 @@ class NegotiationOrchestrator:
             "history": self.history,
             "deadlock_info": self.deadlock_info
         }
+
 

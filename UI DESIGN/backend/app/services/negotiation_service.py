@@ -116,7 +116,8 @@ def create_negotiation_session(
     agent_profiles: Optional[List[Dict[str, Any]]] = None,
     max_rounds: int = 5,
     mode: str = "simulation",
-    human_role: Optional[str] = None
+    human_role: Optional[str] = None,
+    user_id: Optional[str] = None
 ) -> NegotiationOrchestrator:
     negotiation_id = str(uuid.uuid4())
 
@@ -130,6 +131,7 @@ def create_negotiation_session(
     initial_turn = agent_profiles[0]["id"] if agent_profiles else "buyer"
     db_neg = NegotiationModel(
         negotiation_id=negotiation_id,
+        user_id=user_id,
         scenario_id=scenario_id,
         mode=mode,
         human_role=human_role,
@@ -138,6 +140,7 @@ def create_negotiation_session(
         current_agent_turn=initial_turn,
         status="active"
     )
+
     db_neg.participating_agents = agent_profiles
     db_neg.current_offer = None
     db_neg.previous_offer = None
@@ -157,6 +160,7 @@ def create_negotiation_session(
         status="active",
         mode=mode,
         human_role=human_role,
+        user_id=user_id,
         current_offer=None,
         previous_offer=None,
         history=[],
@@ -185,11 +189,13 @@ def load_orchestrator(db: Session, negotiation_id: str) -> Optional[NegotiationO
         status=db_neg.status,
         mode=getattr(db_neg, "mode", "simulation") or "simulation",
         human_role=getattr(db_neg, "human_role", None),
+        user_id=getattr(db_neg, "user_id", None),
         current_offer=db_neg.current_offer,
         previous_offer=db_neg.previous_offer,
         history=history,
         deadlock_info=getattr(db_neg, "deadlock_info", {}) or {}
     )
+
 
 def save_orchestrator_state(db: Session, orch: NegotiationOrchestrator):
     db_neg = db.query(NegotiationModel).filter(NegotiationModel.negotiation_id == orch.negotiation_id).first()

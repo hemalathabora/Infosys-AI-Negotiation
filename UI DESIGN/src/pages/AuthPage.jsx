@@ -415,26 +415,6 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                   </div>
                 </div>
 
-                {demoOtpCode && (
-                  <div className="flex items-center justify-between rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-4">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                        {emailSent ? "Active OTP" : "Demo OTP"}
-                      </p>
-                      <p className="mt-1 font-mono text-xl font-black tracking-[0.3em] text-white">
-                        {demoOtpCode}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setOtpDigits(demoOtpCode.split(""))}
-                      className="rounded-xl bg-indigo-500/20 px-3 py-2 text-[11px] font-bold text-indigo-200 transition hover:bg-indigo-500/30"
-                    >
-                      Auto-fill
-                    </button>
-                  </div>
-                )}
 
                 <form onSubmit={handleOtpSubmit} className="space-y-6">
                   <div className="flex justify-between gap-2">

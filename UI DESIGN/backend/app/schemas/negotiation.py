@@ -23,6 +23,7 @@ class NegotiationCreate(BaseModel):
     max_rounds: Optional[int] = 5
     mode: Optional[str] = "simulation"  # "simulation" | "practice"
     human_role: Optional[str] = None
+    user_id: Optional[str] = None
 
 class NegotiationStateResponse(BaseModel):
     negotiation_id: str
@@ -33,11 +34,25 @@ class NegotiationStateResponse(BaseModel):
     status: str # "active" | "accepted" | "rejected" | "completed" | "cancelled" | "in_progress" | "agreement" | "deadlock"
     mode: Optional[str] = "Normal Mode"
     human_role: Optional[str] = None
+    user_id: Optional[str] = None
     previous_offer: Optional[Dict[str, Any]] = None
     current_offer: Optional[Dict[str, Any]] = None
     participating_agents: List[AgentProfileResponse]
     history: List[OfferLog] = Field(default_factory=list)
     deadlock_info: Optional[Dict[str, Any]] = None
+
+class NegotiationSummary(BaseModel):
+    negotiation_id: str
+    scenario_id: str
+    scenario_name: str
+    mode: str
+    status: str
+    current_round: int
+    max_rounds: int
+    agents_summary: str
+    created_at: Optional[str] = None
+    user_id: Optional[str] = None
+
 
 class PracticeTurnRequest(BaseModel):
     participant_id: Optional[str] = "human"

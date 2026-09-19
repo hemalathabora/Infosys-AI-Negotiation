@@ -1,90 +1,57 @@
 import { useState, useEffect, useCallback } from "react";
-
-const INITIAL_HISTORY = [
-  {
-    id: "session-101",
-    scenario: "Vendor Pricing Negotiation",
-    scenario_id: "vendor_pricing",
-    agents: "Alex Morgan vs Daniel Carter",
-    rounds: 6,
-    mode: "LLM Mode",
-    result: "Agreement",
-    utility: "88%",
-    settlement: "$48,500",
-    date: "Today",
-    timestamp: Date.now() - 1000 * 60 * 45,
-  },
-  {
-    id: "session-102",
-    scenario: "Job Offer Negotiation",
-    scenario_id: "job_offer",
-    agents: "Sarah Mitchell vs Michael Anderson",
-    rounds: 4,
-    mode: "Normal Mode",
-    result: "Agreement",
-    utility: "92%",
-    settlement: "$102,000",
-    date: "Yesterday",
-    timestamp: Date.now() - 1000 * 60 * 60 * 24,
-  },
-  {
-    id: "session-103",
-    scenario: "Project Budget Allocation",
-    scenario_id: "project_budget",
-    agents: "Olivia Bennett vs James Wilson",
-    rounds: 7,
-    mode: "LLM Mode",
-    result: "Deadlock",
-    utility: "45%",
-    settlement: "N/A",
-    date: "Aug 31",
-    timestamp: Date.now() - 1000 * 60 * 60 * 48,
-  },
-  {
-    id: "session-104",
-    scenario: "Vendor Pricing Negotiation",
-    scenario_id: "vendor_pricing",
-    agents: "Alex Morgan vs Daniel Carter",
-    rounds: 5,
-    mode: "Normal Mode",
-    result: "Agreement",
-    utility: "84%",
-    settlement: "$46,200",
-    date: "Aug 30",
-    timestamp: Date.now() - 1000 * 60 * 60 * 72,
-  },
-];
+import { fetchNegotiationsList } from "../services/api.js";
 
 const STORAGE_KEY = "negotiation_platform_history_v1";
 
-export function useNegotiationHistory() {
-  const [history, setHistory] = useState(() => {
+export function useNegotiationHistory(userId = null) {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadFromBackend = useCallback(async () => {
+    setLoading(true);
+    if (!userId) {
+      setHistory([]);
+      setLoading(false);
+      return;
+    }
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
+      const dbList = await fetchNegotiationsList(userId);
+      if (Array.isArray(dbList) && dbList.length > 0) {
+        const formatted = dbList.map((item) => ({
+          id: item.negotiation_id,
+          scenario: item.scenario_name,
+          scenario_id: item.scenario_id,
+          agents: item.agents_summary,
+          rounds: item.current_round,
+          mode: (item.mode || "simulation").toUpperCase(),
+          result: item.status === "accepted" || item.status === "agreement" || item.status === "completed" 
+            ? "Agreement" 
+            : item.status === "deadlock" || item.status === "rejected" || item.status === "breakdown" 
+            ? "Deadlock" 
+            : "In Progress",
+          settlement: "N/A",
+          date: item.created_at ? new Date(item.created_at).toLocaleDateString() : "Recent",
+          timestamp: item.created_at ? new Date(item.created_at).getTime() : Date.now(),
+        }));
+        setHistory(formatted);
+      } else {
+        setHistory([]);
       }
     } catch (e) {
-      console.warn("Could not load history from localStorage:", e);
+      console.warn("Could not fetch negotiation history from DB backend:", e);
+      setHistory([]);
+    } finally {
+      setLoading(false);
     }
-    return INITIAL_HISTORY;
-  });
+  }, [userId]);
 
-  // Save to localStorage whenever history changes
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-    } catch (e) {
-      console.warn("Could not save history to localStorage:", e);
-    }
-  }, [history]);
+    loadFromBackend();
+  }, [loadFromBackend]);
+
 
   const addSession = useCallback((newSession) => {
     setHistory((prev) => {
-      // Prevent duplicates if already recorded
       if (prev.some((item) => item.id === newSession.id)) {
         return prev;
       }
@@ -93,7 +60,7 @@ export function useNegotiationHistory() {
   }, []);
 
   const clearHistory = useCallback(() => {
-    setHistory(INITIAL_HISTORY);
+    setHistory([]);
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
@@ -101,7 +68,7 @@ export function useNegotiationHistory() {
     }
   }, []);
 
-  // Compute dynamic real-time stats
+  // Compute dynamic real-time stats from database records
   const totalSimulations = history.length;
   const agreementsCount = history.filter((item) => item.result === "Agreement").length;
   const deadlocksCount = history.filter((item) => item.result === "Deadlock").length;
@@ -117,6 +84,8 @@ export function useNegotiationHistory() {
 
   return {
     history,
+    loading,
+    refreshHistory: loadFromBackend,
     addSession,
     clearHistory,
     stats: {
@@ -128,3 +97,4 @@ export function useNegotiationHistory() {
     },
   };
 }
+

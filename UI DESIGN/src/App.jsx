@@ -4,7 +4,7 @@ import CinematicLoader from "./components/CinematicLoader";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 import AuthModal from "./components/AuthModal";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
@@ -12,6 +12,7 @@ import NegotiationArena from "./pages/NegotiationArena";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import AuthPage from "./pages/AuthPage";
+import LandingPage from "./pages/LandingPage.jsx";
 import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
 
@@ -24,9 +25,12 @@ export default function App() {
 }
 
 function MainAppContent() {
+  const { user, isAuthenticated } = useAuth();
+  const userId = user ? String(user.email || user.id) : null;
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState("dark");
-  const [activePage, setActivePage] = useState("Dashboard");
+  const [activePage, setActivePage] = useState(() => (user ? "Dashboard" : "Landing"));
   const [activeScenario, setActiveScenario] = useState(null);
   const [loaderKey, setLoaderKey] = useState(1);
   const [showLoader, setShowLoader] = useState(true);
@@ -35,7 +39,16 @@ function MainAppContent() {
   const [authInitialMode, setAuthInitialMode] = useState("signin");
 
   const negotiation = useNegotiationEngine();
-  const { history, addSession, stats, clearHistory } = useNegotiationHistory();
+  const { history, refreshHistory, addSession, stats, clearHistory } = useNegotiationHistory(userId);
+
+  // Sync active page with authentication status
+  useEffect(() => {
+    if (user) {
+      setActivePage((prev) => (prev === "Landing" || prev === "AuthPage" ? "Dashboard" : prev));
+    } else {
+      setActivePage("Landing");
+    }
+  }, [user]);
 
   const handleOpenAuthModal = (mode = "signin") => {
     setAuthInitialMode(mode);
@@ -84,19 +97,19 @@ function MainAppContent() {
         timestamp: Date.now(),
       };
       addSession(sessionData);
+      if (refreshHistory) refreshHistory();
     }
-  }, [negotiation.state, activeScenario, addSession]);
+  }, [negotiation.state, activeScenario, addSession, refreshHistory]);
 
 
   const renderPage = () => {
     switch (activePage) {
+      case "Landing":
+        return <LandingPage onNavigate={setActivePage} />;
 
       case "Dashboard":
         return (
-          <div
-            data-guide="dashboard-shell"
-            className="min-h-0 flex-1"
-          >
+          <div data-guide="dashboard-shell" className="min-h-0 flex-1">
             <Dashboard
               onNavigate={setActivePage}
               activeScenario={activeScenario}
@@ -108,21 +121,19 @@ function MainAppContent() {
           </div>
         );
 
-
       case "Configure Agents":
         return (
           <div data-guide="agent-configuration-shell" className="flex-1">
             <AgentConfiguration
               onNegotiationStart={async (scenario, mode, humanRole) => {
                 setActiveScenario(scenario);
-                await negotiation.start(scenario, mode, humanRole);
+                await negotiation.start(scenario, mode, humanRole, userId);
                 setActivePage("Negotiation Arena");
               }}
               onNegotiationReset={negotiation.reset}
             />
           </div>
         );
-
 
       case "Negotiation Arena":
         return (
@@ -133,7 +144,6 @@ function MainAppContent() {
           />
         );
 
-
       case "Analytics":
         return (
           <Analytics
@@ -143,7 +153,6 @@ function MainAppContent() {
             history={history}
           />
         );
-
 
       case "Reports":
         return (
@@ -163,13 +172,9 @@ function MainAppContent() {
           />
         );
 
-
       default:
-        return (
-          <div
-            data-guide="dashboard-shell"
-            className="min-h-0 flex-1"
-          >
+        return isAuthenticated ? (
+          <div data-guide="dashboard-shell" className="min-h-0 flex-1">
             <Dashboard
               onNavigate={setActivePage}
               activeScenario={activeScenario}
@@ -179,10 +184,11 @@ function MainAppContent() {
               onClearHistory={clearHistory}
             />
           </div>
+        ) : (
+          <LandingPage onNavigate={setActivePage} />
         );
     }
   };
-
 
   /* ============================================================
      APPLICATION LAYOUT
@@ -205,7 +211,6 @@ function MainAppContent() {
         }
       `}
     >
-
       {showLoader && (
         <CinematicLoader
           key={loaderKey}
@@ -218,37 +223,23 @@ function MainAppContent() {
       ======================================================= */}
 
       <header className="shrink-0 print:hidden">
-
         <TopNavigation
-          onMenuToggle={() =>
-            setSidebarOpen((value) => !value)
-          }
+          onMenuToggle={() => setSidebarOpen((value) => !value)}
+          isMenuOpen={sidebarOpen}
           theme={theme}
           onThemeChange={setTheme}
           activePage={activePage}
+          onNavigate={setActivePage}
           onReplayIntro={handleReplayIntro}
           onOpenAuthModal={handleOpenAuthModal}
         />
-
       </header>
 
-
       {/* ======================================================
-          SIDEBAR + MAIN CONTENT
+          STAGGERED MENU OVERLAY (FOR LOGGED IN USERS)
       ======================================================= */}
 
-      <div
-        className="
-          flex
-          min-h-0
-          flex-1
-          overflow-hidden
-          bg-[#0C0C0F]
-        "
-      >
-
-        {/* Sidebar */}
-
+      {isAuthenticated && (
         <Sidebar
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
@@ -261,25 +252,17 @@ function MainAppContent() {
           onClearHistory={clearHistory}
           onReplayIntro={handleReplayIntro}
         />
+      )}
 
+      {/* ======================================================
+          MAIN PAGE CONTENT AREA
+      ======================================================= */}
 
-        {/* Main page area (Elevated rounded container like reference screenshot) */}
-
-        <div
-          className="
-            min-h-0
-            min-w-0
-            flex-1
-            overflow-y-auto
-            overflow-x-hidden
-            
-          "
-        >
+      <div className="flex min-h-0 flex-1 overflow-hidden bg-[#0C0C0F]">
+        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
           {renderPage()}
         </div>
-
       </div>
-
     </div>
   );
 }

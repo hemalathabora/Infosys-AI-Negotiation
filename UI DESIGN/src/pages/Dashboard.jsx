@@ -1,9 +1,13 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { fetchDashboardAnalytics } from "../services/api.js";
+
 export default function Dashboard({
   onNavigate,
   activeScenario,
   negotiation,
   history = [],
-  stats = {
+  stats: parentStats = {
     totalSimulations: 0,
     agreementsCount: 0,
     deadlocksCount: 0,
@@ -12,6 +16,55 @@ export default function Dashboard({
   },
   onClearHistory,
 }) {
+  const { user } = useAuth();
+  const userId = user ? String(user.email || user.id) : null;
+
+
+  const [dbMetrics, setDbMetrics] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!userId) {
+      setDbMetrics({
+        totalSimulations: 0,
+        agreementsCount: 0,
+        deadlocksCount: 0,
+        agreementRate: 0,
+        avgRounds: "0.0",
+      });
+      return;
+    }
+
+    fetchDashboardAnalytics(userId)
+      .then((data) => {
+        if (!isMounted) return;
+        if (data && data.stats) {
+          setDbMetrics({
+            totalSimulations: data.stats.totalNegotiations || 0,
+            agreementsCount: data.stats.agreements || 0,
+            deadlocksCount: data.stats.deadlocks || 0,
+            agreementRate: data.stats.successRate || 0,
+            avgRounds: (data.stats.averageRounds || 0).toFixed(1),
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not fetch user dashboard analytics from DB:", err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, history]);
+
+  const stats = dbMetrics || (userId ? parentStats : {
+    totalSimulations: 0,
+    agreementsCount: 0,
+    deadlocksCount: 0,
+    agreementRate: 0,
+    avgRounds: "0.0",
+  });
+
   const hasActiveSession = Boolean(activeScenario && negotiation?.state);
   const engineState = negotiation?.state;
   const isDone = engineState?.status === "agreement" || engineState?.status === "deadlock";
@@ -63,7 +116,7 @@ export default function Dashboard({
 
   return (
     <main className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="mx-auto w-[95%] space-y-6">
 
         {/* =====================================================
             BREADCRUMB & HEADER BAR MATCHING REFERENCE IMAGE
@@ -486,23 +539,31 @@ export default function Dashboard({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {history.map((item, idx) => (
-                    <tr key={item.id || idx} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="px-4 py-3.5 font-semibold text-textPrimary">{item.scenario}</td>
-                      <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
-                      <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>
-                      <td className="px-4 py-3.5">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${
-                          item.result === "Agreement"
-                            ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                            : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
-                        }`}>
-                          {item.result}
-                        </span>
+                  {history.length > 0 ? (
+                    history.map((item, idx) => (
+                      <tr key={item.id || idx} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="px-4 py-3.5 font-semibold text-textPrimary">{item.scenario}</td>
+                        <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
+                        <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>
+                        <td className="px-4 py-3.5">
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${
+                            item.result === "Agreement"
+                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                              : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
+                          }`}>
+                            {item.result}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 font-mono font-semibold text-indigo-400">{item.settlement || "N/A"}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-textMuted font-mono text-xs">
+                        No negotiation sessions recorded yet for this account. Launch a session to start tracking live runs.
                       </td>
-                      <td className="px-4 py-3.5 font-mono font-semibold text-indigo-400">{item.settlement || "N/A"}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -516,20 +577,27 @@ export default function Dashboard({
             </h3>
 
             <div className="relative space-y-4 pl-4 border-l-2 border-border/80">
-              {activityTimeline.map((act, idx) => (
-                <div key={idx} className="relative space-y-1">
-                  <div className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-card ${
-                    act.type === "live" ? "bg-emerald-400 animate-pulse" : "bg-indigo-500"
-                  }`} />
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-textPrimary font-sans">{act.title}</p>
-                    <span className="font-mono text-[10px] text-textMuted">{act.time}</span>
+              {activityTimeline.length > 0 ? (
+                activityTimeline.map((act, idx) => (
+                  <div key={idx} className="relative space-y-1">
+                    <div className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-card ${
+                      act.type === "live" ? "bg-emerald-400 animate-pulse" : "bg-indigo-500"
+                    }`} />
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-textPrimary font-sans">{act.title}</p>
+                      <span className="font-mono text-[10px] text-textMuted">{act.time}</span>
+                    </div>
+                    <p className="text-xs text-textSecondary leading-relaxed font-body">{act.detail}</p>
                   </div>
-                  <p className="text-xs text-textSecondary leading-relaxed font-body">{act.detail}</p>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-xs text-textMuted font-mono py-4">
+                  No recent activity feed available. Sign in or run a simulation to see live system events.
+                </p>
+              )}
             </div>
           </div>
+
 
         </div>
 

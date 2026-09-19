@@ -4,9 +4,11 @@ import UserProfileDropdown from "./UserProfileDropdown";
 
 export default function TopNavigation({
   onMenuToggle,
+  isMenuOpen,
   theme,
-  _onThemeChange,
-  _activePage,
+  onThemeChange,
+  activePage,
+  onNavigate,
   onReplayIntro,
   onOpenAuthModal,
 }) {
@@ -14,47 +16,20 @@ export default function TopNavigation({
   const { isAuthenticated } = useAuth();
 
   return (
-    <header
-      className={`sticky top-0 z-30 flex h-16 items-center justify-between border-b px-3 sm:px-6 transition-colors duration-200 ${
-        isDark
-          ? "border-[#1F1E26] bg-[#0C0C0F]"
-          : "border-slate-200 bg-white"
-      }`}
-    >
-      {/* Left side - 3 Lines Menu Button + Logo & Title */}
-      <div className="flex items-center gap-3">
-        {/* Three Lines Menu Pop-Out Button (Icon Only) */}
-        <button
-          type="button"
-          onClick={onMenuToggle}
-          className={`flex items-center justify-center rounded-xl border p-2.5 transition-all duration-200 shadow-md active:scale-95 cursor-pointer ${
-            isDark
-              ? "border-[#3A3945] bg-[#1E1D26] text-white hover:border-slate-300 hover:bg-[#272632]"
-              : "border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200"
-          }`}
-          aria-label="Open Pop-out Main Menu"
-          title="Click 3 lines to pop out Main Menu"
+    <header className="sticky top-0 z-30 flex flex-col transition-colors duration-200">
+      {/* Top Navbar Main Header */}
+      <div
+        className={`flex h-16 items-center justify-between border-b px-3 sm:px-6 ${
+          isDark
+            ? "border-[#1F1E26] bg-[#0C0C0F]"
+            : "border-slate-200 bg-white"
+        }`}
+      >
+        {/* Left side - Logo & Project Title */}
+        <div
+          className="flex items-center gap-2.5 cursor-pointer"
+          onClick={() => onNavigate && onNavigate(isAuthenticated ? "Dashboard" : "Landing")}
         >
-          {/* 3 Horizontal Lines Icon */}
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-emerald-400"
-          >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        </button>
-
-        {/* Logo + Project Title */}
-        <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-950 shadow-md font-bold">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
@@ -72,60 +47,101 @@ export default function TopNavigation({
             </p>
           </div>
         </div>
-      </div>
 
-      {/* Right side - Actions & Status */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {onReplayIntro && (
-          <button
-            type="button"
-            onClick={onReplayIntro}
-            title="Replay Intro Cinematic"
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition ${
-              isDark
-                ? "border-[#3A3944] bg-[#222129] text-slate-300 hover:bg-[#2A2933] hover:text-white"
-                : "border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polygon points="5 3 19 12 5 21 5 3" />
-            </svg>
-            <span className="hidden sm:inline">Replay Intro</span>
-          </button>
-        )}
+        {/* Right side - Actions & Status */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {isAuthenticated && <LlmStatusBadge isDark={isDark} />}
 
-        <LlmStatusBadge isDark={isDark} />
+          {isAuthenticated ? (
+            <UserProfileDropdown isDark={isDark} />
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenAuthModal && onOpenAuthModal("signin")}
+              className="flex items-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 transition shadow-sm active:scale-95 cursor-pointer"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                <polyline points="10 17 15 12 10 7" />
+                <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+              <span>Sign In</span>
+            </button>
+          )}
 
-        {/* Authentication Button or Profile Dropdown */}
-        {isAuthenticated ? (
-          <UserProfileDropdown isDark={isDark} />
-        ) : (
-          <button
-            type="button"
-            onClick={() => onOpenAuthModal && onOpenAuthModal("signin")}
-            className="flex items-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-3.5 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/60 transition shadow-sm active:scale-95 cursor-pointer"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
-            </svg>
-            <span>Sign In</span>
-          </button>
-        )}
-
-        <div
-          className={`hidden sm:inline-flex items-center rounded-xl border px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase ${
-            isDark
-              ? "border-[#3A3944] bg-[#222129] text-slate-200"
-              : "border-slate-300 bg-slate-100 text-slate-800"
-          }`}
-        >
-          TEAM 4
+          {isAuthenticated && (
+            <div
+              className={`hidden sm:inline-flex items-center rounded-xl border px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase ${
+                isDark
+                  ? "border-[#3A3944] bg-[#222129] text-slate-200"
+                  : "border-slate-300 bg-slate-100 text-slate-800"
+              }`}
+            >
+              TEAM 4
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Sub-Navbar Breadcrumb & Menu Bar (Below Main Navbar) */}
+      {isAuthenticated && (
+        <div
+          className={`flex h-11 items-center justify-between border-b px-3 sm:px-6 transition-colors duration-200 ${
+            isDark
+              ? "border-[#1F1E26] bg-[#121117]"
+              : "border-slate-200 bg-slate-100"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            {/* Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={onMenuToggle}
+              className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-all duration-200 shadow-sm active:scale-95 cursor-pointer text-xs font-bold ${
+                isMenuOpen
+                  ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-400"
+                  : isDark
+                  ? "border-[#3A3945] bg-[#1E1D26] text-slate-200 hover:border-slate-300 hover:bg-[#272632]"
+                  : "border-slate-300 bg-slate-200 text-slate-800 hover:bg-slate-300"
+              }`}
+              aria-label="Toggle Navigation Menu"
+              title="Toggle Navigation Menu"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-emerald-400"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+              <span>{isMenuOpen ? "Close Menu" : "Menu"}</span>
+            </button>
+
+            {/* Breadcrumb Navigation Path */}
+            <div className="flex items-center gap-2 font-mono text-xs text-slate-400">
+              <span className="text-slate-500">NegoMind</span>
+              <span className="text-slate-600">/</span>
+              <span className="font-bold text-emerald-400">{activePage || "Dashboard"}</span>
+            </div>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-slate-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>SYSTEM CONTROL HUB</span>
+          </div>
+        </div>
+      )}
     </header>
   );
+
 }
 
 function LlmStatusBadge() {

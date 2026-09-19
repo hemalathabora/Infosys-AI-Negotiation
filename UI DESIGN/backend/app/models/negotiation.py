@@ -6,6 +6,7 @@ class NegotiationModel(Base):
     __tablename__ = "negotiations"
 
     negotiation_id = Column(String, primary_key=True, index=True)
+    user_id = Column(String, nullable=True, index=True)
     scenario_id = Column(String, nullable=False, default="vendor_pricing")
     mode = Column(String, nullable=True, default="simulation")
     human_role = Column(String, nullable=True)

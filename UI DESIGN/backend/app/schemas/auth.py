@@ -47,6 +47,7 @@ class UserSignIn(BaseModel):
 class OAuthSignIn(BaseModel):
     provider: str = Field(..., description="google or github")
     token_or_code: Optional[str] = None
+    redirect_uri: Optional[str] = None
     full_name: Optional[str] = None
     email: Optional[str] = None
     avatar_url: Optional[str] = None

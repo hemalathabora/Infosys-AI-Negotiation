@@ -178,6 +178,7 @@ export function AuthProvider({ children }) {
       const payload = {
         provider: provider.toLowerCase(),
         token_or_code: oauthData.token_or_code || null,
+        redirect_uri: oauthData.redirect_uri || null,
         email: oauthData.email || null,
         full_name: oauthData.name || oauthData.full_name || null,
         avatar_url: oauthData.avatar_url || null,

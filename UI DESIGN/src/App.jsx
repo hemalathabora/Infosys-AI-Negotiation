@@ -4,6 +4,7 @@ import CinematicLoader from "./components/CinematicLoader";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 import AuthModal from "./components/AuthModal";
+import OAuthCallbackHandler from "./components/OAuthCallbackHandler";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Dashboard from "./pages/Dashboard";
@@ -17,6 +18,13 @@ import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
 
 export default function App() {
+  const isOauthCallback = window.location.pathname.includes("/oauth/callback") ||
+    (window.opener && (window.location.search.includes("code=") || window.location.hash.includes("access_token")));
+
+  if (isOauthCallback) {
+    return <OAuthCallbackHandler />;
+  }
+
   return (
     <AuthProvider>
       <MainAppContent />

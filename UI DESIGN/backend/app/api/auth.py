@@ -150,6 +150,17 @@ def signin(payload: UserSignIn, db: Session = Depends(get_db)):
         message=f"Welcome back, {user.full_name}!"
     )
 
+@router.get("/config")
+def get_auth_config():
+    """
+    Returns public OAuth Client IDs and config for frontend authentication.
+    """
+    return {
+        "google_client_id": settings.GOOGLE_CLIENT_ID,
+        "github_client_id": settings.GITHUB_CLIENT_ID,
+        "smtp_enabled": settings.smtp_enabled
+    }
+
 @router.post("/oauth", response_model=AuthResponse)
 async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
     """
@@ -166,17 +177,21 @@ async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
     # Real OAuth Token / Code Verification
     if payload.token_or_code:
         if provider == "google":
-            google_profile = await auth_service.verify_google_oauth_token(payload.token_or_code)
+            google_profile = await auth_service.verify_google_oauth_token(payload.token_or_code, redirect_uri=payload.redirect_uri)
             if google_profile:
                 email = google_profile["email"]
                 full_name = google_profile["full_name"]
                 avatar_url = google_profile["avatar_url"]
+            else:
+                raise HTTPException(status_code=400, detail="Google authentication failed. Invalid or expired token/code.")
         elif provider == "github":
-            github_profile = await auth_service.exchange_github_oauth_code(payload.token_or_code)
+            github_profile = await auth_service.exchange_github_oauth_code(payload.token_or_code, redirect_uri=payload.redirect_uri)
             if github_profile:
                 email = github_profile["email"]
                 full_name = github_profile["full_name"]
                 avatar_url = github_profile["avatar_url"]
+            else:
+                raise HTTPException(status_code=400, detail="GitHub authentication failed. Invalid or expired code/token.")
 
     if not email:
         raise HTTPException(status_code=400, detail=f"Valid email required for {provider.capitalize()} sign in.")
@@ -218,6 +233,11 @@ def get_current_user(authorization: Optional[str] = Header(None), db: Session = 
     user = db.query(auth_service.User).filter(auth_service.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
+
+    if not user.avatar_url:
+        user.avatar_url = auth_service.generate_random_avatar(user.full_name)
+        db.commit()
+        db.refresh(user)
 
     return UserResponse(**user.to_dict())
 

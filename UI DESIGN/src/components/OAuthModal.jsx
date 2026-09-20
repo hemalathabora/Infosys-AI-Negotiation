@@ -1,69 +1,37 @@
 import { useState } from "react";
+import { startGoogleSignIn, startGithubSignIn } from "../services/oauthService";
 
 export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
-  const [customEmail, setCustomEmail] = useState("");
-  const [customName, setCustomName] = useState("");
   const [realTokenOrCode, setRealTokenOrCode] = useState("");
-  const [activeMode, setActiveMode] = useState("accounts"); // "accounts" | "custom" | "token"
+  const [activeMode, setActiveMode] = useState("popup"); // "popup" | "manual"
+  const [errorMsg, setErrorMsg] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   if (!isOpen || !provider) return null;
 
   const isGoogle = provider.toLowerCase() === "google";
 
-  const googleDemoAccounts = [
-    {
-      name: "Alex Johnson",
-      email: "alex.johnson@gmail.com",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    },
-    {
-      name: "Sarah Connor",
-      email: "sarah.connor@gmail.com",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-    },
-  ];
-
-  const githubDemoAccounts = [
-    {
-      name: "Devon Octocat",
-      email: "devon.builder@github.com",
-      avatar: "https://avatars.githubusercontent.com/u/583231?v=4",
-    },
-    {
-      name: "Elena Rostova",
-      email: "elena.code@github.com",
-      avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
-    },
-  ];
-
-  const accounts = isGoogle ? googleDemoAccounts : githubDemoAccounts;
-
-  const handleSelectAccount = (acc) => {
-    onAuthorize({
-      name: acc.name,
-      email: acc.email,
-      avatar_url: acc.avatar,
-    });
+  const handleLaunchPopup = async () => {
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      let result;
+      if (isGoogle) {
+        result = await startGoogleSignIn();
+      } else {
+        result = await startGithubSignIn();
+      }
+      onAuthorize(result);
+    } catch (err) {
+      setErrorMsg(err.message || `${isGoogle ? "Google" : "GitHub"} OAuth sign in failed.`);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCustomSubmit = (e) => {
+  const handleManualSubmit = (e) => {
     e.preventDefault();
-    if (!customEmail) return;
-    const name = customName || customEmail.split("@")[0];
-    const avatar = isGoogle
-      ? `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`
-      : `https://avatars.githubusercontent.com/u/9919?v=4`;
-
-    onAuthorize({
-      name,
-      email: customEmail,
-      avatar_url: avatar,
-    });
-  };
-
-  const handleTokenSubmit = (e) => {
-    e.preventDefault();
-    if (!realTokenOrCode) return;
+    if (!realTokenOrCode.trim()) return;
     onAuthorize({
       token_or_code: realTokenOrCode.trim(),
     });
@@ -72,7 +40,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all duration-200 ${
+        className={`w-full max-w-md rounded-3xl border p-6 shadow-2xl transition-all duration-200 ${
           isGoogle
             ? "border-blue-500/30 bg-[#12141F] text-white"
             : "border-purple-500/30 bg-[#0F0E17] text-white"
@@ -119,7 +87,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                 {isGoogle ? "Sign in with Google" : "Authorize NegoMind AI"}
               </h3>
               <p className="text-xs text-slate-400">
-                to continue to <span className="text-slate-200 font-semibold">NegoMind AI Engine</span>
+                Live OAuth 2.0 verification via <span className="text-slate-200 font-semibold">{isGoogle ? "Google Identity Services" : "GitHub OAuth"}</span>
               </p>
             </div>
           </div>
@@ -132,127 +100,71 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
           </button>
         </div>
 
-        {/* Content Body */}
+        {/* Error notification */}
+        {errorMsg && (
+          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-400">
+            <span className="font-bold">!</span>
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* Body content */}
         <div className="mt-5 space-y-4">
-          {activeMode === "accounts" && (
-            <>
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Select an account to proceed:
-              </p>
-
-              <div className="space-y-2.5">
-                {accounts.map((acc, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSelectAccount(acc)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl border border-[#272636] bg-[#171622] hover:border-emerald-500/50 hover:bg-[#1E1D2D] transition-all group text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={acc.avatar}
-                        alt={acc.name}
-                        className="h-10 w-10 rounded-full object-cover border border-slate-700"
-                      />
-                      <div>
-                        <p className="text-sm font-bold text-slate-100 group-hover:text-white">
-                          {acc.name}
-                        </p>
-                        <p className="text-xs text-slate-400 font-mono">{acc.email}</p>
-                      </div>
-                    </div>
-
-                    <span className="text-xs font-bold text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Select →
-                    </span>
-                  </button>
-                ))}
+          {activeMode === "popup" ? (
+            <div className="space-y-4 text-center">
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-300">
+                <p className="font-bold text-sm text-emerald-200 mb-1">
+                  {isGoogle ? "Official Google Sign-In" : "Official GitHub Sign-In"}
+                </p>
+                <p className="text-slate-300 leading-relaxed">
+                  {isGoogle
+                    ? "Click below to open Google's authentication popup and select your Google account."
+                    : "Click below to authenticate with your official GitHub account."}
+                </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2 text-xs">
+              <button
+                type="button"
+                onClick={handleLaunchPopup}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-emerald-500 py-3 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+              >
+                {loading ? (
+                  <>
+                    <span className="h-4 w-4 rounded-full border-2 border-slate-950 border-t-transparent animate-spin" />
+                    <span>Connecting to {isGoogle ? "Google" : "GitHub"}...</span>
+                  </>
+                ) : (
+                  <span>Launch {isGoogle ? "Google" : "GitHub"} Login Window →</span>
+                )}
+              </button>
+
+              <div className="pt-2 text-center">
                 <button
                   type="button"
-                  onClick={() => setActiveMode("custom")}
-                  className="text-slate-400 hover:text-slate-200 underline font-medium"
+                  onClick={() => setActiveMode("manual")}
+                  className="text-xs text-slate-400 hover:text-slate-200 underline"
                 >
-                  Enter custom email
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveMode("token")}
-                  className="text-emerald-400 hover:text-emerald-300 font-bold"
-                >
-                  {isGoogle ? "🔑 Real Google Token" : "🔑 Real GitHub Code"}
+                  Advanced: Manual Token / Code Entry
                 </button>
               </div>
-            </>
-          )}
-
-          {activeMode === "custom" && (
-            <form onSubmit={handleCustomSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Full Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder={isGoogle ? "Alex Johnson" : "devon_octocat"}
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  className="w-full rounded-xl border border-[#333245] bg-[#1A1926] px-3.5 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {isGoogle ? "Google Email Address" : "GitHub Email / Handle"}
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder={isGoogle ? "user@gmail.com" : "user@github.com"}
-                  value={customEmail}
-                  onChange={(e) => setCustomEmail(e.target.value)}
-                  className="w-full rounded-xl border border-[#333245] bg-[#1A1926] px-3.5 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveMode("accounts")}
-                  className="text-xs text-slate-400 hover:text-white"
-                >
-                  ← Back to default accounts
-                </button>
-
-                <button
-                  type="submit"
-                  className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition"
-                >
-                  Confirm & Sign In
-                </button>
-              </div>
-            </form>
-          )}
-
-          {activeMode === "token" && (
-            <form onSubmit={handleTokenSubmit} className="space-y-4">
+            </div>
+          ) : (
+            <form onSubmit={handleManualSubmit} className="space-y-4">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">
                 {isGoogle
-                  ? "Paste a Google ID Token or Access Token to verify directly against Google OAuth servers."
-                  : "Paste a GitHub Authorization Code to exchange directly with GitHub's official OAuth API."}
+                  ? "Paste a valid Google ID Token or Access Token to verify directly against Google's tokeninfo API."
+                  : "Paste a valid GitHub OAuth Authorization Code or Personal Access Token to verify directly with GitHub."}
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  {isGoogle ? "Google ID Token / Credential" : "GitHub OAuth Code"}
+                  {isGoogle ? "Google ID Token / Access Token" : "GitHub Code / Access Token"}
                 </label>
                 <textarea
                   required
                   rows={3}
-                  placeholder={isGoogle ? "eyJhbGciOiJSUzI1NiIs..." : "a1b2c3d4e5f6..."}
+                  placeholder={isGoogle ? "eyJhbGciOiJSUzI1NiIs..." : "ghp_... or auth_code..."}
                   value={realTokenOrCode}
                   onChange={(e) => setRealTokenOrCode(e.target.value)}
                   className="w-full rounded-xl border border-[#333245] bg-[#1A1926] p-3 font-mono text-xs text-white focus:border-emerald-500 focus:outline-none"
@@ -262,26 +174,26 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
               <div className="flex items-center justify-between pt-2">
                 <button
                   type="button"
-                  onClick={() => setActiveMode("accounts")}
+                  onClick={() => setActiveMode("popup")}
                   className="text-xs text-slate-400 hover:text-white"
                 >
-                  ← Back to accounts
+                  ← Back to OAuth popup
                 </button>
 
                 <button
                   type="submit"
                   className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition"
                 >
-                  Verify Live OAuth Token →
+                  Verify Token with Backend →
                 </button>
               </div>
             </form>
           )}
         </div>
 
-        {/* Footer info */}
+        {/* Footer */}
         <p className="mt-5 text-[10px] text-center text-slate-500 border-t border-[#262535] pt-3">
-          OAuth 2.0 Identity Service • Live Token Verification & Session Creation
+          NegoMind OAuth Engine • Real-time Token Exchange & Verification
         </p>
       </div>
     </div>

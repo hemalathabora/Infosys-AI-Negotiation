@@ -16,13 +16,18 @@ class User(Base):
     last_login = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
 
     def to_dict(self):
+        avatar = self.avatar_url
+        if not avatar or "googleusercontent" in avatar or "githubusercontent" in avatar:
+            seed = (self.full_name or self.email or "user").replace(" ", "_")
+            avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={seed}"
+
         return {
             "id": self.id,
             "email": self.email,
             "full_name": self.full_name,
             "auth_provider": self.auth_provider,
             "is_verified": self.is_verified,
-            "avatar_url": self.avatar_url,
+            "avatar_url": avatar,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "last_login": self.last_login.isoformat() if self.last_login else None,
         }

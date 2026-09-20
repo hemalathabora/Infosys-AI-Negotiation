@@ -28,6 +28,17 @@ export default function UserProfileDropdown({ isDark }) {
         .slice(0, 2)
     : "US";
 
+  const [imgError, setImgError] = useState(false);
+
+  const isExternalOAuthPic =
+    user.avatar_url &&
+    (user.avatar_url.includes("googleusercontent") || user.avatar_url.includes("githubusercontent"));
+
+  const avatarUrl =
+    !imgError && user.avatar_url && !isExternalOAuthPic
+      ? user.avatar_url
+      : `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.full_name || user.email || "user")}`;
+
   const providerBadge =
     user.auth_provider === "google"
       ? "Google"
@@ -47,17 +58,12 @@ export default function UserProfileDropdown({ isDark }) {
             : "border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200"
         }`}
       >
-        {user.avatar_url ? (
-          <img
-            src={user.avatar_url}
-            alt={user.full_name}
-            className="h-6 w-6 rounded-full object-cover border border-emerald-500/50"
-          />
-        ) : (
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-black text-slate-950">
-            {initials}
-          </div>
-        )}
+        <img
+          src={avatarUrl}
+          alt={user.full_name}
+          onError={() => setImgError(true)}
+          className="h-7 w-7 object-cover rounded-full border border-emerald-500/50  bg-slate-800"
+        />
 
         <div className="text-left hidden sm:block">
           <p className="text-xs font-bold leading-none">{user.full_name}</p>
@@ -90,17 +96,12 @@ export default function UserProfileDropdown({ isDark }) {
         >
           {/* User Details Header */}
           <div className="flex items-center gap-3 pb-3 border-b border-[#252435]">
-            {user.avatar_url ? (
-              <img
-                src={user.avatar_url}
-                alt={user.full_name}
-                className="h-11 w-11 rounded-full object-cover border-2 border-emerald-500/60 shadow-md"
-              />
-            ) : (
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500 text-sm font-black text-slate-950 shadow-md">
-                {initials}
-              </div>
-            )}
+            <img
+              src={avatarUrl}
+              alt={user.full_name}
+              onError={() => setImgError(true)}
+              className="h-11 w-11 rounded-full object-cover border-2 border-emerald-500/60 shadow-md bg-slate-800"
+            />
 
             <div className="min-w-0 flex-1">
               <h4 className="text-sm font-bold truncate">{user.full_name}</h4>

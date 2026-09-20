@@ -91,10 +91,10 @@ def verify_otp_code(db: Session, email: str, code: str) -> Tuple[bool, str]:
     db.commit()
     return True, "OTP verified successfully."
 
-# Real Google OAuth Token Verification
-async def verify_google_oauth_token(id_token_or_access_token: str) -> Optional[Dict[str, Any]]:
+# Real Google OAuth Token & Code Verification
+async def verify_google_oauth_token(id_token_or_access_token: str, redirect_uri: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
-    Verifies a Google ID Token or Access Token directly with Google's official OAuth servers.
+    Verifies a Google ID Token, Access Token, or Authorization Code directly with Google's official OAuth servers.
     """
     if not id_token_or_access_token:
         return None
@@ -131,51 +131,82 @@ async def verify_google_oauth_token(id_token_or_access_token: str) -> Optional[D
                         "avatar_url": data2.get("picture"),
                         "verified": data2.get("email_verified") in [True, "true", "True", 1]
                     }
+
+            # 3. If token is a Google authorization code and Client credentials exist
+            if settings.GOOGLE_CLIENT_ID and settings.GOOGLE_CLIENT_SECRET:
+                token_exchange_url = "https://oauth2.googleapis.com/token"
+                exchange_data = {
+                    "code": token,
+                    "client_id": settings.GOOGLE_CLIENT_ID,
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": redirect_uri or "http://localhost:5173/oauth/callback/google"
+                }
+                res3 = await client.post(token_exchange_url, data=exchange_data)
+                if res3.status_code == 200:
+                    tok_res = res3.json()
+                    access_tok = tok_res.get("access_token")
+                    id_tok = tok_res.get("id_token")
+                    if id_tok:
+                        return await verify_google_oauth_token(id_tok, redirect_uri)
+                    elif access_tok:
+                        return await verify_google_oauth_token(access_tok, redirect_uri)
     except Exception as exc:
         logger.error(f"Google OAuth token verification failed: {exc}")
 
     return None
 
-# Real GitHub OAuth Code Exchange
-async def exchange_github_oauth_code(code: str) -> Optional[Dict[str, Any]]:
+# Real GitHub OAuth Code & Token Exchange
+async def exchange_github_oauth_code(code_or_token: str, redirect_uri: Optional[str] = None) -> Optional[Dict[str, Any]]:
     """
-    Exchanges GitHub OAuth 'code' for access token and fetches authenticated GitHub user profile & primary email.
+    Exchanges GitHub OAuth 'code' for access token (or uses access token directly) and fetches authenticated GitHub user profile & primary email.
     """
-    if not code or not settings.GITHUB_CLIENT_ID or not settings.GITHUB_CLIENT_SECRET:
+    if not code_or_token:
         return None
+
+    cleaned = code_or_token.strip()
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            # Exchange code for token
-            token_url = "https://github.com/login/oauth/access_token"
-            payload = {
-                "client_id": settings.GITHUB_CLIENT_ID,
-                "client_secret": settings.GITHUB_CLIENT_SECRET,
-                "code": code.strip(),
-            }
-            headers = {"Accept": "application/json"}
-            res = await client.post(token_url, json=payload, headers=headers)
+            access_token = None
 
-            if res.status_code != 200:
-                logger.error(f"GitHub token exchange returned status {res.status_code}: {res.text}")
-                return None
+            # Check if it's already a GitHub access token or PAT
+            if cleaned.startswith("ghp_") or cleaned.startswith("gho_") or cleaned.startswith("github_pat_"):
+                access_token = cleaned
+            elif settings.GITHUB_CLIENT_ID and settings.GITHUB_CLIENT_SECRET:
+                # Exchange code for token
+                token_url = "https://github.com/login/oauth/access_token"
+                payload = {
+                    "client_id": settings.GITHUB_CLIENT_ID,
+                    "client_secret": settings.GITHUB_CLIENT_SECRET,
+                    "code": cleaned,
+                }
+                if redirect_uri:
+                    payload["redirect_uri"] = redirect_uri
 
-            token_data = res.json()
-            access_token = token_data.get("access_token")
+                headers = {"Accept": "application/json"}
+                res = await client.post(token_url, json=payload, headers=headers)
+
+                if res.status_code == 200:
+                    token_data = res.json()
+                    access_token = token_data.get("access_token")
+                else:
+                    logger.error(f"GitHub token exchange returned status {res.status_code}: {res.text}")
+
             if not access_token:
-                logger.error(f"No access token in GitHub response: {token_data}")
-                return None
+                access_token = cleaned
 
-            # Fetch User Profile
+            # Fetch User Profile from GitHub API
             auth_header = {"Authorization": f"Bearer {access_token}", "Accept": "application/vnd.github.v3+json"}
             user_res = await client.get("https://api.github.com/user", headers=auth_header)
             if user_res.status_code != 200:
+                logger.error(f"GitHub user profile fetch returned status {user_res.status_code}: {user_res.text}")
                 return None
 
             github_user = user_res.json()
             email = github_user.get("email")
 
-            # If primary email is private in profile, fetch from /user/emails
+            # If primary email is private in GitHub profile, fetch from /user/emails endpoint
             if not email:
                 email_res = await client.get("https://api.github.com/user/emails", headers=auth_header)
                 if email_res.status_code == 200:
@@ -198,6 +229,27 @@ async def exchange_github_oauth_code(code: str) -> Optional[Dict[str, Any]]:
 
     return None
 
+AVATAR_STYLES = [
+    "bottts",
+    "avataaars",
+    "lorelei",
+    "micah",
+    "adventurer",
+    "fun-emoji",
+    "personas",
+    "big-smile",
+    "big-ears"
+]
+
+def generate_random_avatar(seed_text: Optional[str] = None) -> str:
+    """
+    Generates a random SVG avatar URL using Dicebear 7.x API with a variety of vector styles.
+    """
+    style = random.choice(AVATAR_STYLES)
+    random_id = secrets.token_hex(4)
+    seed = f"{seed_text or 'user'}_{random_id}".replace(" ", "_")
+    return f"https://api.dicebear.com/7.x/{style}/svg?seed={seed}"
+
 # User Operations
 def get_user_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email.strip().lower()).first()
@@ -214,6 +266,8 @@ def create_unverified_user(db: Session, full_name: str, email: str, password: st
         existing.full_name = full_name.strip()
         existing.hashed_password = pwd_hash
         existing.auth_provider = "email"
+        if not existing.avatar_url:
+            existing.avatar_url = generate_random_avatar(full_name)
         db.commit()
         db.refresh(existing)
         return existing
@@ -224,7 +278,7 @@ def create_unverified_user(db: Session, full_name: str, email: str, password: st
         hashed_password=pwd_hash,
         auth_provider="email",
         is_verified=False,
-        avatar_url=None
+        avatar_url=generate_random_avatar(full_name)
     )
     db.add(user)
     db.commit()
@@ -249,14 +303,15 @@ def authenticate_or_create_oauth_user(
     user = get_user_by_email(db, email_clean)
 
     name = full_name.strip() if full_name else email_clean.split("@")[0].capitalize()
-    default_avatar = avatar_url or f"https://api.dicebear.com/7.x/bottts/svg?seed={name}"
+    random_avatar = generate_random_avatar(name)
 
     if user:
         # Update last login & verified status (OAuth emails are auto-verified)
         user.is_verified = True
         user.last_login = datetime.datetime.utcnow()
-        if not user.avatar_url:
-            user.avatar_url = default_avatar
+        # Always replace Google/GitHub profile picture or missing avatar with random avatar
+        if not user.avatar_url or "googleusercontent" in user.avatar_url or "githubusercontent" in user.avatar_url:
+            user.avatar_url = random_avatar
         db.commit()
         db.refresh(user)
         return user
@@ -267,7 +322,7 @@ def authenticate_or_create_oauth_user(
         hashed_password=None,
         auth_provider=provider.lower(),
         is_verified=True,
-        avatar_url=default_avatar
+        avatar_url=random_avatar
     )
     db.add(user)
     db.commit()

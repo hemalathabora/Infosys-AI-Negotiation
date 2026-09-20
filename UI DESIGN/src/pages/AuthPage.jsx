@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import OAuthModal from "../components/OAuthModal";
+import { startGoogleSignIn, startGithubSignIn } from "../services/oauthService";
 
 function Icon({ name, size = 18, strokeWidth = 1.8 }) {
   const common = {
@@ -316,6 +317,44 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
     }
   };
 
+  const handleGoogleAuth = async () => {
+    setLoading(true);
+    setAuthError(null);
+    try {
+      const oauthData = await startGoogleSignIn();
+      const result = await signInWithOAuth("google", oauthData);
+      if (result.success) {
+        onNavigate?.("Dashboard");
+      }
+    } catch (err) {
+      console.warn("Google OAuth direct prompt notice:", err);
+      if (err.message && !err.message.includes("closed")) {
+        setAuthError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubAuth = async () => {
+    setLoading(true);
+    setAuthError(null);
+    try {
+      const oauthData = await startGithubSignIn();
+      const result = await signInWithOAuth("github", oauthData);
+      if (result.success) {
+        onNavigate?.("Dashboard");
+      }
+    } catch (err) {
+      console.warn("GitHub OAuth direct prompt notice:", err);
+      if (err.message && !err.message.includes("closed")) {
+        setAuthError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOAuthAuthorize = async (oauthUser) => {
     if (!oauthProvider) return;
 
@@ -476,8 +515,9 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setOauthProvider("google")}
-                    className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-[#302E42] bg-[#161522]/80 text-xs font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-[#1D1C2B]"
+                    onClick={handleGoogleAuth}
+                    disabled={loading}
+                    className="flex h-12 items-center justify-center gap-2 border border-[#302E42] bg-[#161522]/80 text-sm font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-[#1D1C2B] disabled:opacity-50"
                   >
                     <GoogleIcon />
                     Google
@@ -485,10 +525,11 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
 
                   <button
                     type="button"
-                    onClick={() => setOauthProvider("github")}
-                    className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-[#302E42] bg-[#161522]/80 text-xs font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-purple-500/50 hover:bg-[#1D1C2B]"
+                    onClick={handleGithubAuth}
+                    disabled={loading}
+                    className="flex h-12 items-center justify-center gap-2 border border-[#302E42] bg-[#161522]/80 text-sm font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-purple-500/50 hover:bg-[#1D1C2B] disabled:opacity-50"
                   >
-                    <GithubIcon />
+                    <GithubIcon/>
                     GitHub
                   </button>
                 </div>

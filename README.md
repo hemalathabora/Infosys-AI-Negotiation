@@ -193,6 +193,7 @@ python -m pytest tests -v
 | 1 | **Santanu Atta** |
 | 2 | **Hemalatha Bora** |
 | 3 | **Shaik Mohammed Fawaz** |
+| 4 | **new member** |
 
 ---
 

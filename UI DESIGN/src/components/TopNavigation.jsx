@@ -153,13 +153,17 @@ function LlmStatusBadge() {
     message: ""
   });
 
+  const apiBase = import.meta.env.VITE_API_BASE_URL
+    ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "")
+    : "http://localhost:8000/api";
+
   const checkLlm = async () => {
     try {
-      const modeRes = await fetch("http://localhost:8000/api/settings/mode");
+      const modeRes = await fetch(`${apiBase}/settings/mode`);
       if (!modeRes.ok) throw new Error("API Offline");
       const modeData = await modeRes.json();
 
-      const healthRes = await fetch("http://localhost:8000/api/health/llm");
+      const healthRes = await fetch(`${apiBase}/health/llm`);
       const healthData = await healthRes.json();
 
       const isLlm = modeData.is_llm_active;
@@ -198,7 +202,7 @@ function LlmStatusBadge() {
     const nextProvider = status.isLlmActive ? "mock" : "gemini";
     try {
       setStatus((prev) => ({ ...prev, loading: true }));
-      const res = await fetch("http://localhost:8000/api/settings/mode", {
+      const res = await fetch(`${apiBase}/settings/mode`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: nextProvider })

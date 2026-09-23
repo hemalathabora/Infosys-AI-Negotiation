@@ -400,7 +400,7 @@ python -m pytest tests -v
 | 1 | **Santanu Atta** | Milestone 1 — System & Agent Foundation |
 | 2 | **Hemalatha Bora** | Milestone 2 — LLM Reasoning & Negotiation Logic |
 | 3 | **Shaik Mohammed Fawaz** | Milestone 3 — Negotiation Arena & Practice Mode |
-| 4 | **new team member** | Milestone 4 — Outcome, Reporting & Finalization |
+| 4 | **Bhanu Jahnavi Kodamanchili** | Milestone 4 — Outcome, Reporting & Finalization |
 
 ---
 

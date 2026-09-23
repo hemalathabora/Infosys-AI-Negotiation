@@ -1,214 +1,110 @@
-# AI-Driven Multi-Agent Negotiation Simulator
+# NegoMind AI: Technical Architecture & Subsystem Documentation
 
-An end-to-end **AI-Driven Multi-Agent Negotiation Training & Simulation Platform** powered by a **Python FastAPI Backend**, **LLM-Powered Reasoning Engine**, and a **React 19 + Vite Frontend**.
+Full-stack technical documentation for the **NegoMind AI** platform, covering the **React 19 + Vite Frontend**, **FastAPI Backend**, **LLM & Rule Reasoning Engines**, **Concession Telemetry**, and **Database Schema**.
 
-```
-Frontend (React) ↔ FastAPI REST Backend ↔ Negotiation Orchestrator ↔ LLM Reasoning Engine ↔ Constraint Enforcement ↔ SQLite Persistence
+> 🔗 **GitHub Repository**: [https://github.com/hemalathabora/Infosys-AI-Negotiation](https://github.com/hemalathabora/Infosys-AI-Negotiation)
+
+---
+
+## 🏗️ Core Architecture Overview
+
+NegoMind AI connects a React 19 single-page application to a FastAPI backend that executes multi-round negotiations via structured state management.
+
+```mermaid
+graph LR
+    UI[React 19 SPA] <-->|REST API| API[FastAPI Backend]
+    API <--> Orch[Orchestrator]
+    Orch <--> Engine[Reasoning Engine]
+    Engine <-->|Live Mode| Gemini[Gemini / OpenAI LLM]
+    Engine <-->|Offline Mode| Rule[Deterministic Rule Engine]
+    Orch <--> Guards[Constraint & Concession Guardrails]
+    Orch <--> DB[(SQLite / PostgreSQL)]
 ```
 
 ---
 
-## 🏗️ System Architecture
+## 🤖 Dual Reasoning Engine Architecture
 
-The platform connects a modern React frontend to a Python FastAPI backend managing the complete negotiation lifecycle:
+The reasoning engine (`backend/app/services/llm_reasoning.py`) operates in two modes:
 
-1. **Agent Profile System**: Defines agent identities, roles, personas, strategic goals, hard constraint limits (`maximum_price`, `minimum_price`, `quantity`), and negotiation objectives.
-2. **Negotiation State & Persistence**: SQLite database (via SQLAlchemy) tracking `negotiation_id`, participating agents, active turn, current round, maximum rounds limit, status, current offer, and complete history.
-3. **Conversation History**: Persists all turns and provides the LLM with complete negotiation context (previous offers, counteroffers, rationales, and opponent bids).
-4. **LLM Reasoning Engine**: Context-aware LLM reasoning module (`app/services/llm_reasoning.py`) that constructs prompt contexts and calls official LLM APIs (`google-genai` / `google-generativeai` / `openai`) or deterministic fallback engines.
-5. **Structured LLM Response & Validation**: Strictly validates structured LLM output (`accept`, `counter`, `reject`, `offer`, `reasoning`, `parameters`) using Pydantic models.
-6. **Constraint Enforcement**: Validates every generated offer against agent limits (Buyer maximum budget, Vendor minimum floor). Clamps or adjusts invalid responses safely before saving.
-7. **Negotiation Orchestrator**: Service managing turn switching, state updates, termination evaluation, and session completion.
-
----
-
-## 🤖 LLM Reasoning Engine & Prompt Architecture
-
-The `generate_agent_response` function (`app/services/llm_reasoning.py`) is the core engine of the system:
-
-```python
-response = await generate_agent_response(
-    agent_profile,
-    negotiation_state,
-    conversation_history,
-    opponent_offer
-)
-```
-
-### Prompt Construction
-The engine builds system and user prompts containing:
-- **Agent Identity & Role**: e.g., `"You are acting strictly as Buyer Agent (Role: buyer)."`
-- **Persona & Personality**: e.g., `"Aggressive but professional negotiator"`.
-- **Goals & Objectives**: e.g., `["Get lowest price", "Target price 75,000"]`.
-- **Numeric Constraints**: e.g., `{"maximum_price": 85000, "quantity": 100}`.
-- **Current Negotiation State**: Current round index, maximum rounds limit, status.
-- **Complete Conversation History**: Full log of previous offers and counterparty responses.
-- **Opponent's Latest Offer**: Most recent proposed terms.
-
-### Structured Response Schema (Pydantic)
-```json
-{
-  "decision": "counter",
-  "offer": {
-    "price": 82000,
-    "quantity": 100
-  },
-  "reasoning": "The vendor has reduced their asking price, so I can increase my offer while staying within budget.",
-  "parameters": {
-    "target_price": 75000,
-    "maximum_price": 85000
+### 1. Gemini / LLM Mode (Contextual AI)
+- Uses `google-generativeai` / `google-genai` or `openai` SDKs.
+- Enforces strict JSON output via Pydantic model (`LLMStructuredResponse`):
+  ```json
+  {
+    "decision": "counter",
+    "offer": { "price": 46500, "quantity": 100 },
+    "reasoning": "Lowering price to move closer to buyer budget while maintaining vendor profit margin.",
+    "parameters": { "target_price": 48000, "minimum_price": 42000 }
   }
-}
+  ```
+
+### 2. Normal Mode (Deterministic Rule Engine)
+- Triggered when `LLM_PROVIDER=mock` or when no valid API key is supplied.
+- Evaluates offer utility, buyer/seller value direction, and personality profiles (`Aggressive`, `Collaborative`, `Risk-averse`) locally without network requests.
+
+---
+
+## 🔒 Constraint & Concession Safety Guardrails
+
+To eliminate out-of-bounds proposals or hallucinations:
+- **Buyer Ceiling Clamp**: Counteroffers above `maximum_price` are clamped to `maximum_price`.
+- **Vendor Floor Clamp**: Counteroffers below `minimum_price` are clamped to `minimum_price`.
+- **Concession Control Layer**: `apply_concession_control` bounds step concession sizes based on persona coefficients (`MAX_STEP_RATIO`).
+
+---
+
+## 🔄 Orchestration Lifecycle
+
+```
+1. Fetch Active Session State & History from Database
+2. Identify Current Turn Agent Profile & Opponent Offer
+3. Invoke Reasoning Engine (LLM or Normal Rule Engine)
+4. Validate & Clamp Output via Constraint Guardrails
+5. Record Step Concession Telemetry & Check Deadlock Engine
+6. Persist Turn Entry to Database Transcript
+7. Check Termination Conditions (Accept, Reject, Max Rounds)
+8. Switch Active Turn Agent or Transition Session Status
 ```
 
 ---
 
-## 🔒 Constraint Enforcement Rules
+## 📊 Concession Telemetry Math
 
-To ensure LLMs do not hallucinate invalid or out-of-bounds proposals:
-- **Buyer Constraint**: Any counteroffer or accepted price above `maximum_price` (e.g., > ₹85,000) is rejected and clamped to `maximum_price`.
-- **Vendor Constraint**: Any counteroffer or accepted price below `minimum_price` (e.g., < ₹80,000) is rejected and clamped to `minimum_price`.
-- **Enforcement Log**: All constraint adjustments are logged and saved in the negotiation parameters (`adjusted_due_to_constraint: true`).
+Concession calculations are implemented in `backend/app/services/concession_tracking.py`:
 
----
-
-## 🔄 Negotiation Orchestration Flow
-
-```
-Orchestrator
- ├─► 1. Get Current Agent
- ├─► 2. Load Agent Profile
- ├─► 3. Load Negotiation State & Conversation History
- ├─► 4. Fetch Opponent's Latest Offer
- ├─► 5. Send Context to LLM Reasoning Engine
- ├─► 6. Generate Agent Response
- ├─► 7. Validate Constraints
- ├─► 8. Save Response to Conversation History
- ├─► 9. Update Negotiation State
- └─► 10. Switch Turn to Next Agent (or Terminate on Accept/Reject/Max Rounds)
-```
+- **Step Concession**: Absolute price movement toward target zone.
+- **Step Percentage**: Percentage of overall target range covered in a turn.
+- **Cumulative Concession**: Sum of true step concessions across rounds.
+- **Rate of Decay**: $\frac{\text{Avg(Early Steps)} - \text{Avg(Recent Steps)}}{\text{Avg(Early Steps)}} \times 100\%$.
+- **ZOPA**: $\text{Max}_{\text{Buyer}} - \text{Min}_{\text{Vendor}}$.
 
 ---
 
-## 📡 REST API Endpoints
+## 📡 REST API Summary
 
-### Negotiations API
-- `POST /api/negotiations` — Create and start a negotiation session.
-- `GET /api/negotiations/{id}` — Get current negotiation state.
-- `POST /api/negotiations/{id}/turn` — Run the current active agent's turn.
-- `POST /api/negotiations/{id}/run` — Run negotiation automatically to completion.
-- `GET /api/negotiations/{id}/history` — Retrieve complete negotiation history log.
-
-### Agents API
-- `GET /api/agents` — List available agent profiles.
-- `POST /api/agents` — Create a custom agent profile.
-- `GET /api/agents/{id}` — Get specific agent profile details.
+- `POST /api/negotiations` — Start simulation or practice session
+- `GET /api/negotiations/{id}` — Fetch session state & current turn
+- `POST /api/negotiations/{id}/turn` — Execute single turn
+- `POST /api/negotiations/{id}/practice-turn` — Submit human offer
+- `POST /api/negotiations/{id}/run` — Auto-run session to completion
+- `GET /api/analytics/{id}` — Fetch session concession metrics
+- `POST /api/settings/mode` — Dynamically switch between Gemini and Normal modes
 
 ---
 
-## ⚙️ Environment Configuration
+## 🧪 Testing
 
-Create `backend/.env` (based on `backend/.env.example`):
-
-```env
-LLM_PROVIDER=gemini
-LLM_API_KEY=your_api_key_here
-LLM_MODEL=gemini-2.5-flash
-DATABASE_URL=sqlite:///./negotiation.db
-PORT=8000
-HOST=0.0.0.0
-CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-```
-
-> **Note**: If `LLM_API_KEY` is not provided or `LLM_PROVIDER=mock`, the system automatically uses a deterministic mock reasoning engine for testing and offline development.
-
----
-
-## 🚀 Running the System
-
-### 1. Start Python FastAPI Backend
+Run pytest suite from `backend/`:
 ```bash
-cd backend
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --port 8000
-```
-Backend API will be live at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`.
-
-### 2. Start React Frontend
-```bash
-# In the project root directory
-npm install
-npm run dev
-```
-Frontend UI will be live at `http://localhost:5173`.
-
----
-
-## 🧪 Running Automated Tests
-
-Run the full `pytest` suite in the backend directory:
-
-```bash
-cd backend
 python -m pytest tests -v
 ```
-
-### Multi-Round Vendor Pricing Test (`tests/test_multi_round_vendor_pricing.py`)
-Simulates a multi-round negotiation between:
-- **BUYER**: Persona = Aggressive but professional, Target = ₹75,000, Maximum = ₹85,000
-- **VENDOR**: Persona = Firm but flexible, Target = ₹95,000, Minimum = ₹80,000
-
-The test verifies that:
-1. Buyer remembers previous Vendor offers.
-2. Vendor remembers previous Buyer offers.
-3. Offers evolve dynamically based on conversation history.
-4. Buyer offer never exceeds ₹85,000.
-5. Vendor offer never falls below ₹80,000.
-6. Round indices increment correctly and turns switch between agents.
-7. Session terminates cleanly with agreement, rejection, or deadlock.
+All 62 tests across 12 test modules pass cleanly.
 
 ---
 
-## 📁 Project Directory Structure
+## 🌐 Deployment Configuration
 
-```
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── agents.py
-│   │   │   ├── negotiations.py
-│   │   │   └── scenarios.py
-│   │   ├── models/
-│   │   │   ├── agent.py
-│   │   │   ├── negotiation.py
-│   │   │   └── message.py
-│   │   ├── schemas/
-│   │   │   ├── agent.py
-│   │   │   ├── negotiation.py
-│   │   │   └── response.py
-│   │   ├── services/
-│   │   │   ├── llm_reasoning.py
-│   │   │   ├── orchestrator.py
-│   │   │   └── negotiation_service.py
-│   │   ├── config.py
-│   │   ├── database.py
-│   │   └── main.py
-│   ├── tests/
-│   │   ├── test_agents.py
-│   │   ├── test_negotiation.py
-│   │   ├── test_orchestrator.py
-│   │   ├── test_reasoning.py
-│   │   └── test_multi_round_vendor_pricing.py
-│   ├── .env.example
-│   └── requirements.txt
-├── src/
-│   ├── services/
-│   │   └── api.js              # FastAPI frontend client
-│   ├── hooks/
-│   │   └── useNegotiationEngine.js  # React hook connected to backend
-│   └── pages/
-│       └── NegotiationArena.jsx
-├── .env.example
-├── .gitignore
-└── README.md
-```
+- **Frontend**: Hosted on Vercel (`vercel.json`).
+- **Backend**: Hosted on Render (`render.yaml` & `Procfile`).
+- **Database**: SQLite default or PostgreSQL via `DATABASE_URL`.

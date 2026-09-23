@@ -336,21 +336,19 @@ python -m pytest tests -v
 - **Status**: 62 Passed (100% pass rate)
 - **Execution Time**: ~5.4 seconds
 
-```
-Area / Module                        | Test Count | Status
--------------------------------------|------------|-------
-Agent Profile API (test_agents.py)   | 3          | PASSED
-Session State (test_negotiation.py)  | 2          | PASSED
-Turn Execution (test_orchestrator.py)| 1          | PASSED
-Reasoning & Guardrails (test_reasoning.py) | 4   | PASSED
-Offer Evaluation (test_offer_evaluation.py)| 6   | PASSED
-Concession Telemetry (test_concession_tracking.py) | 13 | PASSED
-Practice Mode (test_practice_mode.py)| 12         | PASSED
-Milestone 3 Integration (test_milestone3.py) | 10  | PASSED
-Multi-Round Simulation (test_multi_round_vendor_pricing.py) | 4 | PASSED
-Analytics & Guide Bot (test_analytics_and_guide.py) | 3 | PASSED
-Auth & User Avatar (test_auth_avatar.py) | 4      | PASSED
-```
+| Area / Module | Test Count | Status |
+| :--- | :---: | :---: |
+| Agent Profile API (`test_agents.py`) | 3 | PASSED |
+| Session State (`test_negotiation.py`) | 2 | PASSED |
+| Turn Execution (`test_orchestrator.py`) | 1 | PASSED |
+| Reasoning & Guardrails (`test_reasoning.py`) | 4 | PASSED |
+| Offer Evaluation (`test_offer_evaluation.py`) | 6 | PASSED |
+| Concession Telemetry (`test_concession_tracking.py`) | 13 | PASSED |
+| Practice Mode (`test_practice_mode.py`) | 12 | PASSED |
+| Milestone 3 Integration (`test_milestone3.py`) | 10 | PASSED |
+| Multi-Round Simulation (`test_multi_round_vendor_pricing.py`) | 4 | PASSED |
+| Analytics & Guide Bot (`test_analytics_and_guide.py`) | 3 | PASSED |
+| Auth & User Avatar (`test_auth_avatar.py`) | 4 | PASSED |
 
 ---
 

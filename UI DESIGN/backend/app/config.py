@@ -10,7 +10,12 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,*"
 
+    # External Vercel Mail Service Configuration
+    MAIL_SERVICE_URL: str = "https://otp-mail-service.vercel.app/api/send-otp"
+    MAIL_SERVICE_SECRET: str = ""
+
     # Real SMTP Email Configuration
+
     SMTP_SERVER: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
     SMTP_USERNAME: str = ""

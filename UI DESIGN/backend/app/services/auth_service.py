@@ -64,8 +64,9 @@ def create_otp_for_email(db: Session, email: str, purpose: str = "signup", name:
     print(f" [OTP NOTIFICATION] Code for {email}: {code}")
     print(f"==========================================\n")
 
-    # Dispatch via Real SMTP Email Service if configured
-    email_sent, email_msg = email_service._send_smtp_sync(to_email=email, otp_code=code, name=name)
+    # Dispatch via Vercel Mail Service (with SMTP fallback)
+    email_sent, email_msg = email_service.send_otp_email(to_email=email, otp_code=code, name=name)
+
 
     return code, email_sent
 

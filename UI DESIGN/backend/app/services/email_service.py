@@ -1,15 +1,61 @@
+import os
+import requests
 import smtplib
 import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from typing import Tuple
+from typing import Tuple, Dict, Any
 
 from app.config import settings
 
 logger = logging.getLogger("email_service")
 executor = ThreadPoolExecutor(max_workers=3)
+
+def send_otp_via_mail_service(email: str, otp: str) -> Dict[str, Any]:
+    """
+    Calls the external Vercel mail service endpoint for OTP delivery.
+    """
+    mail_service_url = os.getenv("MAIL_SERVICE_URL") or settings.MAIL_SERVICE_URL
+    mail_service_secret = os.getenv("MAIL_SERVICE_SECRET") or settings.MAIL_SERVICE_SECRET
+
+    if not mail_service_url:
+        raise Exception("MAIL_SERVICE_URL is not configured")
+
+    if not mail_service_secret:
+        raise Exception("MAIL_SERVICE_SECRET is not configured")
+
+    response = requests.post(
+        mail_service_url,
+        json={
+            "email": email,
+            "otp": otp
+        },
+        headers={
+            "Authorization": f"Bearer {mail_service_secret}",
+            "Content-Type": "application/json"
+        },
+        timeout=20
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+def send_otp_email(to_email: str, otp_code: str, name: str = "User") -> Tuple[bool, str]:
+    """
+    Dispatches OTP code via Vercel mail service with fallback to SMTP/Demo mode.
+    """
+    try:
+        res = send_otp_via_mail_service(to_email, otp_code)
+        success_msg = f"OTP email successfully sent to {to_email} via Vercel mail service."
+        logger.info(f"{success_msg} Response: {res}")
+        return True, success_msg
+    except Exception as exc:
+        logger.warning(f"Vercel mail service call failed: {exc}. Falling back to SMTP configuration...")
+        return _send_smtp_sync(to_email, otp_code, name)
+
 
 def _build_html_template(to_email: str, otp_code: str, name: str = "User") -> str:
     user_display = name if name and name.strip() else to_email.split("@")[0]

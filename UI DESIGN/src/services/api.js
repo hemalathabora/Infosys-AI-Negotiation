@@ -8,7 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000
  * Creates and starts a new negotiation session on the backend.
  * @param {import('../types/negotiation').Scenario} scenario
  */
-export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null, userId = null) {
+export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null, userId = null, maxRounds = 5) {
   const payload = {
     scenario_id: scenario.scenario_id,
     scenario_name: scenario.scenario_name || scenario.name,
@@ -33,7 +33,7 @@ export async function createNegotiationSession(scenario, mode = "simulation", hu
       }),
       negotiation_objectives: [agent.goal]
     })),
-    max_rounds: 5
+    max_rounds: maxRounds
   };
 
 

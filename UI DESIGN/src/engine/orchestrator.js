@@ -35,13 +35,14 @@ export class Orchestrator {
   /**
    * @param {import("../types/negotiation").Scenario} scenario
    */
-  constructor(scenario, mode = "simulation", humanRole = null) {
+  constructor(scenario, mode = "simulation", humanRole = null, maxRounds = 5) {
     this.scenario = scenario;
     this.mode = mode;
     this.humanRole = humanRole;
+    this.maxRounds = maxRounds;
 
     // Create the initial negotiation state.
-    this.state = createNegotiationState(scenario);
+    this.state = createNegotiationState(scenario, maxRounds);
 
     /**
      * Store the effective negotiation position of every agent.
@@ -198,8 +199,8 @@ export class Orchestrator {
 
     const round = this.getRoundForCurrentTurn(agentId);
 
-    // Safety check for MAX_ROUNDS
-    if (round > MAX_ROUNDS) {
+    // Safety check for maxRounds
+    if (round > this.maxRounds) {
       this.state = {
         ...this.state,
         status: NEGOTIATION_STATUS.DEADLOCK,
@@ -214,7 +215,7 @@ export class Orchestrator {
       const personality = agent.personality ?? "Unknown";
       const negotiationState = {
         current_round: round,
-        max_rounds: MAX_ROUNDS,
+        max_rounds: this.maxRounds,
         status: this.state.status,
         history: this.state.history ?? [],
       };
@@ -259,7 +260,7 @@ export class Orchestrator {
 
     const negotiationState = {
       current_round: round,
-      max_rounds: MAX_ROUNDS,
+      max_rounds: this.maxRounds,
       status: this.state.status,
     };
 
@@ -390,7 +391,7 @@ export class Orchestrator {
    */
   async runToCompletion() {
     let guard = 0;
-    const MAX_STEPS = MAX_ROUNDS * this.agentOrder.length;
+    const MAX_STEPS = this.maxRounds * this.agentOrder.length;
 
     while (
       this.state.status !== NEGOTIATION_STATUS.AGREEMENT &&

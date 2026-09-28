@@ -73,6 +73,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
   // Milestone 3: Participant Mode ("simulation" | "practice") & Human Role Selection
   const [mode, setMode] = useState("simulation"); 
   const [humanRole, setHumanRole] = useState("");
+  const [maxRounds, setMaxRounds] = useState(5);
 
   const activeHumanRole = humanRole || (agents[0]?.role || "buyer");
 
@@ -81,9 +82,9 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
     setIsStarting(true);
     try {
       if (onNegotiationStart) {
-        await onNegotiationStart(selectedScenario, mode, activeHumanRole);
+        await onNegotiationStart(selectedScenario, mode, activeHumanRole, maxRounds);
       } else {
-        await negotiation.start(selectedScenario, mode, activeHumanRole);
+        await negotiation.start(selectedScenario, mode, activeHumanRole, null, maxRounds);
       }
     } catch (err) {
       console.error("Error starting negotiation session:", err);
@@ -215,6 +216,39 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                 </div>
               </div>
             )}
+
+            {/* Round Selection */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#2D2C36]">
+              <div>
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  Negotiation Round Limit Selection
+                </p>
+                <p className="text-xs text-slate-400 font-body mt-0.5">
+                  Set maximum turn limit before deadlock triggers if no agreement is reached.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 font-mono">
+                {[3, 5, 8, 10, 12].map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setMaxRounds(r)}
+                    className={`rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                      maxRounds === r
+                        ? "border-sky-400 bg-sky-500/20 text-sky-300 shadow-md scale-105"
+                        : "border-[#3A3944] bg-[#17161B] text-slate-300 hover:text-white hover:border-slate-500"
+                    }`}
+                  >
+                    {r} Rounds {r === 5 ? "(Default)" : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Symmetrical 3-Step Progress Grid */}

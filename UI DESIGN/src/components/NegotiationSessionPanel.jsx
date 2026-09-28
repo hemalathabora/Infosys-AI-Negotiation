@@ -1,3 +1,5 @@
+
+
 const STATUS_META = {
   not_started: {
     label: "Not Started",
@@ -169,6 +171,8 @@ export default function NegotiationSessionPanel({
           {statusMessage}
         </p>
       </div>
+
+
 
       {/* METRICS ROW - 4 EQUAL SYMMETRICAL CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">

@@ -1,4 +1,4 @@
-﻿
+
 import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 
 /**
@@ -13,7 +13,7 @@ import { NEGOTIATION_STATUS } from "../types/negotiation.js";
  * @param {import("../types/negotiation").Scenario} scenario
  * @returns {import("../types/negotiation").NegotiationState}
  */
-export function createNegotiationState(scenario) {
+export function createNegotiationState(scenario, maxRounds = 5) {
   /** @type {Record<string, { goal: string, constraints: string[], personality: string }>} */
   const agent_profiles = {};
 
@@ -31,6 +31,7 @@ export function createNegotiationState(scenario) {
     // 0 means the negotiation has not started yet.
     // The first offer changes this to Round 1.
     current_round: 0,
+    max_rounds: maxRounds,
 
     // The first configured agent starts the negotiation.
     current_agent_turn: scenario.agents[0]?.id ?? null,

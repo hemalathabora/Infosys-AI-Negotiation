@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PerformanceScorecard from "../components/PerformanceScorecard";
 
 function formatValue(value) {
   if (value === null || value === undefined || Number.isNaN(Number(value))) return "N/A";
@@ -404,6 +405,15 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               {isLlmMode ? "LLM Mode (Generative AI Reasoning)" : "Normal Mode (Rule-Based Concession Engine)"}
             </span>
           </div>
+        </section>
+
+        {/* GAMIFIED PERFORMANCE SCORECARD RING & METRICS */}
+        <section>
+          <PerformanceScorecard 
+            scenario={currentScenario} 
+            state={state} 
+            timeline={negotiation?.timeline || {}} 
+          />
         </section>
 
         {/* 2. SYMMETRICAL METRICS GRID */}

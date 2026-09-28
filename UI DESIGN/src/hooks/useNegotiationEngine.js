@@ -29,7 +29,7 @@ export function useNegotiationEngine() {
      START NEGOTIATION
   ============================================================ */
 
-  const start = useCallback(async (scenario, mode = "simulation", humanRole = null, userId = null) => {
+  const start = useCallback(async (scenario, mode = "simulation", humanRole = null, userId = null, maxRounds = 5) => {
     if (!scenario) {
       console.error("Cannot start negotiation: scenario is missing.");
       return;
@@ -62,7 +62,7 @@ export function useNegotiationEngine() {
 
       // 1. Try starting backend session first
       try {
-        const backendRes = await createNegotiationSession(scenario, mode, humanRole, userId);
+        const backendRes = await createNegotiationSession(scenario, mode, humanRole, userId, maxRounds);
         if (backendRes && backendRes.negotiation_id) {
           setBackendSessionId(backendRes.negotiation_id);
           setState({ ...backendRes, execution_mode: backendRes.execution_mode || engineMode });
@@ -77,7 +77,7 @@ export function useNegotiationEngine() {
 
 
       // 2. Fallback to local JS Orchestrator (Normal Mode)
-      const orch = new Orchestrator(scenario, mode, humanRole);
+      const orch = new Orchestrator(scenario, mode, humanRole, maxRounds);
       const initialState = orch.getState();
 
       setOrchestrator(orch);

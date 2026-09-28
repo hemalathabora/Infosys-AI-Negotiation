@@ -1,6 +1,7 @@
 import { useState } from "react";
 import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
 import OutcomeScreen from "../components/OutcomeScreen";
+import TugOfWarBargainingZone from "../components/TugOfWarBargainingZone";
 import { getAuthoritativeTarget } from "../engine/concessionTracking.js";
 
 function formatCurrency(val) {
@@ -165,7 +166,7 @@ export default function NegotiationArena({
   const { state, isRunning, timeline, concessionTotals } = negotiation;
   const history = state.history || [];
   const agents = state.participating_agents || scenario.agents || [];
-  const maxRounds = (state.max_rounds && state.max_rounds <= 5) ? state.max_rounds : 5;
+  const maxRounds = state?.max_rounds || 5;
 
   const isDone =
     state.status === "agreement" ||
@@ -345,7 +346,15 @@ export default function NegotiationArena({
         )}
 
         {/* =====================================================
-            3. MAIN WORKSPACE GRID (LEFT: METRICS vs RIGHT: TRANSCRIPT)
+            3. "TUG-OF-WAR" BARGAINING ZONE PHYSICS SLIDER
+        ====================================================== */}
+        <TugOfWarBargainingZone
+          scenario={scenario}
+          negotiationState={state}
+        />
+
+        {/* =====================================================
+            4. MAIN WORKSPACE GRID (LEFT: METRICS vs RIGHT: TRANSCRIPT)
         ====================================================== */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
@@ -403,6 +412,8 @@ export default function NegotiationArena({
                 </div>
               </div>
             </div>
+
+
 
             {/* Agent Stance Cards */}
             <div className="space-y-4">

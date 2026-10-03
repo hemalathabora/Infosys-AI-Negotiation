@@ -13,9 +13,10 @@ from app.config import settings
 logger = logging.getLogger("email_service")
 executor = ThreadPoolExecutor(max_workers=3)
 
-def send_otp_via_mail_service(email: str, otp: str) -> Dict[str, Any]:
+def send_otp_via_mail_service(email: str, otp: str, name: str = "User") -> Dict[str, Any]:
     """
     Calls the external Vercel mail service endpoint for OTP delivery.
+    Sends `to`, `subject`, `html`, `text`, and `fromName` as required by the Vercel send-otp endpoint.
     """
     mail_service_url = os.getenv("MAIL_SERVICE_URL") or settings.MAIL_SERVICE_URL
     mail_service_secret = os.getenv("MAIL_SERVICE_SECRET") or settings.MAIL_SERVICE_SECRET
@@ -26,12 +27,21 @@ def send_otp_via_mail_service(email: str, otp: str) -> Dict[str, Any]:
     if not mail_service_secret:
         raise Exception("MAIL_SERVICE_SECRET is not configured")
 
+    subject = f"{otp} is your NegoMind AI Verification Code"
+    html_content = _build_html_template(email, otp, name)
+    text_content = f"Hello {name},\n\nYour NegoMind AI OTP verification code is: {otp}\n\nThis code expires in 10 minutes."
+
+    payload = {
+        "to": email,
+        "subject": subject,
+        "html": html_content,
+        "text": text_content,
+        "fromName": "NegoMind AI"
+    }
+
     response = requests.post(
         mail_service_url,
-        json={
-            "email": email,
-            "otp": otp
-        },
+        json=payload,
         headers={
             "Authorization": f"Bearer {mail_service_secret}",
             "Content-Type": "application/json"
@@ -48,7 +58,7 @@ def send_otp_email(to_email: str, otp_code: str, name: str = "User") -> Tuple[bo
     Dispatches OTP code via Vercel mail service with fallback to SMTP/Demo mode.
     """
     try:
-        res = send_otp_via_mail_service(to_email, otp_code)
+        res = send_otp_via_mail_service(to_email, otp_code, name)
         success_msg = f"OTP email successfully sent to {to_email} via Vercel mail service."
         logger.info(f"{success_msg} Response: {res}")
         return True, success_msg

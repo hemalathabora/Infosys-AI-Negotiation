@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import CinematicLoader from "./components/CinematicLoader";
 import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
-import AuthModal from "./components/AuthModal";
 import OAuthCallbackHandler from "./components/OAuthCallbackHandler";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -14,12 +13,19 @@ import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import AuthPage from "./pages/AuthPage";
 import LandingPage from "./pages/LandingPage.jsx";
+import NegotiationScenariosView from "./components/scenarios/NegotiationScenariosView";
+import GuideBot from "./components/GuideBot.jsx";
 import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
 
 export default function App() {
-  const isOauthCallback = window.location.pathname.includes("/oauth/callback") ||
-    (window.opener && (window.location.search.includes("code=") || window.location.hash.includes("access_token")));
+  const isOauthCallback = Boolean(window.opener) && (
+    window.location.pathname.includes("/oauth/callback") ||
+    window.location.pathname.includes("/auth/callback") ||
+    window.location.search.includes("code=") ||
+    window.location.search.includes("token=") ||
+    window.location.hash.includes("access_token")
+  );
 
   if (isOauthCallback) {
     return <OAuthCallbackHandler />;
@@ -125,6 +131,21 @@ function MainAppContent() {
               history={history}
               stats={stats}
               onClearHistory={clearHistory}
+            />
+          </div>
+        );
+
+      case "Negotiation Scenarios":
+      case "Scenarios":
+        return (
+          <div data-guide="scenarios-shell" className="flex-1 overflow-y-auto">
+            <NegotiationScenariosView
+              onSelectScenario={(scen) => {
+                setActiveScenario(scen);
+              }}
+              onNavigate={setActivePage}
+              userId={userId}
+              isDark={isDark}
             />
           </div>
         );
@@ -271,6 +292,9 @@ function MainAppContent() {
           {renderPage()}
         </div>
       </div>
+
+      {/* Floating AI Guide Bot & General AI Chatbot Assistant */}
+      <GuideBot currentPage={activePage} negotiationId={negotiation?.state?.negotiation_id} />
     </div>
   );
 }

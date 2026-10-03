@@ -8,6 +8,12 @@ const navigationItems = [
     icon: "grid",
   },
   {
+    label: "Negotiation Scenarios",
+    ariaLabel: "Browse predefined and custom negotiation scenarios",
+    description: "Browse & create scenarios",
+    icon: "target",
+  },
+  {
     label: "Configure Agents",
     ariaLabel: "Configure negotiation agents",
     description: "Agent strategies & rules",

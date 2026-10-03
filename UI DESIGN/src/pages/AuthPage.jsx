@@ -520,7 +520,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     className="flex h-12 items-center justify-center gap-2 border border-[#302E42] bg-[#161522]/80 text-sm font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-[#1D1C2B] disabled:opacity-50"
                   >
                     <GoogleIcon />
-                    Google
+                    {loading ? "Connecting..." : "Continue with Google"}
                   </button>
 
                   <button

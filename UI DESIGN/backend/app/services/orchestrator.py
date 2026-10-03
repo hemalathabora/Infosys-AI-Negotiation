@@ -525,4 +525,6 @@ class NegotiationOrchestrator:
             "deadlock_info": self.deadlock_info
         }
 
+    to_dict = get_state_dict
+
 

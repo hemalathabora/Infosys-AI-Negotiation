@@ -4,11 +4,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     LLM_PROVIDER: str = "gemini"
     LLM_API_KEY: str = ""
-    LLM_MODEL: str = "gemini-3.5-flash-lite"
+    LLM_MODEL: str = "gemini-1.5-flash"
     DATABASE_URL: str = "sqlite:///./negotiation.db"
     PORT: int = 8000
     HOST: str = "0.0.0.0"
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,*"
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
 
     # External Vercel Mail Service Configuration
     MAIL_SERVICE_URL: str = "https://otp-mail-service.vercel.app/api/send-otp"
@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # Real Google OAuth Configuration
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/auth/google/callback"
 
     # Real GitHub OAuth Configuration
     GITHUB_CLIENT_ID: str = ""

@@ -150,20 +150,97 @@ export async function getBackendAnalytics(negotiationId) {
 }
 
 /**
+ * Helper to get Auth Header
+ */
+function getAuthHeaders() {
+  const token = localStorage.getItem("nego_auth_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+/**
+ * Sends message to backend General AI Chatbot endpoint.
+ * @param {string} message
+ * @param {string} [conversationId]
+ * @param {string} [negotiationId]
+ * @param {any} [context]
+ */
+export async function sendChatMessage(message, conversationId = null, negotiationId = null, context = null) {
+  const payload = {
+    message,
+    conversation_id: conversationId,
+    negotiation_id: negotiationId,
+    context
+  };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders()
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (err) {
+    console.warn("Backend chat endpoint fetch error, proceeding to intelligent fallback:", err);
+  }
+
+  return null;
+}
+
+/**
+ * Fetches user's active conversations.
+ */
+export async function fetchConversations() {
+  const response = await fetch(`${API_BASE_URL}/chat/conversations`, {
+    headers: { ...getAuthHeaders() }
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch chat conversations.");
+  }
+  return await response.json();
+}
+
+/**
+ * Fetches message history for a specific conversation.
+ * @param {string} conversationId
+ */
+export async function fetchConversationDetail(conversationId) {
+  const response = await fetch(`${API_BASE_URL}/chat/conversations/${conversationId}`, {
+    headers: { ...getAuthHeaders() }
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch conversation history.");
+  }
+  return await response.json();
+}
+
+/**
+ * Deletes a conversation.
+ * @param {string} conversationId
+ */
+export async function deleteConversation(conversationId) {
+  const response = await fetch(`${API_BASE_URL}/chat/conversations/${conversationId}`, {
+    method: "DELETE",
+    headers: { ...getAuthHeaders() }
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete conversation.");
+  }
+  return await response.json();
+}
+
+/**
  * Queries the AI Guide Bot assistant backend endpoint.
  * @param {string} query
  * @param {string} [scenarioId]
  */
 export async function queryBackendGuideBot(query, scenarioId = "vendor_pricing") {
-  const response = await fetch(`${API_BASE_URL}/guide/query`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query, scenario_id: scenarioId })
-  });
-  if (!response.ok) {
-    throw new Error("Failed to query AI Guide Bot on backend.");
-  }
-  return await response.json();
+  return await sendChatMessage(query, null, null, `Scenario: ${scenarioId}`);
 }
 
 /**
@@ -189,8 +266,6 @@ export async function fetchDashboardAnalytics(userId = null) {
   return data;
 }
 
-
-
 /**
  * Fetches list of negotiation history from database.
  * @param {string} [userId]
@@ -201,6 +276,60 @@ export async function fetchNegotiationsList(userId = null) {
   if (!response.ok) {
     throw new Error("Failed to fetch negotiations list from DB.");
   }
+  return await response.json();
+}
+
+/**
+ * Custom Scenarios API helper functions
+ */
+export async function fetchCustomScenarios(userId = null) {
+  const url = userId ? `${API_BASE_URL}/custom-scenarios?user_id=${encodeURIComponent(userId)}` : `${API_BASE_URL}/custom-scenarios`;
+  const response = await fetch(url, { headers: { ...getAuthHeaders() } });
+  if (!response.ok) throw new Error("Failed to fetch custom scenarios.");
+  return await response.json();
+}
+
+export async function createCustomScenario(scenarioData) {
+  const response = await fetch(`${API_BASE_URL}/custom-scenarios`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    body: JSON.stringify(scenarioData)
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to create custom scenario: ${errText}`);
+  }
+  return await response.json();
+}
+
+export async function updateCustomScenario(id, scenarioData) {
+  const response = await fetch(`${API_BASE_URL}/custom-scenarios/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...getAuthHeaders() },
+    body: JSON.stringify(scenarioData)
+  });
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to update custom scenario: ${errText}`);
+  }
+  return await response.json();
+}
+
+export async function duplicateCustomScenario(id) {
+  const response = await fetch(`${API_BASE_URL}/custom-scenarios/${id}/duplicate`, {
+    method: "POST",
+    headers: { ...getAuthHeaders() }
+  });
+  if (!response.ok) throw new Error("Failed to duplicate custom scenario.");
+  return await response.json();
+}
+
+export async function deleteCustomScenario(id) {
+  const response = await fetch(`${API_BASE_URL}/custom-scenarios/${id}`, {
+    method: "DELETE",
+    headers: { ...getAuthHeaders() }
+  });
+  if (!response.ok) throw new Error("Failed to delete custom scenario.");
   return await response.json();
 }
 

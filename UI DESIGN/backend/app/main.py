@@ -5,7 +5,9 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import Base, engine
 from app.models.user import User, OTPToken  # Ensure SQLAlchemy registers user & otp models
-from app.api import agents, negotiations, scenarios, analytics, guide, auth
+from app.models.chat import ChatConversationModel, ChatMessageModel # Register chat models
+from app.models.custom_scenario import CustomScenarioModel # Register custom scenario models
+from app.api import agents, negotiations, scenarios, analytics, guide, auth, chat, custom_scenarios
 
 # Setup logging
 logging.basicConfig(
@@ -30,8 +32,11 @@ def init_db():
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN human_role VARCHAR(50)"))
                 if "user_id" not in columns:
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN user_id VARCHAR(255)"))
-                if "deadlock_info_json" not in columns:
-                    conn.execute(text("ALTER TABLE negotiations ADD COLUMN deadlock_info_json TEXT"))
+        if "users" in inspector.get_table_names():
+            user_cols = [c["name"] for c in inspector.get_columns("users")]
+            with engine.connect() as conn:
+                if "provider_user_id" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN provider_user_id VARCHAR(255)"))
                 conn.commit()
     except Exception as e:
         logger.error(f"Database initialization notice (check connection parameters in .env): {e}")
@@ -59,9 +64,11 @@ app.include_router(auth.router)
 app.include_router(agents.router)
 app.include_router(negotiations.router)
 app.include_router(scenarios.router)
+app.include_router(custom_scenarios.router)
 app.include_router(analytics.router)
 app.include_router(analytics.analytics_router)
 app.include_router(guide.router)
+app.include_router(chat.router)
 
 
 @app.get("/")

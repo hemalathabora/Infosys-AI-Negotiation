@@ -6,9 +6,34 @@ import { getNavigationSuggestion } from "../services/guideBotService.js";
 import { useGuideBot } from "../hooks/useGuideBot.js";
 import { useGuidedTour } from "../hooks/useGuidedTour.js";
 
-export default function GuideBot({ currentPage = "Dashboard" }) {
-  const { isOpen, setIsOpen, messages, input, setInput, submitPrompt, quickQuestions } = useGuideBot(currentPage);
-  const { isTourActive, currentStep, stepIndex, totalSteps, highlightStyle, startTour, nextStep, prevStep, skipTour, closeTour } = useGuidedTour(currentPage);
+export default function GuideBot({ currentPage = "Dashboard", negotiationId = null }) {
+  const {
+    isOpen,
+    setIsOpen,
+    messages,
+    input,
+    setInput,
+    isLoading,
+    error,
+    submitPrompt,
+    retryLastPrompt,
+    startNewConversation,
+    clearMessages,
+    quickQuestions
+  } = useGuideBot(currentPage, negotiationId);
+
+  const {
+    isTourActive,
+    currentStep,
+    stepIndex,
+    totalSteps,
+    highlightStyle,
+    startTour,
+    nextStep,
+    prevStep,
+    skipTour,
+    closeTour
+  } = useGuidedTour(currentPage);
 
   const suggestions = useMemo(
     () => getNavigationSuggestion(currentPage),
@@ -31,6 +56,11 @@ export default function GuideBot({ currentPage = "Dashboard" }) {
         input={input}
         onInputChange={setInput}
         onSubmit={() => submitPrompt(input)}
+        isLoading={isLoading}
+        error={error}
+        onRetry={retryLastPrompt}
+        onNewChat={startNewConversation}
+        onClearMessages={clearMessages}
         quickQuestions={quickQuestions}
         suggestions={suggestions}
         onQuickQuestion={handleQuickQuestion}

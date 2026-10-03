@@ -19,7 +19,7 @@ export async function getOauthConfig() {
     console.warn("Could not load backend OAuth config:", err);
   }
   return {
-    google_client_id: "1020175991005-aci29ngmc4u3c2227i4d3ct6t3c8dj20.apps.googleusercontent.com",
+    google_client_id: "640684974355-3q8rkhfj19forn17n4mr9ofi3doi2re1.apps.googleusercontent.com",
     github_client_id: "Ov23liGUUoaQ4lwt12Cm",
   };
 }
@@ -52,59 +52,27 @@ function loadGoogleGisScript() {
  * Returns { provider: "google", token_or_code, redirect_uri }
  */
 export async function startGoogleSignIn() {
-  const config = await getOauthConfig();
-  const googleClientId = config.google_client_id;
-
-  if (!googleClientId) {
-    throw new Error("Google Client ID is not configured on the backend.");
+  try {
+    const res = await fetch(`${API_BASE_URL}/google/login`);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || "Failed to initialize Google OAuth login with backend.");
+    }
+    const data = await res.json();
+    if (!data.url) {
+      throw new Error("Backend did not return a valid Google OAuth URL.");
+    }
+    return openGooglePopup(data.url);
+  } catch (err) {
+    console.warn("Backend Google login endpoint failed, falling back to GIS/direct flow:", err);
+    const config = await getOauthConfig();
+    const googleClientId = config.google_client_id || "8565267080-0id89fmrmju7ik3qpna2nac9vriv3bem.apps.googleusercontent.com";
+    return openGooglePopupDirect(googleClientId);
   }
-
-  // Attempt 1: Try Official Google Identity Services GIS SDK popup first
-  const gisLoaded = await loadGoogleGisScript();
-  if (gisLoaded && window.google?.accounts?.oauth2) {
-    return new Promise((resolve, reject) => {
-      try {
-        const client = window.google.accounts.oauth2.initTokenClient({
-          client_id: googleClientId,
-          scope: "openid email profile",
-          callback: (response) => {
-            if (response.error) {
-              reject(new Error(response.error_description || response.error || "Google sign-in was cancelled or failed."));
-            } else if (response.access_token) {
-              resolve({
-                provider: "google",
-                token_or_code: response.access_token,
-                redirect_uri: window.location.origin,
-              });
-            } else {
-              reject(new Error("No access token returned from Google."));
-            }
-          },
-          onerror: (err) => reject(new Error("Google OAuth error: " + JSON.stringify(err))),
-        });
-        client.requestAccessToken();
-      } catch (err) {
-        console.warn("GIS Client failed, falling back to popup window:", err);
-        openGooglePopup(googleClientId).then(resolve).catch(reject);
-      }
-    });
-  }
-
-  // Attempt 2: Fallback to standard Google OAuth 2.0 Popup window
-  return openGooglePopup(googleClientId);
 }
 
-function openGooglePopup(googleClientId) {
+function openGooglePopup(googleAuthUrl) {
   return new Promise((resolve, reject) => {
-    const redirectUri = `${window.location.origin}/oauth/callback/google`;
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${encodeURIComponent(googleClientId)}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=token%20id_token&` +
-      `scope=${encodeURIComponent("openid email profile")}&` +
-      `nonce=${Math.random().toString(36).substring(2)}&` +
-      `prompt=select_account`;
-
     const width = 500;
     const height = 650;
     const left = window.screenX + (window.outerWidth - width) / 2;
@@ -117,7 +85,9 @@ function openGooglePopup(googleClientId) {
     );
 
     if (!popup) {
-      return reject(new Error("Popup window was blocked by browser. Please allow popups for Google sign-in."));
+      // Fallback if popup is blocked: full page redirect
+      window.location.href = googleAuthUrl;
+      return;
     }
 
     const handleMessage = (event) => {
@@ -125,12 +95,15 @@ function openGooglePopup(googleClientId) {
       if (event.data?.type === "NEGOMIND_OAUTH_RESPONSE") {
         window.removeEventListener("message", handleMessage);
         clearInterval(checkClosed);
-        const { token, code } = event.data;
-        if (token || code) {
+        const { token, code, error } = event.data;
+        if (error) {
+          reject(new Error(error));
+        } else if (token || code) {
           resolve({
             provider: "google",
             token_or_code: token || code,
-            redirect_uri: redirectUri,
+            token: token || null,
+            redirect_uri: `${window.location.origin}/auth/callback`,
           });
         } else {
           reject(new Error("Failed to receive Google authorization response."));
@@ -148,6 +121,19 @@ function openGooglePopup(googleClientId) {
       }
     }, 1000);
   });
+}
+
+function openGooglePopupDirect(googleClientId) {
+  const redirectUri = `${window.location.origin}/oauth/callback/google`;
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${encodeURIComponent(googleClientId)}&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `response_type=token%20id_token&` +
+    `scope=${encodeURIComponent("openid email profile")}&` +
+    `nonce=${Math.random().toString(36).substring(2)}&` +
+    `prompt=select_account`;
+
+  return openGooglePopup(googleAuthUrl);
 }
 
 /**

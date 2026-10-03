@@ -1,5 +1,7 @@
 import datetime
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from urllib.parse import quote
+from fastapi import APIRouter, Depends, HTTPException, Header, status, Query
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -18,6 +20,90 @@ from app.services import auth_service
 from app.config import settings
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+
+@router.get("/google/login")
+def google_login(redirect: bool = False):
+    """
+    Generates a cryptographically secure state parameter and returns or redirects to the official Google OAuth consent URL.
+    """
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Google Client ID is not configured on the backend.")
+
+    state = auth_service.generate_oauth_state("google")
+    redirect_uri = settings.GOOGLE_REDIRECT_URI
+    scope = "openid email profile"
+
+    google_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={quote(settings.GOOGLE_CLIENT_ID)}&"
+        f"redirect_uri={quote(redirect_uri)}&"
+        f"response_type=code&"
+        f"scope={quote(scope)}&"
+        f"state={quote(state)}&"
+        f"prompt=select_account"
+    )
+
+    if redirect:
+        return RedirectResponse(url=google_url, status_code=307)
+
+    return {
+        "url": google_url,
+        "state": state,
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": redirect_uri
+    }
+
+@router.get("/google/callback")
+async def google_callback(
+    code: Optional[str] = Query(None),
+    state: Optional[str] = Query(None),
+    error: Optional[str] = Query(None),
+    error_description: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    """
+    FastAPI OAuth callback endpoint registered with Google OAuth Provider.
+    Validates state, exchanges authorization code for tokens, retrieves user identity,
+    creates/links user in database, and redirects user back to NegoMind frontend.
+    """
+    frontend_base = settings.cors_origins_list[0] if settings.cors_origins_list else "http://localhost:5173"
+
+    if error:
+        err_msg = quote(error_description or error or "Google OAuth authentication failed.")
+        return RedirectResponse(url=f"{frontend_base}/auth/callback?error={err_msg}", status_code=307)
+
+    if not state or not auth_service.validate_oauth_state(state, "google"):
+        err_msg = quote("Invalid or expired OAuth state parameter. Request rejected for security.")
+        return RedirectResponse(url=f"{frontend_base}/auth/callback?error={err_msg}", status_code=307)
+
+    if not code:
+        err_msg = quote("Authorization code missing from Google response.")
+        return RedirectResponse(url=f"{frontend_base}/auth/callback?error={err_msg}", status_code=307)
+
+    # Exchange code & fetch user profile from Google
+    google_profile = await auth_service.verify_google_oauth_token(
+        code,
+        redirect_uri=settings.GOOGLE_REDIRECT_URI
+    )
+
+    if not google_profile or not google_profile.get("email"):
+        err_msg = quote("Failed to exchange code or retrieve user identity from Google.")
+        return RedirectResponse(url=f"{frontend_base}/auth/callback?error={err_msg}", status_code=307)
+
+    # Find existing or create user with safe account linking
+    user = auth_service.authenticate_or_create_oauth_user(
+        db,
+        provider="google",
+        email=google_profile["email"],
+        full_name=google_profile.get("full_name"),
+        avatar_url=google_profile.get("avatar_url"),
+        provider_user_id=google_profile.get("sub")
+    )
+
+    # Create application session token
+    token = auth_service.generate_session_token(user.id, user.email)
+
+    return RedirectResponse(url=f"{frontend_base}/auth/callback?token={quote(token)}", status_code=307)
 
 @router.post("/signup", response_model=OTPRequiredResponse)
 def signup(payload: UserSignUp, db: Session = Depends(get_db)):
@@ -174,6 +260,8 @@ async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
     full_name = payload.full_name
     avatar_url = payload.avatar_url
 
+    provider_user_id = None
+
     # Real OAuth Token / Code Verification
     if payload.token_or_code:
         if provider == "google":
@@ -182,6 +270,7 @@ async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
                 email = google_profile["email"]
                 full_name = google_profile["full_name"]
                 avatar_url = google_profile["avatar_url"]
+                provider_user_id = google_profile.get("sub")
             else:
                 raise HTTPException(status_code=400, detail="Google authentication failed. Invalid or expired token/code.")
         elif provider == "github":
@@ -190,6 +279,7 @@ async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
                 email = github_profile["email"]
                 full_name = github_profile["full_name"]
                 avatar_url = github_profile["avatar_url"]
+                provider_user_id = github_profile.get("sub")
             else:
                 raise HTTPException(status_code=400, detail="GitHub authentication failed. Invalid or expired code/token.")
 
@@ -201,7 +291,8 @@ async def oauth_signin(payload: OAuthSignIn, db: Session = Depends(get_db)):
         provider=provider,
         email=email,
         full_name=full_name,
-        avatar_url=avatar_url
+        avatar_url=avatar_url,
+        provider_user_id=provider_user_id
     )
 
     token = auth_service.generate_session_token(user.id, user.email)

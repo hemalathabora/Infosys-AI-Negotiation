@@ -168,6 +168,26 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
     }
   };
 
+  // Quick Demo Sign-In for local/mobile testing without OAuth origin_mismatch
+  const handleDemoQuickSignIn = async () => {
+    setLoading(true);
+    setAuthError(null);
+    try {
+      const res = await signInWithOAuth("google", {
+        email: "shaikrazaq920@gmail.com",
+        full_name: "Shaik Razaq",
+        avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Shaik",
+      });
+      if (res.success) {
+        onClose();
+      }
+    } catch (err) {
+      setAuthError(err.message || "Quick demo login failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Real Google & GitHub OAuth Handlers
   const handleGoogleAuth = async () => {
     setLoading(true);
@@ -180,8 +200,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
       }
     } catch (err) {
       console.warn("Google OAuth direct prompt warning:", err);
-      if (err.message && !err.message.includes("closed")) {
-        setAuthError(err.message);
+      let errMsg = err.message || "Google sign-in failed.";
+      if (errMsg.includes("origin_mismatch") || errMsg.includes("idpiframe_initialization_failed")) {
+        errMsg = "Google OAuth Origin Mismatch (Error 400): App URL is not listed in Google Cloud Console. Use '🚀 Quick Demo Login' below to sign in instantly!";
+      }
+      if (!errMsg.includes("closed")) {
+        setAuthError(errMsg);
       }
     } finally {
       setLoading(false);
@@ -330,6 +354,16 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                   <span>GitHub</span>
                 </button>
               </div>
+
+              {/* Quick Demo Login Button */}
+              <button
+                type="button"
+                onClick={handleDemoQuickSignIn}
+                disabled={loading}
+                className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400 transition cursor-pointer disabled:opacity-50"
+              >
+                <span>🚀 Quick Demo Login (Instant Access)</span>
+              </button>
 
               <div className="relative my-4 flex items-center justify-center">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#262535]" /></div>

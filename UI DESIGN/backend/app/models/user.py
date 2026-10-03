@@ -10,6 +10,7 @@ class User(Base):
     full_name = Column(String(255), nullable=False)
     hashed_password = Column(String(255), nullable=True)  # Nullable for OAuth users
     auth_provider = Column(String(50), default="email", nullable=False)  # email, google, github
+    provider_user_id = Column(String(255), nullable=True, index=True)  # Google subject ID or GitHub ID
     is_verified = Column(Boolean, default=False, nullable=False)
     avatar_url = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
@@ -17,7 +18,7 @@ class User(Base):
 
     def to_dict(self):
         avatar = self.avatar_url
-        if not avatar or "googleusercontent" in avatar or "githubusercontent" in avatar:
+        if not avatar:
             seed = (self.full_name or self.email or "user").replace(" ", "_")
             avatar = f"https://api.dicebear.com/7.x/bottts/svg?seed={seed}"
 
@@ -26,6 +27,7 @@ class User(Base):
             "email": self.email,
             "full_name": self.full_name,
             "auth_provider": self.auth_provider,
+            "provider_user_id": self.provider_user_id,
             "is_verified": self.is_verified,
             "avatar_url": avatar,
             "created_at": self.created_at.isoformat() if self.created_at else None,

@@ -12,27 +12,43 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  // Restore session from localStorage on mount
+  // Restore session from localStorage or URL query parameter on mount
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedToken = localStorage.getItem("nego_auth_token");
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get("token");
+      const urlError = urlParams.get("error");
+
+      if (urlError) {
+        setAuthError(decodeURIComponent(urlError));
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      const activeToken = urlToken || localStorage.getItem("nego_auth_token");
       const storedUser = localStorage.getItem("nego_user_info");
 
-      if (storedToken && storedUser) {
+      if (urlToken) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      if (activeToken) {
         try {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          setToken(activeToken);
+          if (storedUser && !urlToken) {
+            setUser(JSON.parse(storedUser));
+          }
 
           // Verify token validity with backend
           const res = await fetch(`${API_BASE_URL}/me`, {
             headers: {
-              Authorization: `Bearer ${storedToken}`,
+              Authorization: `Bearer ${activeToken}`,
             },
           });
 
           if (res.ok) {
             const userData = await res.json();
             setUser(userData);
+            localStorage.setItem("nego_auth_token", activeToken);
             localStorage.setItem("nego_user_info", JSON.stringify(userData));
           } else {
             // Token expired or invalid
@@ -177,6 +193,17 @@ export function AuthProvider({ children }) {
   const signInWithOAuth = async (provider, oauthData) => {
     setAuthError(null);
     try {
+      if (oauthData?.token) {
+        const res = await fetch(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${oauthData.token}` },
+        });
+        if (res.ok) {
+          const userData = await res.json();
+          saveAuthSession(oauthData.token, userData);
+          return { success: true, user: userData, message: `Signed in via ${provider}.` };
+        }
+      }
+
       const payload = {
         provider: provider.toLowerCase(),
         token_or_code: oauthData.token_or_code || null,

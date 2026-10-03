@@ -62,6 +62,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     auth_provider: str
+    provider_user_id: Optional[str] = None
     is_verified: bool
     avatar_url: Optional[str] = None
     created_at: Optional[str] = None

@@ -7,11 +7,16 @@ from app.models.message import NegotiationMessageModel
 from app.models.agent import AgentModel
 from app.services.orchestrator import NegotiationOrchestrator
 
+from app.models.custom_scenario import CustomScenarioModel
+
 DEFAULT_SCENARIOS = {
     "vendor_pricing": {
         "scenario_id": "vendor_pricing",
         "scenario_name": "Vendor Pricing Negotiation",
+        "category": "Purchasing",
         "description": "Buyer and Vendor negotiate the price of a bulk components order while balancing budget, profit, and acceptable terms.",
+        "participants": ["Buyer", "Vendor"],
+        "variables": ["unit_price", "quantity", "delivery_time", "payment_terms"],
         "agents": [
             {
                 "id": "buyer",
@@ -36,7 +41,10 @@ DEFAULT_SCENARIOS = {
     "job_offer": {
         "scenario_id": "job_offer",
         "scenario_name": "Job Offer Negotiation",
+        "category": "Employment",
         "description": "Candidate and Employer negotiate salary and start terms for a new role while balancing compensation expectations against budget limits.",
+        "participants": ["Candidate", "Employer"],
+        "variables": ["base_salary", "bonus", "joining_date", "remote_work"],
         "agents": [
             {
                 "id": "candidate",
@@ -61,7 +69,10 @@ DEFAULT_SCENARIOS = {
     "project_budget": {
         "scenario_id": "project_budget",
         "scenario_name": "Project Budget Allocation",
+        "category": "Project Management",
         "description": "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative.",
+        "participants": ["Department Head", "Finance Manager"],
+        "variables": ["budget_amount", "milestones", "resource_count"],
         "agents": [
             {
                 "id": "department_head",
@@ -80,6 +91,258 @@ DEFAULT_SCENARIOS = {
                 "goals": ["Control company-wide spending"],
                 "constraints": {"maximum_price": 85000},
                 "negotiation_objectives": ["Target allocation is $70,000", "Maximum $85,000 allocation"]
+            }
+        ]
+    },
+    "real_estate": {
+        "scenario_id": "real_estate",
+        "scenario_name": "Real Estate Price Negotiation",
+        "category": "Real Estate",
+        "description": "Buyer and Seller negotiate property purchase price, closing timeline, deposit, included items, and repair credits.",
+        "participants": ["Buyer", "Seller"],
+        "variables": ["property_price", "closing_date", "deposit", "included_items", "repairs"],
+        "agents": [
+            {
+                "id": "buyer",
+                "name": "Alex Vance",
+                "role": "buyer",
+                "persona": "Risk-averse",
+                "goals": ["Secure property within max home loan pre-approval"],
+                "constraints": {"maximum_price": 450000},
+                "negotiation_objectives": ["Target price is $420,000", "Maximum $450,000 budget limit"]
+            },
+            {
+                "id": "seller",
+                "name": "Elena Rostova",
+                "role": "seller",
+                "persona": "Aggressive",
+                "goals": ["Maximize net proceeds from property sale"],
+                "constraints": {"minimum_price": 410000},
+                "negotiation_objectives": ["Target price is $445,000", "Minimum $410,000 floor price"]
+            }
+        ]
+    },
+    "car_purchase": {
+        "scenario_id": "car_purchase",
+        "scenario_name": "Car Purchase Negotiation",
+        "category": "Consumer",
+        "description": "Customer and dealership representative negotiate vehicle out-the-door price, down payment, extended warranty, accessories, and trade-in value.",
+        "participants": ["Customer", "Dealer"],
+        "variables": ["vehicle_price", "down_payment", "warranty", "accessories", "trade_in_value"],
+        "agents": [
+            {
+                "id": "customer",
+                "name": "David Miller",
+                "role": "customer",
+                "persona": "Collaborative",
+                "goals": ["Get fair pricing with free accessories"],
+                "constraints": {"maximum_price": 32000},
+                "negotiation_objectives": ["Target price is $28,500", "Maximum $32,000 budget limit"]
+            },
+            {
+                "id": "dealer",
+                "name": "Marcus Vance",
+                "role": "dealer",
+                "persona": "Aggressive",
+                "goals": ["Protect dealer commission and margin"],
+                "constraints": {"minimum_price": 27500},
+                "negotiation_objectives": ["Target price is $31,000", "Minimum $27,500 selling floor"]
+            }
+        ]
+    },
+    "freelance_contract": {
+        "scenario_id": "freelance_contract",
+        "scenario_name": "Freelance Contract Negotiation",
+        "category": "Freelancing",
+        "description": "Freelance developer/designer and client negotiate project scope, fixed project fee, delivery deadline, payment schedule, and revision rounds.",
+        "participants": ["Freelancer", "Client"],
+        "variables": ["project_fee", "deadline", "scope", "payment_schedule", "revisions"],
+        "agents": [
+            {
+                "id": "freelancer",
+                "name": "Maya Lin",
+                "role": "freelancer",
+                "persona": "Collaborative",
+                "goals": ["Fair rate for project complexity and tight deadline"],
+                "constraints": {"minimum_price": 8500},
+                "negotiation_objectives": ["Target fee is $11,000", "Minimum $8,500 project floor"]
+            },
+            {
+                "id": "client",
+                "name": "Jonathan Reed",
+                "role": "client",
+                "persona": "Risk-averse",
+                "goals": ["Deliver project within startup launch budget"],
+                "constraints": {"maximum_price": 12000},
+                "negotiation_objectives": ["Target fee is $9,000", "Maximum $12,000 budget cap"]
+            }
+        ]
+    },
+    "supplier_contract": {
+        "scenario_id": "supplier_contract",
+        "scenario_name": "Supplier Contract Negotiation",
+        "category": "Supply Chain",
+        "description": "Procurement Manager and raw materials supplier negotiate unit pricing, annual volume quantity, delivery schedules, payment terms, and multi-year contract duration.",
+        "participants": ["Procurement Manager", "Supplier"],
+        "variables": ["unit_price", "quantity", "delivery_time", "payment_terms", "contract_duration"],
+        "agents": [
+            {
+                "id": "procurement_manager",
+                "name": "Robert Chen",
+                "role": "procurement_manager",
+                "persona": "Risk-averse",
+                "goals": ["Reduce raw material cost per unit for manufacturing"],
+                "constraints": {"maximum_price": 140000},
+                "negotiation_objectives": ["Target cost is $120,000", "Maximum $140,000 annual budget"]
+            },
+            {
+                "id": "supplier",
+                "name": "Viktor Sterling",
+                "role": "supplier",
+                "persona": "Aggressive",
+                "goals": ["Lock in high volume order with healthy wholesale margin"],
+                "constraints": {"minimum_price": 115000},
+                "negotiation_objectives": ["Target cost is $135,000", "Minimum $115,000 price floor"]
+            }
+        ]
+    },
+    "salary_benefits": {
+        "scenario_id": "salary_benefits",
+        "scenario_name": "Salary & Benefits Negotiation",
+        "category": "Employment",
+        "description": "Executive candidate and VP of HR negotiate base salary, sign-on bonus, annual performance bonus, remote work days, and vacation allowance.",
+        "participants": ["Candidate", "Employer"],
+        "variables": ["base_salary", "bonus", "joining_date", "remote_work", "benefits", "vacation"],
+        "agents": [
+            {
+                "id": "candidate",
+                "name": "Rachel Adams",
+                "role": "candidate",
+                "persona": "Aggressive",
+                "goals": ["Market-leading executive compensation package"],
+                "constraints": {"minimum_price": 130000},
+                "negotiation_objectives": ["Target salary is $150,000", "Minimum $130,000 base compensation"]
+            },
+            {
+                "id": "employer",
+                "name": "Thomas Wright",
+                "role": "employer",
+                "persona": "Collaborative",
+                "goals": ["Attract top talent without destabilizing team pay bands"],
+                "constraints": {"maximum_price": 155000},
+                "negotiation_objectives": ["Target salary is $138,000", "Maximum $155,000 pay band limit"]
+            }
+        ]
+    },
+    "project_deadline": {
+        "scenario_id": "project_deadline",
+        "scenario_name": "Project Deadline Negotiation",
+        "category": "Project Management",
+        "description": "Project Lead and Enterprise Client negotiate realistic delivery milestones, team resource allocation, feature scope, and expediting budget bonuses.",
+        "participants": ["Project Manager", "Client"],
+        "variables": ["delivery_date", "project_scope", "resources", "budget", "milestones"],
+        "agents": [
+            {
+                "id": "project_manager",
+                "name": "Chris Taylor",
+                "role": "project_manager",
+                "persona": "Risk-averse",
+                "goals": ["Ensure sufficient development sprint time to prevent burnout"],
+                "constraints": {"minimum_price": 60000},
+                "negotiation_objectives": ["Target budget is $80,000", "Minimum $60,000 resource allocation"]
+            },
+            {
+                "id": "client",
+                "name": "Amanda Foster",
+                "role": "client",
+                "persona": "Aggressive",
+                "goals": ["Accelerate go-to-market date for Q3 product launch"],
+                "constraints": {"maximum_price": 85000},
+                "negotiation_objectives": ["Target budget is $70,000", "Maximum $85,000 total budget"]
+            }
+        ]
+    },
+    "rent_negotiation": {
+        "scenario_id": "rent_negotiation",
+        "scenario_name": "Rent Negotiation",
+        "category": "Housing",
+        "description": "Prospective tenant and property landlord negotiate monthly rent rate, security deposit amount, 12 vs 24 month lease term, included utilities, and move-in date.",
+        "participants": ["Tenant", "Landlord"],
+        "variables": ["monthly_rent", "security_deposit", "lease_duration", "maintenance", "move_in_date"],
+        "agents": [
+            {
+                "id": "tenant",
+                "name": "Jordan Lee",
+                "role": "tenant",
+                "persona": "Collaborative",
+                "goals": ["Affordable long-term lease in a quiet residential building"],
+                "constraints": {"maximum_price": 2600},
+                "negotiation_objectives": ["Target rent is $2,350/mo", "Maximum $2,600 monthly rent"]
+            },
+            {
+                "id": "landlord",
+                "name": "Arthur Pendelton",
+                "role": "landlord",
+                "persona": "Aggressive",
+                "goals": ["Maximize rental yield and secure stable multi-year tenant"],
+                "constraints": {"minimum_price": 2300},
+                "negotiation_objectives": ["Target rent is $2,550/mo", "Minimum $2,300 monthly floor"]
+            }
+        ]
+    },
+    "business_partnership": {
+        "scenario_id": "business_partnership",
+        "scenario_name": "Business Partnership Negotiation",
+        "category": "Business",
+        "description": "Startup Founder and Angel Investor negotiate seed investment capital, equity percentage, revenue sharing terms, operational responsibilities, and contract duration.",
+        "participants": ["Startup Founder", "Business Partner/Investor"],
+        "variables": ["investment_amount", "equity_percentage", "revenue_sharing", "responsibilities", "contract_duration"],
+        "agents": [
+            {
+                "id": "founder",
+                "name": "Sophia Martinez",
+                "role": "founder",
+                "persona": "Aggressive",
+                "goals": ["Raise maximum growth capital while preserving founder control"],
+                "constraints": {"minimum_price": 250000},
+                "negotiation_objectives": ["Target capital is $350,000", "Minimum $250,000 valuation floor"]
+            },
+            {
+                "id": "investor",
+                "name": "Harrison Vance",
+                "role": "investor",
+                "persona": "Risk-averse",
+                "goals": ["Secure meaningful equity stake and governance rights"],
+                "constraints": {"maximum_price": 400000},
+                "negotiation_objectives": ["Target capital is $300,000", "Maximum $400,000 investment cap"]
+            }
+        ]
+    },
+    "service_contract": {
+        "scenario_id": "service_contract",
+        "scenario_name": "Service Contract Negotiation",
+        "category": "Services",
+        "description": "Corporate Client and IT Service Provider negotiate monthly service retainer fees, SLA uptime guarantees, support levels, and annual renewal escalation terms.",
+        "participants": ["Customer", "Service Provider"],
+        "variables": ["service_price", "contract_duration", "support_level", "sla", "renewal_terms"],
+        "agents": [
+            {
+                "id": "customer",
+                "name": "Kevin Patel",
+                "role": "customer",
+                "persona": "Risk-averse",
+                "goals": ["Strict 99.99% SLA uptime guarantee within IT operating budget"],
+                "constraints": {"maximum_price": 15000},
+                "negotiation_objectives": ["Target fee is $12,000/mo", "Maximum $15,000 monthly budget"]
+            },
+            {
+                "id": "service_provider",
+                "name": "Siddharth Nair",
+                "role": "service_provider",
+                "persona": "Collaborative",
+                "goals": ["Cover high 24/7 engineering team coverage overhead"],
+                "constraints": {"minimum_price": 11000},
+                "negotiation_objectives": ["Target fee is $14,000/mo", "Minimum $11,000 fee floor"]
             }
         ]
     }
@@ -125,7 +388,13 @@ def create_negotiation_session(
         if scenario_id in DEFAULT_SCENARIOS:
             agent_profiles = DEFAULT_SCENARIOS[scenario_id]["agents"]
         else:
-            agent_profiles = get_or_create_default_agents(db)
+            custom_scen = db.query(CustomScenarioModel).filter(CustomScenarioModel.id == scenario_id).first()
+            if custom_scen:
+                agent_profiles = custom_scen.agents
+                if custom_scen.max_rounds and max_rounds == 5:
+                    max_rounds = custom_scen.max_rounds
+            else:
+                agent_profiles = get_or_create_default_agents(db)
 
     # Save initial negotiation state to DB
     initial_turn = agent_profiles[0]["id"] if agent_profiles else "buyer"

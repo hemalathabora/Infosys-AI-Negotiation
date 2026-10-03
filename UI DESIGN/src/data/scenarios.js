@@ -1,23 +1,16 @@
-// Designed by TEAM 4
 /**
- * Scenario data store.
- *
- * All three scenarios ship with finalized persona data. Each scenario has
- * exactly two agents, each with a role, goal, one or more constraints, and
- * one of the three supported personalities (Aggressive, Collaborative,
- * Risk-averse). Numeric constraint values double as each agent's initial
- * negotiation anchor for the negotiation-engine prototype in
- * src/engine/.
- *
- * @type {Record<string, import('../types/negotiation').Scenario & { isConfigured: boolean }>}
+ * Predefined Scenarios Data Store
+ * Contains all 12 predefined negotiation scenarios.
  */
 export const scenarios = {
   vendor_pricing: {
     scenario_id: "vendor_pricing",
     scenario_name: "Vendor Pricing Negotiation",
-    description:
-      "Buyer and Vendor negotiate the price of a bulk components order while balancing budget, profit, and acceptable terms.",
+    category: "Purchasing",
+    description: "Buyer and Vendor negotiate the price of a bulk components order while balancing budget, profit, and acceptable terms.",
     isConfigured: true,
+    participants: ["Buyer", "Vendor"],
+    variables: ["unit_price", "quantity", "delivery_time", "payment_terms"],
     agents: [
       {
         id: "buyer",
@@ -40,9 +33,11 @@ export const scenarios = {
   job_offer: {
     scenario_id: "job_offer",
     scenario_name: "Job Offer Negotiation",
-    description:
-      "Candidate and Employer negotiate salary and start terms for a new role while balancing compensation expectations against budget limits.",
+    category: "Employment",
+    description: "Candidate and Employer negotiate salary and start terms for a new role while balancing compensation expectations against budget limits.",
     isConfigured: true,
+    participants: ["Candidate", "Employer"],
+    variables: ["base_salary", "bonus", "joining_date", "remote_work"],
     agents: [
       {
         id: "candidate",
@@ -65,9 +60,11 @@ export const scenarios = {
   project_budget: {
     scenario_id: "project_budget",
     scenario_name: "Project Budget Allocation",
-    description:
-      "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative while balancing departmental needs against company-wide spending limits.",
+    category: "Project Management",
+    description: "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative while balancing departmental needs against company-wide spending limits.",
     isConfigured: true,
+    participants: ["Department Head", "Finance Manager"],
+    variables: ["budget_amount", "milestones", "resource_count"],
     agents: [
       {
         id: "department_head",
@@ -87,13 +84,256 @@ export const scenarios = {
       },
     ],
   },
+  real_estate: {
+    scenario_id: "real_estate",
+    scenario_name: "Real Estate Price Negotiation",
+    category: "Real Estate",
+    description: "Buyer and Seller negotiate property purchase price, closing date, deposit, included items, and repair credits.",
+    isConfigured: true,
+    participants: ["Buyer", "Seller"],
+    variables: ["property_price", "closing_date", "deposit", "included_items", "repairs"],
+    agents: [
+      {
+        id: "buyer",
+        name: "Alex Vance",
+        role: "Buyer Agent",
+        goal: "Secure property within max pre-approval budget",
+        constraints: [{ text: "Maximum $450,000", defaultValue: 450000 }],
+        personality: "Risk-averse",
+      },
+      {
+        id: "seller",
+        name: "Elena Rostova",
+        role: "Seller Agent",
+        goal: "Maximize net proceeds from property sale",
+        constraints: [{ text: "Minimum $410,000", defaultValue: 410000 }],
+        personality: "Aggressive",
+      },
+    ],
+  },
+  car_purchase: {
+    scenario_id: "car_purchase",
+    scenario_name: "Car Purchase Negotiation",
+    category: "Consumer",
+    description: "Customer and Dealer negotiate vehicle price, down payment, extended warranty, accessories, and trade-in value.",
+    isConfigured: true,
+    participants: ["Customer", "Dealer"],
+    variables: ["vehicle_price", "down_payment", "warranty", "accessories", "trade_in_value"],
+    agents: [
+      {
+        id: "customer",
+        name: "David Miller",
+        role: "Customer Agent",
+        goal: "Get fair pricing with included warranty and accessories",
+        constraints: [{ text: "Maximum $32,000", defaultValue: 32000 }],
+        personality: "Collaborative",
+      },
+      {
+        id: "dealer",
+        name: "Marcus Vance",
+        role: "Dealer Agent",
+        goal: "Protect dealership commission and profit margin",
+        constraints: [{ text: "Minimum $27,500", defaultValue: 27500 }],
+        personality: "Aggressive",
+      },
+    ],
+  },
+  freelance_contract: {
+    scenario_id: "freelance_contract",
+    scenario_name: "Freelance Contract Negotiation",
+    category: "Freelancing",
+    description: "Freelancer and Client negotiate project fee, deadline, scope boundaries, payment schedule, and revision rounds.",
+    isConfigured: true,
+    participants: ["Freelancer", "Client"],
+    variables: ["project_fee", "deadline", "scope", "payment_schedule", "revisions"],
+    agents: [
+      {
+        id: "freelancer",
+        name: "Maya Lin",
+        role: "Freelancer Agent",
+        goal: "Fair compensation rate for complex scope & tight timeline",
+        constraints: [{ text: "Minimum $8,500 fee floor", defaultValue: 8500 }],
+        personality: "Collaborative",
+      },
+      {
+        id: "client",
+        name: "Jonathan Reed",
+        role: "Client Agent",
+        goal: "Deliver project features within startup budget cap",
+        constraints: [{ text: "Maximum $12,000 budget", defaultValue: 12000 }],
+        personality: "Risk-averse",
+      },
+    ],
+  },
+  supplier_contract: {
+    scenario_id: "supplier_contract",
+    scenario_name: "Supplier Contract Negotiation",
+    category: "Supply Chain",
+    description: "Procurement Manager and Supplier negotiate unit price, volume quantity, delivery schedule, payment terms, and contract duration.",
+    isConfigured: true,
+    participants: ["Procurement Manager", "Supplier"],
+    variables: ["unit_price", "quantity", "delivery_time", "payment_terms", "contract_duration"],
+    agents: [
+      {
+        id: "procurement_manager",
+        name: "Robert Chen",
+        role: "Procurement Manager Agent",
+        goal: "Reduce component unit cost for high-volume manufacturing",
+        constraints: [{ text: "Maximum $140,000 budget", defaultValue: 140000 }],
+        personality: "Risk-averse",
+      },
+      {
+        id: "supplier",
+        name: "Viktor Sterling",
+        role: "Supplier Agent",
+        goal: "Lock in multi-year volume order with healthy wholesale margin",
+        constraints: [{ text: "Minimum $115,000 floor", defaultValue: 115000 }],
+        personality: "Aggressive",
+      },
+    ],
+  },
+  salary_benefits: {
+    scenario_id: "salary_benefits",
+    scenario_name: "Salary & Benefits Negotiation",
+    category: "Employment",
+    description: "Candidate and Employer negotiate base salary, bonus, joining date, remote work flexibility, benefits, and vacation.",
+    isConfigured: true,
+    participants: ["Candidate", "Employer"],
+    variables: ["base_salary", "bonus", "joining_date", "remote_work", "benefits", "vacation"],
+    agents: [
+      {
+        id: "candidate",
+        name: "Rachel Adams",
+        role: "Executive Candidate Agent",
+        goal: "Market-leading executive compensation and remote perks",
+        constraints: [{ text: "Minimum $130,000 base", defaultValue: 130000 }],
+        personality: "Aggressive",
+      },
+      {
+        id: "employer",
+        name: "Thomas Wright",
+        role: "VP of HR Agent",
+        goal: "Secure executive talent within departmental salary bands",
+        constraints: [{ text: "Maximum $155,000 budget limit", defaultValue: 155000 }],
+        personality: "Collaborative",
+      },
+    ],
+  },
+  project_deadline: {
+    scenario_id: "project_deadline",
+    scenario_name: "Project Deadline Negotiation",
+    category: "Project Management",
+    description: "Project Manager and Client negotiate delivery date, project scope, team resources, budget, and milestones.",
+    isConfigured: true,
+    participants: ["Project Manager", "Client"],
+    variables: ["delivery_date", "project_scope", "resources", "budget", "milestones"],
+    agents: [
+      {
+        id: "project_manager",
+        name: "Chris Taylor",
+        role: "Project Manager Agent",
+        goal: "Ensure realistic sprint schedule and resource allocation",
+        constraints: [{ text: "Minimum $60,000 resource allocation", defaultValue: 60000 }],
+        personality: "Risk-averse",
+      },
+      {
+        id: "client",
+        name: "Amanda Foster",
+        role: "Client Agent",
+        goal: "Accelerate delivery timeline for product launch",
+        constraints: [{ text: "Maximum $85,000 budget cap", defaultValue: 85000 }],
+        personality: "Aggressive",
+      },
+    ],
+  },
+  rent_negotiation: {
+    scenario_id: "rent_negotiation",
+    scenario_name: "Rent Negotiation",
+    category: "Housing",
+    description: "Tenant and Landlord negotiate monthly rent, security deposit, lease duration, maintenance terms, and move-in date.",
+    isConfigured: true,
+    participants: ["Tenant", "Landlord"],
+    variables: ["monthly_rent", "security_deposit", "lease_duration", "maintenance", "move_in_date"],
+    agents: [
+      {
+        id: "tenant",
+        name: "Jordan Lee",
+        role: "Tenant Agent",
+        goal: "Affordable rent rate with quiet multi-year lease security",
+        constraints: [{ text: "Maximum $2,600 monthly rent", defaultValue: 2600 }],
+        personality: "Collaborative",
+      },
+      {
+        id: "landlord",
+        name: "Arthur Pendelton",
+        role: "Landlord Agent",
+        goal: "Maximize annual rental yield and secure reliable tenant",
+        constraints: [{ text: "Minimum $2,300 rent floor", defaultValue: 2300 }],
+        personality: "Aggressive",
+      },
+    ],
+  },
+  business_partnership: {
+    scenario_id: "business_partnership",
+    scenario_name: "Business Partnership Negotiation",
+    category: "Business",
+    description: "Startup Founder and Business Partner/Investor negotiate investment amount, equity percentage, revenue sharing, responsibilities, and contract duration.",
+    isConfigured: true,
+    participants: ["Startup Founder", "Investor"],
+    variables: ["investment_amount", "equity_percentage", "revenue_sharing", "responsibilities", "contract_duration"],
+    agents: [
+      {
+        id: "founder",
+        name: "Sophia Martinez",
+        role: "Startup Founder Agent",
+        goal: "Raise seed growth capital while preserving equity control",
+        constraints: [{ text: "Minimum $250,000 capital", defaultValue: 250000 }],
+        personality: "Aggressive",
+      },
+      {
+        id: "investor",
+        name: "Harrison Vance",
+        role: "Investor Agent",
+        goal: "Secure strong equity valuation return & board governance",
+        constraints: [{ text: "Maximum $400,000 investment cap", defaultValue: 400000 }],
+        personality: "Risk-averse",
+      },
+    ],
+  },
+  service_contract: {
+    scenario_id: "service_contract",
+    scenario_name: "Service Contract Negotiation",
+    category: "Services",
+    description: "Customer and Service Provider negotiate service price, contract duration, support level, SLA uptime, and renewal terms.",
+    isConfigured: true,
+    participants: ["Customer", "Service Provider"],
+    variables: ["service_price", "contract_duration", "support_level", "sla", "renewal_terms"],
+    agents: [
+      {
+        id: "customer",
+        name: "Kevin Patel",
+        role: "Customer Agent",
+        goal: "Secure 99.99% SLA uptime within monthly IT budget",
+        constraints: [{ text: "Maximum $15,000 monthly fee", defaultValue: 15000 }],
+        personality: "Risk-averse",
+      },
+      {
+        id: "service_provider",
+        name: "Siddharth Nair",
+        role: "Service Provider Agent",
+        goal: "Cover 24/7 dedicated engineering support operational costs",
+        constraints: [{ text: "Minimum $11,000 fee floor", defaultValue: 11000 }],
+        personality: "Collaborative",
+      },
+    ],
+  },
 };
 
 export const scenarioList = Object.values(scenarios).map((s) => ({
   id: s.scenario_id,
   name: s.scenario_name,
+  category: s.category,
+  description: s.description,
+  participants: s.participants,
   isConfigured: s.isConfigured,
 }));
-// Designed by TEAM 4
-// Designed by TEAM 4
-

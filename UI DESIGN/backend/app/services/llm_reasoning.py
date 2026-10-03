@@ -300,7 +300,7 @@ def _is_valid_api_key(api_key: str, provider: str) -> bool:
     if k.startswith("AQ.") or "placeholder" in k.lower() or "your_api_key" in k.lower() or len(k) < 20:
         return False
     if provider == "gemini":
-        return k.startswith("AIzaSy")
+        return k.startswith("AIza")
     if provider == "openai":
         return k.startswith("sk-")
     return True
@@ -384,8 +384,8 @@ Generate response as JSON now."""
                         if res and hasattr(res, "text") and res.text:
                             return res.text
                     except Exception as model_err:
-                        logger.warning(f"Gemini API call to {target_model} failed ({model_err}). Fast aborting to fallback.")
-                        break
+                        logger.warning(f"Gemini API call to {target_model} failed ({model_err}). Trying fallback model.")
+                        continue
             except (ImportError, Exception) as genai_err:
                 logger.warning(f"Google GenAI client import/init error: {genai_err}")
                 return ""

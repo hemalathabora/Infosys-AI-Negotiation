@@ -6,6 +6,8 @@ export default function UserProfileDropdown({ isDark }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const [imgError, setImgError] = useState(false);
+
   // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event) {
@@ -18,17 +20,6 @@ export default function UserProfileDropdown({ isDark }) {
   }, []);
 
   if (!user) return null;
-
-  const initials = user.full_name
-    ? user.full_name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "US";
-
-  const [imgError, setImgError] = useState(false);
 
   const isExternalOAuthPic =
     user.avatar_url &&

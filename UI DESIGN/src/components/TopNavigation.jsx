@@ -27,23 +27,21 @@ export default function TopNavigation({
       >
         {/* Left side - Logo & Project Title */}
         <div
-          className="flex items-center gap-2.5 cursor-pointer"
+          className="flex items-center gap-3 cursor-pointer group"
           onClick={() => onNavigate && onNavigate(isAuthenticated ? "Dashboard" : "Landing")}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-950 shadow-md font-bold">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1 shadow-md border border-white/10 overflow-hidden group-hover:scale-105 transition-transform">
+            <img src="/logo-icon.png" alt="NegoMind AI" className="h-full w-full object-contain" />
           </div>
 
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <p className={`text-base font-black tracking-tight font-sans ${isDark ? "text-white" : "text-slate-900"}`}>
-                NegoMind <span className="text-slate-200 font-black">AI</span>
+                NegoMind <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 font-black">Ai</span>
               </p>
             </div>
             <p className={`text-[10px] font-semibold tracking-wider hidden md:block ${isDark ? "text-[#71707E]" : "text-slate-500"}`}>
-              AI-Driven Multi-Agent Negotiation Training & Simulation Platform
+              THINK • NEGOTIATE • GROW
             </p>
           </div>
         </div>

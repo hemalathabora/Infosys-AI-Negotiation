@@ -12,6 +12,7 @@ class AgentProfileBase(BaseModel):
     negotiation_objectives: Optional[List[str]] = Field(
         default_factory=list, description="Specific negotiation target objectives"
     )
+    personality: Optional[str] = Field(default=None, description="Optional personality label")
 
 class AgentProfileCreate(AgentProfileBase):
     id: Optional[str] = None

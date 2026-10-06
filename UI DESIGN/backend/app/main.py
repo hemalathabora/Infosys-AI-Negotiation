@@ -32,6 +32,11 @@ def init_db():
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN human_role VARCHAR(50)"))
                 if "user_id" not in columns:
                     conn.execute(text("ALTER TABLE negotiations ADD COLUMN user_id VARCHAR(255)"))
+                if "difficulty" not in columns:
+                    conn.execute(text("ALTER TABLE negotiations ADD COLUMN difficulty VARCHAR(50) DEFAULT 'Intermediate'"))
+                if "metrics_json" not in columns:
+                    conn.execute(text("ALTER TABLE negotiations ADD COLUMN metrics_json TEXT"))
+                conn.commit()
         if "users" in inspector.get_table_names():
             user_cols = [c["name"] for c in inspector.get_columns("users")]
             with engine.connect() as conn:
@@ -79,12 +84,14 @@ def root():
         "version": "1.0.0"
     }
 
+from app.config import settings, mask_secrets
+
 @app.get("/api/health")
 def health_check():
     return {
         "status": "healthy",
         "llm_provider": settings.LLM_PROVIDER,
-        "database": settings.DATABASE_URL
+        "database": mask_secrets(settings.DATABASE_URL)
     }
 
 @app.get("/api/settings/mode")

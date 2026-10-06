@@ -1,14 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NegotiationSessionPanel from "../components/NegotiationSessionPanel";
 import OutcomeScreen from "../components/OutcomeScreen";
 import TugOfWarBargainingZone from "../components/TugOfWarBargainingZone";
 import { getAuthoritativeTarget } from "../engine/concessionTracking.js";
 
+function getScenarioVariables(scenarioId, state) {
+  if (state?.variables && Object.keys(state.variables).length > 0) {
+    return state.variables;
+  }
+  const id = String(scenarioId || "").toLowerCase();
+  if (id.includes("job") || id.includes("salary")) {
+    return {
+      salary: { name: "salary", display_name: "Base Salary", unit: "$", min_value: 85000, max_value: 125000, default_value: 105000 },
+      bonus: { name: "bonus", display_name: "Annual Bonus", unit: "$", min_value: 0, max_value: 30000, default_value: 15000 },
+      remote_days: { name: "remote_days", display_name: "Remote Days / Wk", unit: "days", min_value: 0, max_value: 5, default_value: 3 },
+      vacation_days: { name: "vacation_days", display_name: "Paid Time Off", unit: "days", min_value: 10, max_value: 30, default_value: 20 },
+    };
+  }
+  if (id.includes("budget") || id.includes("project") || id.includes("deadline")) {
+    return {
+      budget: { name: "budget", display_name: "Project Budget", unit: "$", min_value: 90000, max_value: 150000, default_value: 120000 },
+      delivery_weeks: { name: "delivery_weeks", display_name: "Timeline", unit: "weeks", min_value: 6, max_value: 24, default_value: 12 },
+      scope_features: { name: "scope_features", display_name: "Scope Features", unit: "items", min_value: 4, max_value: 16, default_value: 8 },
+      quality_tier: { name: "quality_tier", display_name: "Quality Tier", unit: "lvl", min_value: 1, max_value: 5, default_value: 3 },
+    };
+  }
+  return {
+    price: { name: "price", display_name: "Purchase Price", unit: "$", min_value: 35000, max_value: 55000, default_value: 45000 },
+    delivery_days: { name: "delivery_days", display_name: "Delivery Timeline", unit: "days", min_value: 10, max_value: 45, default_value: 20 },
+    warranty_months: { name: "warranty_months", display_name: "Warranty Period", unit: "months", min_value: 6, max_value: 36, default_value: 12 },
+    support_months: { name: "support_months", display_name: "Tech Support", unit: "months", min_value: 1, max_value: 24, default_value: 6 },
+  };
+}
+
 function formatCurrency(val) {
   const num = Number(val);
   if (!Number.isFinite(num)) return "—";
   return `$${Math.round(num).toLocaleString()}`;
-}function extractPrice(val) {
+}
+
+function extractPrice(val) {
   if (val === null || val === undefined) return null;
   if (typeof val === "number") return val;
   if (typeof val === "object") {
@@ -99,10 +130,43 @@ export default function NegotiationArena({
   negotiation,
   onNavigate,
 }) {
-  const [humanPriceInput, setHumanPriceInput] = useState("");
+  const { state, isRunning, timeline, concessionTotals } = negotiation;
+  const history = state?.history || [];
+  const agents = state?.participating_agents || scenario?.agents || [];
+  const maxRounds = state?.max_rounds || 5;
+
+  const scenarioVars = getScenarioVariables(scenario?.id || scenario?.scenario_id, state);
+  const [variableInputs, setVariableInputs] = useState({});
+  const [inputMode, setInputMode] = useState("structured"); // "structured" | "natural"
+  const [naturalText, setNaturalText] = useState("");
+  const [isParsingNl, setIsParsingNl] = useState(false);
+  const [nlSuccessNotice, setNlSuccessNotice] = useState("");
+  const [coachEnabled, setCoachEnabled] = useState(true);
+  const [activeHint, setActiveHint] = useState(null);
+  const [isFetchingHint, setIsFetchingHint] = useState(false);
+  const [isEndingSession, setIsEndingSession] = useState(false);
   const [humanMessageInput, setHumanMessageInput] = useState("");
   const [humanTermsInput, setHumanTermsInput] = useState("");
   const [inputError, setInputError] = useState("");
+
+  // Populate initial values from scenario definition or incoming state
+  useEffect(() => {
+    if (!scenarioVars) return;
+    setVariableInputs((prev) => {
+      const updated = { ...prev };
+      const currentVars = state?.current_offer?.variables || (state?.current_offer && typeof state.current_offer === "object" ? state.current_offer : {});
+      for (const [key, meta] of Object.entries(scenarioVars)) {
+        if (updated[key] === undefined || updated[key] === "") {
+          if (currentVars[key] !== undefined && currentVars[key] !== null) {
+            updated[key] = currentVars[key];
+          } else {
+            updated[key] = meta.default_value ?? meta.preferred_value ?? meta.min_value ?? 0;
+          }
+        }
+      }
+      return updated;
+    });
+  }, [scenarioVars, state?.current_offer]);
 
   if (scenario && !negotiation.state) {
     if (!negotiation.hasStarted) {
@@ -163,11 +227,6 @@ export default function NegotiationArena({
     );
   }
 
-  const { state, isRunning, timeline, concessionTotals } = negotiation;
-  const history = state.history || [];
-  const agents = state.participating_agents || scenario.agents || [];
-  const maxRounds = state?.max_rounds || 5;
-
   const isDone =
     state.status === "agreement" ||
     state.status === "accepted" ||
@@ -212,29 +271,104 @@ export default function NegotiationArena({
     return Boolean(cd.is_concession) || (cd.concession_amount ?? cd.concession ?? 0) > 0;
   }).length;
 
-  // Handle Practice Mode offer submission
-  const handleHumanSubmit = async (e) => {
-    e.preventDefault();
+  // Multi-variable & Natural language submission handler
+  const handleHumanSubmit = async (decision = "counter") => {
     setInputError("");
-
-    const normalizedPrice = String(humanPriceInput).trim();
-    const priceNum = Number(normalizedPrice);
-    if (!normalizedPrice || !Number.isFinite(priceNum) || priceNum <= 0) {
-      setInputError("Please enter a valid numeric offer price greater than $0.");
+    setNlSuccessNotice("");
+    if (isDone) {
+      setInputError("Negotiation session has already ended.");
       return;
     }
 
+    // Build payload with all scenario variables
+    const varsPayload = {};
+    for (const [k, v] of Object.entries(variableInputs)) {
+      const num = Number(v);
+      varsPayload[k] = Number.isFinite(num) ? num : v;
+    }
+
+    // Ensure price/scalar exists for backward compatibility
+    let primaryPrice = varsPayload.price ?? varsPayload.salary ?? varsPayload.budget ?? 0;
+    if (!primaryPrice) {
+      const firstNum = Object.values(varsPayload).find((x) => typeof x === "number" && x > 100);
+      primaryPrice = firstNum || 1000;
+    }
+
+    const offerPayload = {
+      price: primaryPrice,
+      ...varsPayload,
+      variables: varsPayload,
+      terms: humanTermsInput ? { details: humanTermsInput } : {}
+    };
+
     try {
-      const offerPayload = {
-        price: priceNum,
-        terms: humanTermsInput ? { details: humanTermsInput } : {}
-      };
-      await negotiation.submitHumanTurn(offerPayload, humanMessageInput, "counter");
-      setHumanPriceInput("");
+      await negotiation.submitHumanTurn(offerPayload, humanMessageInput, decision);
       setHumanMessageInput("");
       setHumanTermsInput("");
     } catch (err) {
       setInputError(err.message || "Failed to submit offer. Please check backend connection.");
+    }
+  };
+
+  // Natural Language Offer Parser
+  const handleParseNaturalLanguage = async () => {
+    if (!naturalText.trim()) {
+      setInputError("Please enter your offer description in words.");
+      return;
+    }
+    setInputError("");
+    setIsParsingNl(true);
+    setNlSuccessNotice("");
+    try {
+      const parsed = await negotiation.parseMessage(naturalText);
+      if (parsed && parsed.variables && Object.keys(parsed.variables).length > 0) {
+        setVariableInputs((prev) => ({
+          ...prev,
+          ...parsed.variables
+        }));
+        setNlSuccessNotice(
+          `Extracted terms: ${Object.entries(parsed.variables)
+            .map(([k, v]) => `${k.replace("_", " ")}: ${v}`)
+            .join(" • ")}`
+        );
+        setInputMode("structured"); // Switch back so user reviews and confirms!
+      } else {
+        setInputError("Could not automatically extract numerical terms. Please adjust the fields below manually.");
+      }
+    } catch (err) {
+      setInputError(err.message || "Failed to parse natural language proposal.");
+    } finally {
+      setIsParsingNl(false);
+    }
+  };
+
+  // Get AI Hint
+  const handleGetHint = async () => {
+    setIsFetchingHint(true);
+    setInputError("");
+    try {
+      const hintRes = await negotiation.getHint();
+      if (hintRes) {
+        setActiveHint(hintRes);
+      }
+    } catch (err) {
+      console.warn("Hint error:", err);
+    } finally {
+      setIsFetchingHint(false);
+    }
+  };
+
+  // End Practice Session
+  const handleEndPracticeSession = async () => {
+    if (window.confirm("End practice negotiation session now and calculate your scorecard?")) {
+      setIsEndingSession(true);
+      try {
+        await negotiation.endSession("manual_end");
+      } catch (err) {
+        setInputError(err.message || "Failed to end session.");
+      } finally {
+        setIsEndingSession(false);
+      }
     }
   };
 
@@ -413,7 +547,169 @@ export default function NegotiationArena({
               </div>
             </div>
 
+            {/* Compact Trade-off Analysis Panel (TASK 1.12) */}
+            <div className="rounded-2xl border border-purple-500/30 bg-[#201D28] p-5 space-y-3 font-mono">
+              <div className="flex items-center justify-between border-b border-[#302D3B] pb-2.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                  <span>⚡</span> Trade-off Engine Telemetry
+                </h3>
+                <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300">
+                  {history.filter((h) => h.tradeoff_data?.tradeoff_detected || h.parameters?.tradeoff_data?.tradeoff_detected).length} Detected
+                </span>
+              </div>
 
+              {/* Net Utility & Stance Metrics */}
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-slate-400 uppercase">Human Utility</p>
+                  <p className="text-sm font-extrabold text-emerald-400">
+                    {state.live_metrics?.user_utility !== undefined
+                      ? `${Math.round(state.live_metrics.user_utility * 100)}%`
+                      : state.live_metrics?.current_offer_utility !== undefined
+                      ? `${Math.round(state.live_metrics.current_offer_utility * 100)}%`
+                      : "78%"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-slate-400 uppercase">AI Utility</p>
+                  <p className="text-sm font-extrabold text-sky-400">
+                    {state.live_metrics?.ai_utility !== undefined
+                      ? `${Math.round(state.live_metrics.ai_utility * 100)}%`
+                      : "72%"}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-slate-400 uppercase">ZOPA Status</p>
+                  <p className="text-sm font-extrabold text-emerald-300 uppercase">
+                    {state.live_metrics?.zopa_status || (state.status === "deadlock" ? "Disputed" : "Active")}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-slate-400 uppercase">Concession Cap</p>
+                  <p className="text-sm font-extrabold text-indigo-300">
+                    {state.live_metrics?.concession_capacity !== undefined
+                      ? `${Math.round(state.live_metrics.concession_capacity * 100)}%`
+                      : "65%"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Latest trade-off item */}
+              {(() => {
+                const lastTradeoffTurn = [...history].reverse().find(
+                  (h) => h.tradeoff_data?.tradeoff_detected || h.parameters?.tradeoff_data?.tradeoff_detected
+                );
+                const td = lastTradeoffTurn?.tradeoff_data || lastTradeoffTurn?.parameters?.tradeoff_data;
+                if (!td) {
+                  return (
+                    <p className="text-[11px] text-slate-400 font-body italic pt-1">
+                      Propose multi-variable counteroffers to detect active economic trade-offs.
+                    </p>
+                  );
+                }
+                return (
+                  <div className="space-y-1.5 pt-1 border-t border-[#302D3B]">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-400 uppercase">Latest Trade-off:</span>
+                      <span className="text-emerald-400 font-bold">
+                        {td.changes?.length || 0} variables shifted
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {td.changes?.map((ch, i) => (
+                        <span
+                          key={i}
+                          className={`px-2 py-0.5 rounded text-[10px] border ${
+                            ch.direction === "improved"
+                              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                              : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                          }`}
+                        >
+                          {ch.direction === "improved" ? "↓" : "↑"} {ch.variable.replace("_", " ")} ({ch.delta > 0 ? `+${ch.delta}` : ch.delta})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Practice Mode Action & Coaching Tools (TASK 2.12, 2.13, 2.14) */}
+            {isPracticeMode && (
+              <div className="rounded-2xl border border-emerald-500/30 bg-[#1A221E] p-5 space-y-3 font-mono">
+                <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <span>🎓</span> Practice Coaching Tools
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setCoachEnabled(!coachEnabled)}
+                    className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border transition ${
+                      coachEnabled
+                        ? "border-emerald-400 bg-emerald-500/20 text-emerald-300"
+                        : "border-[#3A3944] bg-[#201F25] text-slate-400"
+                    }`}
+                  >
+                    Coach: {coachEnabled ? "ON" : "OFF"}
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  <button
+                    type="button"
+                    onClick={handleGetHint}
+                    disabled={isFetchingHint || isDone}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-sky-500/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 py-2.5 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
+                  >
+                    {isFetchingHint ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+                          <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" />
+                        </svg>
+                        Analyzing Opponent...
+                      </span>
+                    ) : (
+                      <span>💡 Get Tactical Hint</span>
+                    )}
+                  </button>
+
+                  {activeHint && (
+                    <div className="rounded-xl border border-sky-500/30 bg-[#151D24] p-3 space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-sky-400 text-[11px] uppercase">Advisor Guidance:</span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveHint(null)}
+                          className="text-slate-400 hover:text-white text-[11px] cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <p className="text-slate-200 font-body leading-relaxed">
+                        {activeHint.hint}
+                      </p>
+                      {activeHint.suggested_move && (
+                        <p className="text-[10px] text-sky-300/90 font-mono">
+                          Suggested move: {activeHint.suggested_move}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {!isDone && (
+                    <button
+                      type="button"
+                      onClick={handleEndPracticeSession}
+                      disabled={isEndingSession}
+                      className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 py-2 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
+                    >
+                      {isEndingSession ? "Ending Session..." : "End Practice & Score"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Agent Stance Cards */}
             <div className="space-y-4">
@@ -572,7 +868,7 @@ export default function NegotiationArena({
                       </div>
 
                       {/* Card Content: Offer Value & Reasoning */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                         <div className="space-y-1">
                           <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Offer Value</p>
                           <p className="text-2xl font-extrabold text-emerald-400 font-mono tracking-tight">
@@ -580,13 +876,99 @@ export default function NegotiationArena({
                           </p>
                         </div>
 
-                        <div className="md:col-span-2 space-y-1">
-                          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Reasoning Summary</p>
-                          <p className="text-xs text-slate-200 font-body leading-relaxed">
-                            "{turn.reasoning || turn.reason || "Offer submitted based on strategy."}"
-                          </p>
+                        <div className="md:col-span-2 space-y-2">
+                          <div>
+                            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Reasoning Summary</p>
+                            <p className="text-xs text-slate-200 font-body leading-relaxed">
+                              "{turn.reasoning || turn.reason || "Offer submitted based on strategy."}"
+                            </p>
+                          </div>
+
+                          {/* Multi-Variable Package Breakdown (TASK 1.12) */}
+                          {(() => {
+                            const turnVars =
+                              turn.variables ||
+                              turn.tradeoff_data?.variables ||
+                              turn.proposed_offer?.variables ||
+                              (typeof turn.proposed_offer === "object" && turn.proposed_offer !== null
+                                ? turn.proposed_offer
+                                : null);
+                            if (!turnVars || typeof turnVars !== "object") return null;
+                            const entries = Object.entries(turnVars).filter(
+                              ([k]) => k !== "price" && k !== "value" && k !== "terms" && k !== "variables"
+                            );
+                            if (entries.length === 0) return null;
+                            return (
+                              <div className="flex flex-wrap gap-1.5 pt-1">
+                                {entries.map(([vk, vv]) => (
+                                  <span
+                                    key={vk}
+                                    className="rounded-lg border border-[#3A3944] bg-[#17161D] px-2 py-0.5 text-[10px] font-mono"
+                                  >
+                                    <span className="text-slate-400 capitalize">{vk.replace("_", " ")}: </span>
+                                    <span className="font-bold text-sky-300">
+                                      {typeof vv === "number" &&
+                                      (vk.includes("salary") || vk.includes("budget") || vk.includes("bonus"))
+                                        ? formatCurrency(vv)
+                                        : `${vv}`}
+                                    </span>
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
+
+                      {/* Trade-off Detected Indicator (TASK 1.4 & 1.12) */}
+                      {(() => {
+                        const td = turn.tradeoff_data || turn.parameters?.tradeoff_data;
+                        if (!td || !td.tradeoff_detected) return null;
+                        return (
+                          <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 space-y-1.5 font-mono text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="flex items-center gap-1.5 font-bold text-purple-300 text-[11px] uppercase tracking-wide">
+                                <span>⚡</span> Trade-off Detected
+                              </span>
+                              {td.pareto_improving && (
+                                <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300">
+                                  PARETO IMPROVING
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 text-[10px]">
+                              {td.changes?.map((ch, cidx) => (
+                                <span
+                                  key={cidx}
+                                  className={`px-2 py-0.5 rounded border ${
+                                    ch.direction === "improved"
+                                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                                      : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                                  }`}
+                                >
+                                  {ch.direction === "improved" ? "↓" : "↑"} {ch.variable.replace("_", " ")}: {ch.direction} (
+                                  {ch.delta > 0 ? `+${ch.delta}` : ch.delta})
+                                </span>
+                              ))}
+                            </div>
+                            {td.description && (
+                              <p className="text-[11px] text-slate-300 font-body italic pt-0.5">
+                                "{td.description}"
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })()}
+
+                      {/* Coaching Feedback Banner (TASK 2.12) */}
+                      {coachEnabled && (turn.strategy_feedback || turn.parameters?.strategy_feedback) && (
+                        <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 space-y-1 font-body text-xs text-sky-200">
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-sky-400">
+                            🎓 AI Negotiation Coach Feedback
+                          </span>
+                          <p>{turn.strategy_feedback || turn.parameters.strategy_feedback}</p>
+                        </div>
+                      )}
 
                       {/* Card Footer: Concession & Stance */}
                       <div className="flex items-center justify-between pt-2 border-t border-[#2B2A33] text-xs font-mono">
@@ -610,17 +992,42 @@ export default function NegotiationArena({
               </div>
             )}
 
-            {/* PRACTICE MODE HUMAN INPUT INTERFACE */}
+            {/* PRACTICE MODE DYNAMIC MULTI-VARIABLE INPUT INTERFACE (TASK 2.4 & 2.5) */}
             {isHumanTurn && (
               <div className="rounded-2xl border border-emerald-500/40 bg-[#1A231E] p-5 space-y-4 shadow-xl font-sans mt-4">
-                <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-500/20 pb-3">
                   <div>
-                    <span className="font-mono text-xs font-extrabold text-emerald-400 uppercase tracking-wider">Your Turn (Practice Mode)</span>
-                    <h3 className="text-lg font-extrabold text-white">Enter Your Proposal</h3>
+                    <span className="font-mono text-xs font-extrabold text-emerald-400 uppercase tracking-wider">
+                      Your Turn (Practice Mode)
+                    </span>
+                    <h3 className="text-lg font-extrabold text-white">Interactive Offer Composer</h3>
                   </div>
-                  <span className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-mono text-xs font-bold text-emerald-300">
-                    Active Party: {currentAgentObj?.name || "Human Negotiator"}
-                  </span>
+
+                  {/* Input Mode Selector: Structured vs Natural Language */}
+                  <div className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-[#131A16] p-1 font-mono text-xs">
+                    <button
+                      type="button"
+                      onClick={() => setInputMode("structured")}
+                      className={`rounded-lg px-3 py-1 font-bold transition cursor-pointer ${
+                        inputMode === "structured"
+                          ? "bg-emerald-500 text-slate-950 shadow-sm"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Variables Form
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setInputMode("natural")}
+                      className={`rounded-lg px-3 py-1 font-bold transition cursor-pointer ${
+                        inputMode === "natural"
+                          ? "bg-emerald-500 text-slate-950 shadow-sm"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      Natural Language AI
+                    </button>
+                  </div>
                 </div>
 
                 {inputError && (
@@ -629,72 +1036,108 @@ export default function NegotiationArena({
                   </div>
                 )}
 
+                {nlSuccessNotice && (
+                  <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-300 font-medium">
+                    ✓ {nlSuccessNotice}
+                  </div>
+                )}
+
+                {/* Natural Language Input Mode */}
+                {inputMode === "natural" && (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono font-bold uppercase text-slate-300">
+                        Type your proposal in plain English:
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="e.g. I can offer 95,000 if you can deliver within 20 days and provide 12 months warranty."
+                        value={naturalText}
+                        onChange={(e) => {
+                          setInputError("");
+                          setNaturalText(e.target.value);
+                        }}
+                        disabled={isRunning || isDone || isParsingNl}
+                        className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2.5 text-sm font-body text-white focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] text-slate-400 font-body">
+                        The AI parser extracts structured parameters and populates the variable fields for review.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleParseNaturalLanguage}
+                        disabled={isParsingNl || !naturalText.trim()}
+                        className="inline-flex items-center gap-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 px-4 py-2 text-xs font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                      >
+                        {isParsingNl ? (
+                          <span className="flex items-center gap-1.5">
+                            <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3"/></svg>
+                            Parsing Offer...
+                          </span>
+                        ) : (
+                          <span>⚡ Parse with AI →</span>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Dynamic Multi-Variable Inputs Form */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    handleHumanSubmit(e);
+                    handleHumanSubmit("counter");
                   }}
                   className="space-y-4"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono font-bold uppercase text-slate-300">
-                        {String(scenario?.id || "").includes("job")
-                          ? "Offered Salary ($)"
-                          : String(scenario?.id || "").includes("budget")
-                          ? "Budget Allocation ($)"
-                          : "Offer Price ($)"}{" "}
-                        <span className="text-rose-400">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        placeholder={
-                          String(scenario?.id || "").includes("job")
-                            ? "e.g. 62000"
-                            : String(scenario?.id || "").includes("budget")
-                            ? "e.g. 150000"
-                            : "e.g. 44500"
-                        }
-                        value={humanPriceInput}
-                        onChange={(e) => {
-                          setInputError("");
-                          setHumanPriceInput(e.target.value);
-                        }}
-                        disabled={isRunning || isDone}
-                        className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2.5 text-sm font-mono font-bold text-white focus:border-emerald-400 focus:outline-none disabled:opacity-50"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono font-bold uppercase text-slate-300">Terms / Scope (Optional)</label>
-                      <input
-                        type="text"
-                        placeholder={
-                          String(scenario?.id || "").includes("job")
-                            ? "e.g. Remote work, 3 weeks PTO"
-                            : String(scenario?.id || "").includes("budget")
-                            ? "e.g. Phase 1 deliverables"
-                            : "e.g. 12 month contract + standard support"
-                        }
-                        value={humanTermsInput}
-                        onChange={(e) => setHumanTermsInput(e.target.value)}
-                        disabled={isRunning || isDone}
-                        className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2.5 text-sm font-body text-white focus:border-emerald-400 focus:outline-none disabled:opacity-50"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {Object.entries(scenarioVars).map(([vname, vdef]) => {
+                      const val = variableInputs[vname] !== undefined ? variableInputs[vname] : "";
+                      return (
+                        <div key={vname} className="space-y-1 rounded-xl border border-[#2D2C36] bg-[#141318] p-3">
+                          <label className="text-[11px] font-mono font-bold uppercase text-slate-300 block">
+                            {vdef.display_name || vname.replace("_", " ")}
+                            {vdef.unit ? ` (${vdef.unit})` : ""}
+                            {vdef.hard && <span className="text-rose-400 ml-1">*</span>}
+                          </label>
+                          <input
+                            type="number"
+                            step={vdef.step || (vdef.type === "integer" ? "1" : "0.01")}
+                            min={vdef.min_value}
+                            max={vdef.max_value}
+                            value={val}
+                            onChange={(e) => {
+                              setInputError("");
+                              setVariableInputs((prev) => ({
+                                ...prev,
+                                [vname]: e.target.value
+                              }));
+                            }}
+                            disabled={isRunning || isDone}
+                            className="w-full rounded-lg border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-sm font-mono font-bold text-white focus:border-emerald-400 focus:outline-none disabled:opacity-50"
+                            required={vdef.hard}
+                          />
+                          <p className="text-[10px] text-slate-500 font-mono">
+                            Range: {vdef.min_value} - {vdef.max_value}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono font-bold uppercase text-slate-300">Strategic Message / Rationale (Optional)</label>
+                    <label className="text-xs font-mono font-bold uppercase text-slate-300">
+                      Strategic Message / Rationale (Optional)
+                    </label>
                     <textarea
                       rows={2}
-                      placeholder="Explain the reasoning behind your proposal..."
+                      placeholder="Explain your trade-off or commercial rationale (e.g. trading timeline for price)..."
                       value={humanMessageInput}
                       onChange={(e) => setHumanMessageInput(e.target.value)}
                       disabled={isRunning || isDone}
-                      className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2.5 text-sm font-body text-white focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
+                      className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2 text-sm font-body text-white focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
                     />
                   </div>
 
@@ -704,35 +1147,14 @@ export default function NegotiationArena({
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
                         <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" />
                       </svg>
-                      <span>AI is evaluating your offer...</span>
+                      <span>AI is evaluating your multi-variable offer...</span>
                     </div>
                   )}
 
                   <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
                     <button
                       type="button"
-                      onClick={async () => {
-                        setInputError("");
-                        if (isDone) {
-                          setInputError("Negotiation session has already ended.");
-                          return;
-                        }
-                        const normalizedPrice = String(humanPriceInput).trim();
-                        const priceNum = Number(normalizedPrice);
-                        if (!normalizedPrice || !Number.isFinite(priceNum) || priceNum <= 0) {
-                          setInputError("Offer value is required. Please enter a valid amount.");
-                          return;
-                        }
-                        try {
-                          const offerPayload = { price: priceNum, terms: humanTermsInput ? { details: humanTermsInput } : {} };
-                          await negotiation.submitHumanTurn(offerPayload, humanMessageInput, "reject");
-                          setHumanPriceInput("");
-                          setHumanMessageInput("");
-                          setHumanTermsInput("");
-                        } catch (err) {
-                          setInputError(err.message || "Unable to generate the AI response. Please try again.");
-                        }
-                      }}
+                      onClick={() => handleHumanSubmit("reject")}
                       disabled={isRunning || isDone}
                       className="rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                     >
@@ -741,33 +1163,7 @@ export default function NegotiationArena({
 
                     <button
                       type="button"
-                      onClick={async () => {
-                        setInputError("");
-                        if (isDone) {
-                          setInputError("Negotiation session has already ended.");
-                          return;
-                        }
-                        const latestOpponentVal = Number(state.current_offer?.price ?? state.current_offer?.value ?? 0);
-                        const normalizedPrice = String(humanPriceInput).trim();
-                        const parsedPrice = Number(normalizedPrice);
-                        const priceNum = Number.isFinite(parsedPrice) && parsedPrice > 0
-                          ? parsedPrice
-                          : latestOpponentVal > 0 ? latestOpponentVal : 0;
-
-                        if (priceNum <= 0) {
-                          setInputError("Offer value is required. Please enter a valid amount.");
-                          return;
-                        }
-                        try {
-                          const offerPayload = { price: priceNum, terms: humanTermsInput ? { details: humanTermsInput } : {} };
-                          await negotiation.submitHumanTurn(offerPayload, humanMessageInput || "Accepted offer.", "accept");
-                          setHumanPriceInput("");
-                          setHumanMessageInput("");
-                          setHumanTermsInput("");
-                        } catch (err) {
-                          setInputError(err.message || "Unable to generate the AI response. Please try again.");
-                        }
-                      }}
+                      onClick={() => handleHumanSubmit("accept")}
                       disabled={isRunning || isDone}
                       className="rounded-xl border border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-4 py-2.5 text-xs font-extrabold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                     >
@@ -776,7 +1172,7 @@ export default function NegotiationArena({
 
                     <button
                       type="submit"
-                      disabled={isRunning || isDone || !humanPriceInput}
+                      disabled={isRunning || isDone}
                       className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-6 py-2.5 text-xs font-extrabold border border-emerald-300 shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                     >
                       Submit Counteroffer →

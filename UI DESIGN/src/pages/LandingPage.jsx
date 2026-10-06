@@ -182,6 +182,16 @@ export default function LandingPage({ onNavigate }) {
           className="grid min-h-[720px] items-center gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:py-20"
         >
           <div>
+            <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 backdrop-blur-md shadow-[0_0_24px_rgba(99,102,241,0.2)]">
+              <img
+                src="/logo-icon.png"
+                alt="NegoMind Ai"
+                className="h-6 w-6 rounded-lg object-contain bg-white p-0.5 shadow-sm"
+              />
+              <span className="text-xs font-bold tracking-wider text-indigo-300 uppercase">
+                NegoMind Ai &bull; Think &bull; Negotiate &bull; Grow
+              </span>
+            </div>
 
             <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
               Turn every negotiation into a{" "}
@@ -456,10 +466,12 @@ export default function LandingPage({ onNavigate }) {
 
         {/* Footer */}
         <footer className="flex flex-col gap-3 border-t border-white/[0.08] py-6 text-xs text-slate-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            © {new Date().getFullYear()} Negotiate.AI. Intelligent negotiation
-            infrastructure.
-          </span>
+          <div className="flex items-center gap-2">
+            <img src="/logo-icon.png" alt="NegoMind Ai" className="h-5 w-5 rounded-md object-contain bg-white p-0.5" />
+            <span>
+              © {new Date().getFullYear()} NegoMind Ai. Intelligent Multi-Agent Negotiation Infrastructure.
+            </span>
+          </div>
           <span className="font-mono">SYSTEM STATUS: OPERATIONAL</span>
         </footer>
       </div>

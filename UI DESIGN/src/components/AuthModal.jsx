@@ -261,13 +261,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
 
           {/* Top Title Bar */}
           <div className="text-center mb-5">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-400 mb-2 shadow-inner">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white p-1.5 border border-indigo-500/30 mb-2.5 shadow-[0_0_24px_rgba(99,102,241,0.25)]">
+              <img
+                src="/logo-icon.png"
+                alt="NegoMind Ai"
+                className="h-full w-full object-contain"
+              />
             </div>
             <h2 className="text-xl font-black tracking-tight text-white">
-              {activeTab === "otp" ? "Email Verification" : "NegoMind AI Portal"}
+              {activeTab === "otp" ? "Email Verification" : "NegoMind Ai Portal"}
             </h2>
             <p className="text-xs text-slate-400 mt-1">
               {activeTab === "signin" && "Sign in to access your negotiation agent simulations"}

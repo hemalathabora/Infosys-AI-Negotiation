@@ -16,7 +16,7 @@ DEFAULT_SCENARIOS = {
         "category": "Purchasing",
         "description": "Buyer and Vendor negotiate the price of a bulk components order while balancing budget, profit, and acceptable terms.",
         "participants": ["Buyer", "Vendor"],
-        "variables": ["unit_price", "quantity", "delivery_time", "payment_terms"],
+        "variables": ["price", "delivery_days", "warranty_months", "support_months", "payment_terms"],
         "agents": [
             {
                 "id": "buyer",
@@ -25,6 +25,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Risk-averse",
                 "goals": ["Lowest possible unit price"],
                 "constraints": {"maximum_price": 50000, "quantity": 100},
+                "variable_weights": {"price": 0.45, "delivery_days": 0.25, "warranty_months": 0.15, "support_months": 0.15},
                 "negotiation_objectives": ["Target price is 42500", "Maximum $50,000 budget limit"]
             },
             {
@@ -34,6 +35,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Aggressive",
                 "goals": ["Maximize profit margin"],
                 "constraints": {"minimum_price": 42000, "quantity": 100},
+                "variable_weights": {"price": 0.40, "delivery_days": 0.25, "warranty_months": 0.20, "support_months": 0.15},
                 "negotiation_objectives": ["Target price is 48000", "Minimum $42,000 price floor"]
             }
         ]
@@ -44,7 +46,7 @@ DEFAULT_SCENARIOS = {
         "category": "Employment",
         "description": "Candidate and Employer negotiate salary and start terms for a new role while balancing compensation expectations against budget limits.",
         "participants": ["Candidate", "Employer"],
-        "variables": ["base_salary", "bonus", "joining_date", "remote_work"],
+        "variables": ["salary", "bonus", "remote_days", "vacation_days"],
         "agents": [
             {
                 "id": "candidate",
@@ -53,6 +55,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Collaborative",
                 "goals": ["Maximize total compensation and benefits"],
                 "constraints": {"minimum_price": 95000},
+                "variable_weights": {"salary": 0.45, "bonus": 0.25, "remote_days": 0.15, "vacation_days": 0.15},
                 "negotiation_objectives": ["Target salary is $105,000", "Minimum $95,000 base salary"]
             },
             {
@@ -62,6 +65,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Risk-averse",
                 "goals": ["Secure the candidate within approved budget"],
                 "constraints": {"maximum_price": 110000},
+                "variable_weights": {"salary": 0.45, "bonus": 0.20, "remote_days": 0.15, "vacation_days": 0.20},
                 "negotiation_objectives": ["Target salary is $98,000", "Maximum $110,000 budget limit"]
             }
         ]
@@ -72,7 +76,7 @@ DEFAULT_SCENARIOS = {
         "category": "Project Management",
         "description": "Department Head and Finance Manager negotiate how much budget to allocate to a new initiative.",
         "participants": ["Department Head", "Finance Manager"],
-        "variables": ["budget_amount", "milestones", "resource_count"],
+        "variables": ["budget", "scope", "deadline_weeks", "milestones"],
         "agents": [
             {
                 "id": "department_head",
@@ -81,6 +85,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Aggressive",
                 "goals": ["Secure maximum budget for the initiative"],
                 "constraints": {"minimum_price": 75000},
+                "variable_weights": {"budget": 0.45, "scope": 0.25, "deadline_weeks": 0.15, "milestones": 0.15},
                 "negotiation_objectives": ["Target allocation is $95,000", "Minimum $75,000 allocation"]
             },
             {
@@ -90,6 +95,7 @@ DEFAULT_SCENARIOS = {
                 "persona": "Collaborative",
                 "goals": ["Control company-wide spending"],
                 "constraints": {"maximum_price": 85000},
+                "variable_weights": {"budget": 0.45, "scope": 0.20, "deadline_weeks": 0.20, "milestones": 0.15},
                 "negotiation_objectives": ["Target allocation is $70,000", "Maximum $85,000 allocation"]
             }
         ]
@@ -380,7 +386,8 @@ def create_negotiation_session(
     max_rounds: int = 5,
     mode: str = "simulation",
     human_role: Optional[str] = None,
-    user_id: Optional[str] = None
+    user_id: Optional[str] = None,
+    difficulty: Optional[str] = "Intermediate"
 ) -> NegotiationOrchestrator:
     negotiation_id = str(uuid.uuid4())
 
@@ -404,6 +411,7 @@ def create_negotiation_session(
         scenario_id=scenario_id,
         mode=mode,
         human_role=human_role,
+        difficulty=difficulty or "Intermediate",
         current_round=0,
         max_rounds=max_rounds,
         current_agent_turn=initial_turn,
@@ -430,6 +438,7 @@ def create_negotiation_session(
         mode=mode,
         human_role=human_role,
         user_id=user_id,
+        difficulty=difficulty or "Intermediate",
         current_offer=None,
         previous_offer=None,
         history=[],
@@ -459,6 +468,7 @@ def load_orchestrator(db: Session, negotiation_id: str) -> Optional[NegotiationO
         mode=getattr(db_neg, "mode", "simulation") or "simulation",
         human_role=getattr(db_neg, "human_role", None),
         user_id=getattr(db_neg, "user_id", None),
+        difficulty=getattr(db_neg, "difficulty", "Intermediate") or "Intermediate",
         current_offer=db_neg.current_offer,
         previous_offer=db_neg.previous_offer,
         history=history,
@@ -478,7 +488,9 @@ def save_orchestrator_state(db: Session, orch: NegotiationOrchestrator):
     db_neg.previous_offer = orch.previous_offer
     db_neg.mode = orch.mode
     db_neg.human_role = orch.human_role
+    db_neg.difficulty = getattr(orch, "difficulty", "Intermediate")
     db_neg.deadlock_info = orch.deadlock_info
+    db_neg.live_metrics = orch.get_live_metrics()
 
     # Save any new history items
     existing_count = db.query(NegotiationMessageModel).filter(

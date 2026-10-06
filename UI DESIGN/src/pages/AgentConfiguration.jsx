@@ -74,6 +74,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
   const [mode, setMode] = useState("simulation"); 
   const [humanRole, setHumanRole] = useState("");
   const [maxRounds, setMaxRounds] = useState(5);
+  const [difficulty, setDifficulty] = useState("Intermediate");
+  const [aiPersonality, setAiPersonality] = useState("Collaborative");
 
   const activeHumanRole = humanRole || (agents[0]?.role || "buyer");
 
@@ -82,9 +84,9 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
     setIsStarting(true);
     try {
       if (onNegotiationStart) {
-        await onNegotiationStart(selectedScenario, mode, activeHumanRole, maxRounds);
+        await onNegotiationStart(selectedScenario, mode, activeHumanRole, maxRounds, difficulty, aiPersonality);
       } else {
-        await negotiation.start(selectedScenario, mode, activeHumanRole, null, maxRounds);
+        await negotiation.start(selectedScenario, mode, activeHumanRole, null, maxRounds, difficulty, aiPersonality);
       }
     } catch (err) {
       console.error("Error starting negotiation session:", err);
@@ -213,6 +215,70 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                       Human: {agent.name} ({agent.role})
                     </button>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {mode === "practice" && (
+              <div className="space-y-3 pt-3 border-t border-[#2D2C36]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                      Practice Difficulty Level
+                    </p>
+                    <p className="text-xs text-slate-400 font-body">
+                      Calibrates opponent concession magnitude, anchoring, and package complexity.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { id: "Beginner", label: "Beginner", desc: "Forgiving concessions" },
+                      { id: "Intermediate", label: "Intermediate", desc: "Balanced trade-offs" },
+                      { id: "Advanced", label: "Advanced", desc: "Strategic packages" },
+                      { id: "Expert", label: "Expert", desc: "Minimal concessions" },
+                    ].map((lvl) => (
+                      <button
+                        key={lvl.id}
+                        type="button"
+                        onClick={() => setDifficulty(lvl.id)}
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                          difficulty === lvl.id
+                            ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm"
+                            : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                        }`}
+                        title={lvl.desc}
+                      >
+                        {lvl.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                  <div>
+                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400">
+                      AI Opponent Persona
+                    </p>
+                    <p className="text-xs text-slate-400 font-body">
+                      Select AI negotiation temperament and strategic posture.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {["Aggressive", "Collaborative", "Risk-Averse"].map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setAiPersonality(p)}
+                        className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                          aiPersonality === p
+                            ? "border-purple-400 bg-purple-500/20 text-purple-300 shadow-sm"
+                            : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

@@ -16,6 +16,14 @@ from app.services.concession_tracking import (
     get_agent_previous_position,
     extract_scalar_price
 )
+from app.services.tradeoff_engine import (
+    get_scenario_variables,
+    calculate_utility,
+    detect_tradeoffs,
+    generate_tradeoff_package,
+    extract_normalized_offer_variables
+)
+from app.services.practice_service import get_difficulty_settings
 
 logger = logging.getLogger("negotiation_engine")
 logger.setLevel(logging.INFO)
@@ -181,7 +189,12 @@ def validate_agent_constraints(
                 "clamped_price": final_price,
                 "control_reason": adj_reason
             })
-            clamped_offer = {"price": final_price, "quantity": target_qty or 100}
+            if isinstance(llm_response.offer, dict):
+                clamped_offer = dict(llm_response.offer)
+                clamped_offer["price"] = final_price
+            else:
+                clamped_offer = {"price": final_price, "quantity": target_qty or 100}
+
             adjusted = LLMStructuredResponse(
                 decision="counter",
                 offer=clamped_offer,
@@ -199,7 +212,8 @@ def mock_llm_reasoning(
     opponent_offer: Optional[Dict[str, Any]]
 ) -> LLMStructuredResponse:
     """
-    Deterministic rule-based negotiation reasoning fallback. Fast and lightweight.
+    Deterministic rule-based negotiation reasoning fallback.
+    Upgraded with Multi-Variable Trade-off Engine & Difficulty Adjustment.
     """
     role = str(agent_profile.get("role", "")).lower()
     persona = agent_profile.get("persona") or agent_profile.get("personality") or "Collaborative"
@@ -207,20 +221,26 @@ def mock_llm_reasoning(
     max_price, min_price, quantity = parse_numeric_constraint(constraints, role)
     round_num = negotiation_state.get("current_round", 1)
     max_rounds = negotiation_state.get("max_rounds", 8)
+    scenario_id = negotiation_state.get("scenario_id", "vendor_pricing")
+    difficulty = negotiation_state.get("difficulty", "Intermediate")
 
-    # 1. Perform structured offer evaluation
+    # 1. Get multi-variable definitions and difficulty settings
+    vdefs = get_scenario_variables(scenario_id, role)
+    diff_cfg = get_difficulty_settings(difficulty)
+
+    # 2. Perform structured offer evaluation
     eval_res = evaluate_offer(agent_profile, opponent_offer, negotiation_state, conversation_history)
     direction = eval_res.direction
     limit = eval_res.limit_price
 
-    # 2. Extract agent's own previous offer position
+    # 3. Extract agent's own previous offer position
     agent_id = agent_profile.get("id", "")
     own_history = [h for h in conversation_history if h.get("agent_id") == agent_id]
     last_own_price = extract_offer_price(own_history[-1].get("proposed_offer")) if own_history else (
         limit * 0.85 if direction == "minimize" else limit * 1.15
     )
 
-    # 3. Apply Decision Logic Engine
+    # 4. Apply Decision Logic Engine
     decision_info = decide_action(
         evaluation_result=eval_res,
         personality=persona,
@@ -233,12 +253,66 @@ def mock_llm_reasoning(
     next_val = decision_info["next_value"]
     reasoning = decision_info["reasoning"]
 
+    # 5. Apply Difficulty Multiplier to Concession Magnitude
+    if decision == "counter" and own_history:
+        conc_mult = diff_cfg.get("concession_multiplier", 1.0)
+        if conc_mult != 1.0:
+            diff_shift = (next_val - last_own_price) * conc_mult
+            adjusted_next = last_own_price + diff_shift
+            if direction == "minimize":
+                next_val = min(adjusted_next, limit)
+            else:
+                next_val = max(adjusted_next, limit)
+
+    # 6. Hard constraint verification on Accept
+    if decision == "accept" and opponent_offer:
+        opp_util = calculate_utility(agent_profile, opponent_offer, vdefs, scenario_id)
+        if not opp_util.is_valid:
+            decision = "counter"
+            viol_str = "; ".join(opp_util.violations)
+            reasoning = f"Countering because offer violates hard constraints: {viol_str}."
+
+    # 7. Construct Multi-Variable Package Offer
+    package: Dict[str, Any] = {"price": round(next_val, 2)}
+    opp_vars = extract_normalized_offer_variables(opponent_offer)
+
+    # Populate scenario-specific variables
+    for vname, vdef in vdefs.items():
+        if vname == "price":
+            continue
+        pref = vdef.preferred_value if vdef.preferred_value is not None else (vdef.min_value + vdef.max_value) / 2.0
+        if vname in opp_vars:
+            opp_val = opp_vars[vname]
+            # Move 35% toward opponent's requested term as a trade-off
+            conceded_val = pref + 0.35 * (opp_val - pref)
+            step = vdef.step or 1.0
+            package[vname] = round(conceded_val / step) * step if step >= 1 else round(conceded_val, 2)
+        else:
+            package[vname] = pref
+
+    if quantity and "quantity" not in package:
+        package["quantity"] = quantity
+
+    # 8. Compute Trade-offs and Utility Telemetry
+    tradeoff_res = detect_tradeoffs(agent_profile, opponent_offer, package, vdefs, scenario_id)
+    util_res = calculate_utility(agent_profile, package, vdefs, scenario_id)
+
+    if tradeoff_res.tradeoff_detected and decision == "counter":
+        g_desc = ", ".join([f"{item.variable}" for item in tradeoff_res.tradeoff.give])
+        r_desc = ", ".join([f"{item.variable}" for item in tradeoff_res.tradeoff.receive])
+        tradeoff_summary = f"Adjusting {g_desc} in exchange for terms on {r_desc}."
+        reasoning = f"{reasoning} {tradeoff_summary}"
+
     params = dict(eval_res.metrics)
-    params.update({"evaluation_summary": eval_res.evaluation_summary})
+    params.update({
+        "evaluation_summary": eval_res.evaluation_summary,
+        "tradeoff_analysis": tradeoff_res.model_dump(),
+        "utility_analysis": util_res.model_dump()
+    })
 
     return LLMStructuredResponse(
         decision=decision,
-        offer={"price": round(next_val, 2), "quantity": quantity or 100},
+        offer=package,
         reasoning=reasoning,
         parameters=params
     )
@@ -277,20 +351,23 @@ CRITICAL INSTRUCTIONS:
 1. Evaluate opponent's offer against your objectives and constraints.
 2. Decide Accept, Counter, or Reject.
 3. NEVER violate your numeric limits.
-4. Output JSON ONLY matching this schema:
-{{
+4. When proposing a counteroffer, you may negotiate multiple variables simultaneously (e.g. price, delivery_days, warranty_months, support_months) and propose trade-offs (e.g. offering better price in exchange for longer delivery).
+5. Output JSON ONLY matching this schema:
+{
   "decision": "counter" | "accept" | "reject",
-  "offer": {{
-    "price": <numeric_value>,
-    "quantity": <numeric_quantity>
-  }},
+  "offer": {
+    "price": <numeric_value>
+  },
+  "tradeoff": {
+    "description": "<concise trade-off explanation if applicable>"
+  },
   "reasoning": "<concise explanation>",
-  "parameters": {{
+  "parameters": {
     "target_price": <value>,
     "maximum_price": <value or null>,
     "minimum_price": <value or null>
-  }}
-}}
+  }
+}
 Do NOT wrap in markdown backticks or add extraneous text."""
 
 def _is_valid_api_key(api_key: str, provider: str) -> bool:

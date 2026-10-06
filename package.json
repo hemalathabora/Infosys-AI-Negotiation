@@ -1,0 +1,8 @@
+{
+  "name": "infosys-ai-negotiation",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd \"UI DESIGN\" && npm install && npm run build"
+  }
+}

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="UI DESIGN/public/logo.png" alt="NegoMind Ai Logo" width="220" />
+  <img src="logo.png" alt="NegoMind Ai Logo" width="220" />
 </p>
 
 # NegoMind Ai: AI-Driven Multi-Agent Negotiation Training & Simulation Platform

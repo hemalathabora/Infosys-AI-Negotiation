@@ -512,7 +512,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
             ) : (
               <>
                 {/* Social providers */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   <button
                     type="button"
                     onClick={handleGoogleAuth}
@@ -521,16 +521,6 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                   >
                     <GoogleIcon />
                     {loading ? "Connecting..." : "Continue with Google"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleGithubAuth}
-                    disabled={loading}
-                    className="flex h-12 items-center justify-center gap-2 border border-[#302E42] bg-[#161522]/80 text-sm font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-purple-500/50 hover:bg-[#1D1C2B] disabled:opacity-50"
-                  >
-                    <GithubIcon/>
-                    GitHub
                   </button>
                 </div>
 

@@ -43,9 +43,9 @@ export default function UserProfileDropdown({ isDark }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2.5 rounded-2xl border px-3 py-1.5 transition-all duration-200 cursor-pointer shadow-sm ${
+        className={`flex items-center gap-2.5 border px-3 py-1.5 transition-all duration-200 cursor-pointer ${
           isDark
-            ? "border-[#3A3945] bg-[#1E1D26] text-white hover:border-emerald-500/50 hover:bg-[#252430]"
+            ? "border-[#4B4A45] bg-[#222326] text-[#E8E3D8] hover:border-[#E8E3D8]"
             : "border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200"
         }`}
       >
@@ -53,12 +53,12 @@ export default function UserProfileDropdown({ isDark }) {
           src={avatarUrl}
           alt={user.full_name}
           onError={() => setImgError(true)}
-          className="h-7 w-7 object-cover rounded-full border border-emerald-500/50  bg-slate-800"
+          className="h-6 w-6 object-cover rounded-full border border-[#8E8B83] bg-slate-800"
         />
 
         <div className="text-left hidden sm:block">
-          <p className="text-xs font-bold leading-none">{user.full_name}</p>
-          <p className="text-[10px] text-emerald-400 font-mono font-medium leading-tight">
+          <p className="text-xs font-bold leading-none text-[#E8E3D8]">{user.full_name}</p>
+          <p className="text-[10px] text-[#AAA79E] font-mono font-medium leading-tight mt-0.5">
             {providerBadge}
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function UserProfileDropdown({ isDark }) {
           fill="none"
           stroke="currentColor"
           strokeWidth="2.5"
-          className={`transition-transform duration-200 text-slate-400 ${isOpen ? "rotate-180" : ""}`}
+          className={`transition-transform duration-200 text-[#AAA79E] ${isOpen ? "rotate-180" : ""}`}
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -79,9 +79,9 @@ export default function UserProfileDropdown({ isDark }) {
       {/* Popover Dropdown Card */}
       {isOpen && (
         <div
-          className={`absolute right-0 top-12 z-50 w-72 rounded-2xl border p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
+          className={`absolute right-0 top-12 z-50 w-72 border p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
             isDark
-              ? "border-[#323142] bg-[#14131D] text-white"
+              ? "border-[#4B4A45] bg-[#191A1C] text-[#E8E3D8]"
               : "border-slate-200 bg-white text-slate-900"
           }`}
         >

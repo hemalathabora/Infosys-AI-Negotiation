@@ -1,153 +1,255 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-function ArrowUpRight({ size = 16 }) {
+const navLinks = [
+  { label: "Product", href: "#product" },
+  { label: "Method", href: "#method" },
+  { label: "Practice", href: "#practice" },
+  { label: "About", href: "#about" },
+];
 
+const photos = {
+  hero:
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=2200&q=85",
+  meeting:
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1800&q=85",
+  detail:
+    "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1400&q=85",
+  workspace:
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1800&q=85",
+  portrait:
+    "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=85",
+};
+
+function Logo() {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M7 17 17 7" />
-      <path d="M7 7h10v10" />
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M8 5.14v13.72a1 1 0 0 0 1.55.83l10-6.86a1 1 0 0 0 0-1.66l-10-6.86A1 1 0 0 0 8 5.14Z" />
-    </svg>
-  );
-}
-
-function SparkIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m12 3-1.6 5.4L5 10l5.4 1.6L12 17l1.6-5.4L19 10l-5.4-1.6L12 3Z" />
-      <path d="m19 16-.8 2.2L16 19l2.2.8L19 22l.8-2.2L22 19l-2.2-.8L19 16Z" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m5 12 4 4L19 6" />
-    </svg>
-  );
-}
-
-function AgentMiniCard({ label, name, role, value, color = "blue" }) {
-  const isEmerald = color === "emerald";
-
-  return (
-    <div
-      className={`rounded-2xl border p-4 ${
-        isEmerald
-          ? "border-emerald-500/25 bg-emerald-500/[0.06]"
-          : "border-indigo-500/25 bg-indigo-500/[0.06]"
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <span
-          className={`font-mono text-[10px] font-bold uppercase tracking-widest ${
-            isEmerald ? "text-emerald-400" : "text-indigo-300"
-          }`}
-        >
-          {label}
-        </span>
-
-        <span
-          className={`h-2 w-2 rounded-full ${
-            isEmerald ? "bg-emerald-400" : "bg-indigo-400"
-          }`}
+    <a href="#top" className="group flex items-center gap-3">
+      <span className="flex h-9 w-9 items-center justify-center border border-[#C7C1B5]/30 bg-[#E8E3D8] p-1.5 transition-transform duration-300 group-hover:rotate-3">
+        <img
+          src="/logo-icon.png"
+          alt="NegoMind Ai"
+          className="h-full w-full object-contain"
         />
-      </div>
+      </span>
 
-      <div className="mt-4 flex items-center gap-3">
-        <div
-          className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-black ${
-            isEmerald
-              ? "bg-emerald-400/15 text-emerald-300"
-              : "bg-indigo-400/15 text-indigo-300"
-          }`}
-        >
-          {label === "Party A" ? "A1" : "A2"}
-        </div>
-
-        <div>
-          <p className="text-sm font-bold text-white">{name}</p>
-          <p className="mt-0.5 text-[11px] text-slate-400">{role}</p>
-        </div>
-      </div>
-
-      <div className="mt-4 border-t border-white/[0.08] pt-3">
-        <p className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
-          Current position
-        </p>
-        <p
-          className={`mt-1 font-mono text-2xl font-extrabold ${
-            isEmerald ? "text-emerald-300" : "text-indigo-300"
-          }`}
-        >
-          {value}
-        </p>
-      </div>
-    </div>
+      <span className="leading-none">
+        <span className="block text-[12px] font-bold uppercase tracking-[0.22em] text-[#E8E3D8]">
+          NegoMind
+        </span>
+        <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.18em] text-[#96938B]">
+          Negotiation intelligence
+        </span>
+      </span>
+    </a>
   );
 }
 
-function FeatureCard({ number, title, description, icon }) {
+function Arrow({ className = "" }) {
   return (
-    <div className="group rounded-2xl border border-[#302F39] bg-[#201F25]/80 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-indigo-500/40 hover:bg-[#25242C]">
-      <div className="flex items-start justify-between">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.05] text-indigo-300">
-          {icon}
+    <span className={`inline-block text-lg leading-none ${className}`}>↗</span>
+  );
+}
+
+function PrimaryButton({ children, onClick, className = "" }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group inline-flex items-center justify-center gap-4 border border-[#E8E3D8] bg-[#E8E3D8] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#191A1C] transition-all duration-300 hover:bg-[#FFFFFF] active:translate-y-px ${className}`}
+    >
+      {children}
+      <Arrow className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+    </button>
+  );
+}
+
+function TextButton({ children, onClick, className = "" }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group inline-flex items-center gap-3 border-b border-[#8E8B83]/50 pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#D8D3C8] transition-colors duration-300 hover:border-[#E8E3D8] hover:text-[#E8E3D8] ${className}`}
+    >
+      {children}
+      <Arrow className="text-base transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+    </button>
+  );
+}
+
+function SectionLabel({ children, light = false }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span
+        className={`h-px w-8 ${
+          light ? "bg-[#403F3C]" : "bg-[#878377]"
+        }`}
+      />
+      <span
+        className={`font-mono text-[10px] uppercase tracking-[0.22em] ${
+          light ? "text-[#8D8A82]" : "text-[#69665F]"
+        }`}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function ProductPreview() {
+  return (
+    <div className="relative overflow-hidden border border-[#4B4A45] bg-[#1F2022] shadow-[0_24px_70px_rgba(0,0,0,0.35)]">
+      <div className="flex h-10 items-center justify-between border-b border-[#3A3B3D] px-4">
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#9AA18A]" />
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#9B9C96]">
+            Live negotiation
+          </span>
         </div>
 
-        <span className="font-mono text-xs text-slate-600">{number}</span>
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#737570]">
+          Session 024
+        </span>
       </div>
 
-      <h3 className="mt-6 text-lg font-bold text-white">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-400">{description}</p>
+      <div className="grid min-h-[390px] grid-cols-[1fr_220px]">
+        <div className="border-r border-[#3A3B3D] p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#7F817A]">
+                Enterprise vendor renewal
+              </p>
+              <h3 className="mt-2 max-w-md font-serif text-2xl leading-tight text-[#F1EEE6]">
+                A negotiation in motion.
+              </h3>
+            </div>
 
-      <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-indigo-300 opacity-0 transition-opacity group-hover:opacity-100">
-        Learn more
-        <ArrowUpRight size={14} />
+            <span className="border border-[#737B69]/50 bg-[#737B69]/10 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.15em] text-[#B8C0A7]">
+              Round 06
+            </span>
+          </div>
+
+          <div className="mt-8 grid grid-cols-2 gap-3">
+            <div className="border border-[#4C5363] bg-[#26282E] p-3">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#858995]">
+                Party A
+              </p>
+              <p className="mt-5 text-sm font-semibold text-[#E9E7E0]">
+                Alex Morgan
+              </p>
+              <p className="mt-1 text-[10px] text-[#898B91]">
+                Procurement lead
+              </p>
+              <p className="mt-6 font-mono text-2xl font-bold text-[#AEB9D3]">
+                $48k
+              </p>
+            </div>
+
+            <div className="border border-[#566357] bg-[#252A27] p-3">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#87948A]">
+                Party B
+              </p>
+              <p className="mt-5 text-sm font-semibold text-[#E9E7E0]">
+                Daniel Carter
+              </p>
+              <p className="mt-1 text-[10px] text-[#89928C]">
+                Vendor representative
+              </p>
+              <p className="mt-6 font-mono text-2xl font-bold text-[#B9C8B5]">
+                $52k
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 border border-[#3D4145] bg-[#242629] p-4">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#858880]">
+                Bid / ask convergence
+              </p>
+              <p className="font-mono text-xs text-[#B9C8B5]">72%</p>
+            </div>
+
+            <div className="mt-4 h-1.5 bg-[#111315]">
+              <div className="h-full w-[72%] bg-[#9FAA91]" />
+            </div>
+
+            <div className="mt-4 flex justify-between font-mono text-[9px] text-[#747871]">
+              <span>Concession velocity: stable</span>
+              <span>Gap: $4,000</span>
+            </div>
+          </div>
+
+          <div className="mt-5 flex items-end justify-between border-t border-[#3A3B3D] pt-4">
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#747871]">
+                Agreement probability
+              </p>
+              <p className="mt-1 font-mono text-2xl font-bold text-[#C4CDBD]">
+                86.4%
+              </p>
+            </div>
+
+            <div className="text-right">
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#747871]">
+                Current status
+              </p>
+              <p className="mt-1 text-xs font-semibold text-[#C4CDBD]">
+                Agreement zone detected
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#242528] p-4">
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#858880]">
+            Decision log
+          </p>
+
+          <div className="mt-5 space-y-5">
+            {[
+              ["01", "Initial position", "Opening ask submitted"],
+              ["04", "Concession movement", "Boundary tested"],
+              ["06", "Agreement zone", "High probability"],
+            ].map(([number, title, detail]) => (
+              <div key={number} className="relative pl-8">
+                <span className="absolute left-0 top-0 font-mono text-[10px] text-[#9FAA91]">
+                  {number}
+                </span>
+                <p className="text-xs font-semibold text-[#E1DED5]">{title}</p>
+                <p className="mt-1 text-[10px] leading-5 text-[#858880]">
+                  {detail}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 border-t border-[#3A3B3D] pt-4">
+            <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#858880]">
+              Concession velocity
+            </p>
+
+            <div className="mt-5 flex h-24 items-end gap-2">
+              {[26, 36, 32, 52, 48, 67, 72, 86].map((height, index) => (
+                <span
+                  key={index}
+                  className={`flex-1 ${
+                    index === 7 ? "bg-[#B6C3A9]" : "bg-[#656F63]"
+                  }`}
+                  style={{ height: `${height}%` }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default function LandingPage({ onNavigate }) {
+function LandingPage({ onNavigate }) {
   const navigate = onNavigate || (() => {});
   const { isAuthenticated } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("Simulation");
 
   const handleAction = (targetPage) => {
     if (isAuthenticated) {
@@ -158,311 +260,592 @@ export default function LandingPage({ onNavigate }) {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#17161B] text-white">
-      {/* Decorative background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-[-360px] h-[700px] w-[900px] -translate-x-1/2 rounded-full bg-indigo-500/[0.08] blur-3xl" />
-        <div className="absolute right-[-180px] top-[420px] h-[420px] w-[420px] rounded-full bg-emerald-500/[0.05] blur-3xl" />
+    <main
+      id="top"
+      className="min-h-screen overflow-hidden bg-[#191A1C] text-[#E8E3D8]"
+    >
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
 
-        <div
-          className="absolute inset-0 opacity-[0.035]"
-          style={{
-            backgroundImage:
-              "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-          }}
-        />
-      </div>
+        :root {
+          font-family: "DM Sans", sans-serif;
+        }
 
-      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        .font-serif {
+          font-family: "Fraunces", Georgia, serif;
+        }
 
-        {/* Hero */}
-        <section
-          id="platform"
-          className="grid min-h-[720px] items-center gap-10 py-10 lg:grid-cols-[1.05fr_0.95fr] lg:py-20"
-        >
-          <div>
+        .font-mono {
+          font-family: "DM Mono", monospace;
+        }
 
-            <h1 className="max-w-3xl text-5xl font-black leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-7xl">
-              Turn every negotiation into a{" "}
-              <span className="bg-gradient-to-r from-indigo-300 via-white to-emerald-300 bg-clip-text text-transparent">
-                strategic advantage.
-              </span>
-            </h1>
+        .editorial-grain {
+          background-image:
+            linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px);
+          background-size: 5px 5px;
+        }
 
-            <p className="mt-7 max-w-xl text-base leading-8 text-slate-400 sm:text-lg">
-              Simulate, analyze, and master high-stakes negotiations with
-              intelligent agent personas, live concession tracking, and
-              data-driven outcomes.
-            </p>
+        .image-shift {
+          transition: transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms ease;
+        }
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => handleAction("Configure Agents")}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3.5 text-sm font-extrabold text-slate-950 shadow-[0_0_32px_rgba(52,211,153,0.18)] transition hover:bg-emerald-300 active:scale-95 cursor-pointer"
-              >
-                Start a negotiation
-                <ArrowUpRight size={17} />
-              </button>
+        .image-shift:hover {
+          transform: scale(1.035);
+          filter: saturate(1.08) contrast(1.04);
+        }
 
-              <button
-                type="button"
-                onClick={() => handleAction("Dashboard")}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#3A3944] bg-[#201F25] px-5 py-3.5 text-sm font-bold text-slate-200 transition hover:border-slate-500 hover:bg-[#25242C] cursor-pointer"
-              >
-                <PlayIcon />
-                Explore live demo
-              </button>
+        @keyframes editorialReveal {
+          from {
+            opacity: 0;
+            transform: translateY(22px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .editorial-reveal {
+          animation: editorialReveal 900ms cubic-bezier(.2,.7,.2,1) both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+          }
+        }
+      `}</style>
+
+
+
+      <section className="relative min-h-[760px] border-b border-[#3B3B39] bg-[#242526]">
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={photos.hero}
+            alt="A quiet modern workspace prepared for a negotiation"
+            className="image-shift h-full w-full object-cover opacity-35 mix-blend-luminosity"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#191A1C] via-[#191A1C]/85 to-[#191A1C]/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#191A1C] via-transparent to-[#191A1C]/30" />
+        </div>
+
+        <div className="relative mx-auto flex min-h-[760px] max-w-[1500px] items-end px-5 pb-14 pt-24 sm:px-8 lg:px-12 lg:pb-20">
+          <div className="grid w-full gap-12 lg:grid-cols-[1fr_0.45fr] lg:items-end">
+            <div className="max-w-4xl editorial-reveal">
+              <SectionLabel light>Negotiation intelligence infrastructure</SectionLabel>
+
+              <h1 className="mt-7 max-w-4xl font-serif text-5xl leading-[0.92] tracking-[-0.055em] text-[#F1EEE6] sm:text-7xl lg:text-[8.2rem]">
+                Make the next move with clarity.
+              </h1>
+
+              <div className="mt-9 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
+                <p className="max-w-xl text-base leading-8 text-[#B5B3AC] sm:text-lg">
+                  NegoMind gives teams a realistic environment to configure,
+                  practice, and understand complex negotiations before the
+                  outcome is on the line.
+                </p>
+
+                <div className="flex flex-col items-start gap-5">
+                  <PrimaryButton onClick={() => handleAction("Configure Agents")}>
+                    Build a negotiation
+                  </PrimaryButton>
+
+                  <TextButton onClick={() => handleAction("Dashboard")}>
+                    Explore the workspace
+                  </TextButton>
+                </div>
+              </div>
             </div>
 
+            <div className="hidden border-l border-[#D7D1C5]/30 pl-6 lg:block">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#AAA79E]">
+                A working system for
+              </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-xs text-slate-500">
-              <span className="flex items-center gap-2">
-                <CheckIcon className="text-emerald-400" />
-                AI-to-AI simulations
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckIcon className="text-emerald-400" />
-                Human practice mode
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckIcon className="text-emerald-400" />
-                Real-time analytics
-              </span>
+              <div className="mt-5 space-y-3">
+                {["Procurement", "Revenue teams", "Commercial strategy"].map(
+                  (item) => (
+                    <p
+                      key={item}
+                      className="font-serif text-2xl text-[#D7D1C5]"
+                    >
+                      {item}
+                    </p>
+                  )
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[#D7D1C5]/20">
+          <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-4 sm:px-8 lg:px-12">
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#96938B]">
+              01 / The workspace
+            </span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#96938B]">
+              Scroll to explore ↓
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#D7D1C5]/20 bg-[#E8E3D8] text-[#1D1E20]">
+        <div className="mx-auto grid max-w-[1500px] gap-10 px-5 py-16 sm:px-8 lg:grid-cols-[0.55fr_1fr] lg:px-12 lg:py-24">
+          <div>
+            <SectionLabel>What changes</SectionLabel>
+          </div>
+
+          <div>
+            <h2 className="max-w-4xl font-serif text-4xl leading-[1.02] tracking-[-0.045em] sm:text-6xl">
+              Better preparation creates better leverage.
+            </h2>
+
+            <div className="mt-12 grid gap-10 border-t border-[#A9A49A] pt-8 sm:grid-cols-3">
+              {[
+                ["01", "Prepare", "Model the people, pressure, and boundaries before the first conversation."],
+                ["02", "Practice", "Run the difficult version of the conversation without real-world cost."],
+                ["03", "Learn", "Review the movement behind each decision and carry it forward."],
+              ].map(([number, title, body]) => (
+                <div key={number}>
+                  <p className="font-mono text-[10px] text-[#77736B]">{number}</p>
+                  <h3 className="mt-5 text-xl font-semibold">{title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#68655E]">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="product" className="border-b border-[#3B3B39] bg-[#191A1C]">
+        <div className="mx-auto max-w-[1500px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[0.42fr_1fr] lg:items-end">
+            <div>
+              <SectionLabel light>The product</SectionLabel>
+              <h2 className="mt-6 max-w-md font-serif text-4xl leading-[0.98] tracking-[-0.04em] text-[#F1EEE6] sm:text-5xl">
+                A clear view of the room before you enter it.
+              </h2>
+            </div>
+
+            <p className="max-w-xl text-base leading-8 text-[#96938B]">
+              Every session is designed to feel close to the work: visible
+              positions, real constraints, evolving pressure, and a record of
+              how the conversation moved.
+            </p>
+          </div>
+
+          <div className="mt-14 lg:pl-[18%]">
+            <ProductPreview />
+          </div>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden border-b border-[#3B3B39] bg-[#222426]">
+        <div className="grid min-h-[680px] lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="relative min-h-[420px] overflow-hidden">
+            <img
+              src={photos.meeting}
+              alt="Professionals discussing a business decision around a table"
+              loading="lazy"
+              className="image-shift h-full w-full object-cover grayscale-[20%]"
+            />
+            <div className="absolute inset-0 bg-[#202224]/25 mix-blend-multiply" />
+            <div className="absolute bottom-6 left-6 border border-[#E8E3D8]/40 bg-[#191A1C]/70 px-4 py-3 backdrop-blur-sm sm:bottom-10 sm:left-10">
+              <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#BFBAB0]">
+                Real-world practice
+              </p>
             </div>
           </div>
 
-          {/* Hero product preview */}
-          <div className="relative">
-            <div className="absolute -inset-5 rounded-[32px] bg-indigo-500/[0.08] blur-2xl" />
+          <div className="flex items-center px-5 py-16 sm:px-10 lg:px-20">
+            <div className="max-w-2xl">
+              <SectionLabel light>Practice under pressure</SectionLabel>
 
-            <div className="relative rounded-[28px] border border-white/[0.12] bg-[#1E1D24]/95 p-3 shadow-2xl shadow-black/40">
-              <div className="rounded-[22px] border border-white/[0.08] bg-[#17161B] p-5 sm:p-6">
-                <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                        Live session
-                      </span>
-                    </div>
-                    <h2 className="mt-2 text-lg font-bold text-white">
-                      Enterprise Vendor Renewal
-                    </h2>
-                  </div>
+              <h2 className="mt-7 font-serif text-4xl leading-[0.98] tracking-[-0.045em] text-[#F1EEE6] sm:text-6xl">
+                The room is easier when you have already been in it.
+              </h2>
 
-                  <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 font-mono text-[10px] font-bold text-indigo-300">
-                    ROUND 06 / 10
-                  </span>
+              <p className="mt-7 max-w-xl text-base leading-8 text-[#A8A69E]">
+                Move from abstract roleplay to structured rehearsal. Test
+                opening positions, hold boundaries, explore concessions, and
+                see how the other side responds.
+              </p>
+
+              <div className="mt-10 grid gap-5 border-t border-[#575957] pt-6 sm:grid-cols-2">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.17em] text-[#898B85]">
+                    Human practice
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#D7D3C9]">
+                    Take the seat of one party and practice the conversation
+                    against a responsive agent.
+                  </p>
                 </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <AgentMiniCard
-                    label="Party A"
-                    name="Alex Morgan"
-                    role="Procurement Lead"
-                    value="$48,000"
-                  />
-
-                  <AgentMiniCard
-                    label="Party B"
-                    name="Daniel Carter"
-                    role="Vendor Representative"
-                    value="$52,000"
-                    color="emerald"
-                  />
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.17em] text-[#898B85]">
+                    AI simulation
+                  </p>
+                  <p className="mt-3 text-sm leading-6 text-[#D7D3C9]">
+                    Watch both parties negotiate to study patterns, pressure,
+                    and settlement behavior.
+                  </p>
                 </div>
+              </div>
 
-                <div className="mt-6 rounded-2xl border border-indigo-500/20 bg-[#201F25] p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">
-                      Bid-ask convergence
-                    </span>
-                    <span className="font-mono text-xs font-bold text-emerald-400">
-                      72%
-                    </span>
-                  </div>
+              <div className="mt-9">
+                <TextButton onClick={() => handleAction("Configure Agents")}>
+                  Configure your first scenario
+                </TextButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-900">
-                    <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400" />
-                  </div>
+      <section id="method" className="border-b border-[#3B3B39] bg-[#E8E3D8] text-[#1D1E20]">
+        <div className="mx-auto max-w-[1500px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="grid gap-14 lg:grid-cols-[0.5fr_1fr]">
+            <div>
+              <SectionLabel>How it works</SectionLabel>
+              <p className="mt-7 max-w-xs font-serif text-3xl leading-tight tracking-[-0.03em]">
+                Designed around the decisions that shape the outcome.
+              </p>
+            </div>
 
-                  <div className="mt-4 flex items-center justify-between font-mono text-[10px] text-slate-500">
-                    <span>Concession velocity: stable</span>
-                    <span>Gap: $4,000</span>
-                  </div>
+            <div className="divide-y divide-[#A9A49A] border-y border-[#A9A49A]">
+              {[
+                [
+                  "01",
+                  "Define the situation",
+                  "Set the scenario, stakes, parties, objectives, and non-negotiables.",
+                ],
+                [
+                  "02",
+                  "Tune the participants",
+                  "Give each agent a point of view, behavioral policy, and room to move.",
+                ],
+                [
+                  "03",
+                  "Run the conversation",
+                  "Move through each round and observe how positions change under pressure.",
+                ],
+                [
+                  "04",
+                  "Review the record",
+                  "Use the resulting data to understand the quality of each decision.",
+                ],
+              ].map(([number, title, body]) => (
+                <div
+                  key={number}
+                  className="grid gap-5 py-7 sm:grid-cols-[70px_0.8fr_1fr] sm:items-start"
+                >
+                  <span className="font-mono text-xs text-[#77736B]">{number}</span>
+                  <h3 className="font-serif text-2xl tracking-[-0.02em]">{title}</h3>
+                  <p className="max-w-sm text-sm leading-7 text-[#68655E]">{body}</p>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-                <div className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] px-4 py-3">
-                  <SparkIcon />
-                  <p className="text-xs leading-5 text-slate-300">
-                    AI analysis detects a{" "}
-                    <span className="font-bold text-emerald-300">
-                      high-probability agreement zone
-                    </span>{" "}
-                    within the next two rounds.
+      <section id="practice" className="border-b border-[#3B3B39] bg-[#191A1C]">
+        <div className="mx-auto max-w-[1500px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[1fr_0.58fr] lg:items-center">
+            <div className="relative">
+              <div className="absolute -left-8 top-12 hidden h-40 w-40 border border-[#7F887A]/30 lg:block" />
+
+              <div className="relative overflow-hidden border border-[#494A46]">
+                <img
+                  src={photos.detail}
+                  alt="Architectural workspace detail with natural light"
+                  loading="lazy"
+                  className="image-shift h-[540px] w-full object-cover grayscale-[15%]"
+                />
+
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#191A1C]/80 to-transparent p-6">
+                  <p className="max-w-xs font-serif text-3xl leading-tight text-[#F1EEE6]">
+                    Understand the movement, not just the result.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="absolute -bottom-5 -left-4 hidden rounded-xl border border-white/10 bg-[#25242C] px-4 py-3 shadow-xl sm:block">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-slate-500">
-                Agreement probability
-              </p>
-              <p className="mt-1 font-mono text-xl font-black text-emerald-300">
-                86.4%
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Metrics */}
-        <section className="grid grid-cols-2 gap-4 border-y border-white/[0.08] py-8 sm:grid-cols-4">
-          {[
-            ["10x", "faster scenario testing"],
-            ["24/7", "always-on simulations"],
-            ["3", "strategic scenario types"],
-            ["100%", "auditable outcomes"],
-          ].map(([value, label]) => (
-            <div key={label} className="text-center sm:text-left">
-              <p className="font-mono text-2xl font-black text-white sm:text-3xl">
-                {value}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">{label}</p>
-            </div>
-          ))}
-        </section>
-
-        {/* Capabilities */}
-        <section id="capabilities" className="py-24">
-          <div className="max-w-2xl">
-            <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">
-              Built for better decisions
-            </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Everything you need to negotiate with confidence.
-            </h2>
-            <p className="mt-4 text-base leading-7 text-slate-400">
-              Move beyond static roleplay. Negotiate.AI gives you a complete
-              environment to configure, execute, and understand negotiation
-              behavior.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            <FeatureCard
-              number="01"
-              title="Configure realistic personas"
-              description="Define goals, constraints, personalities, and behavioral policies for every negotiation participant."
-              icon={<SparkIcon />}
-            />
-
-            <FeatureCard
-              number="02"
-              title="Practice under pressure"
-              description="Switch between AI-versus-AI simulation and human-versus-AI practice modes to sharpen your instincts."
-              icon={<PlayIcon />}
-            />
-
-            <FeatureCard
-              number="03"
-              title="Measure every concession"
-              description="Track bid movement, concession velocity, convergence, deadlocks, and final settlement quality."
-              icon={<ArrowUpRight size={18} />}
-            />
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section
-          id="how-it-works"
-          className="rounded-[28px] border border-[#302F39] bg-[#201F25] p-6 sm:p-10"
-        >
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <div>
-              <p className="font-mono text-xs font-bold uppercase tracking-widest text-indigo-300">
-                A better negotiation loop
-              </p>
-              <h2 className="mt-3 text-3xl font-black tracking-tight text-white">
-                From scenario to strategy in three steps.
+              <SectionLabel light>Decision intelligence</SectionLabel>
+
+              <h2 className="mt-7 max-w-xl font-serif text-4xl leading-[0.98] tracking-[-0.045em] text-[#F1EEE6] sm:text-6xl">
+                Every concession tells you something.
               </h2>
+
+              <p className="mt-7 max-w-lg text-base leading-8 text-[#96938B]">
+                NegoMind captures the details most teams lose after the call:
+                who moved, when they moved, what changed the pressure, and
+                whether the final agreement was actually strong.
+              </p>
+
+              <div className="mt-10 space-y-4 border-t border-[#41423F] pt-6">
+                {[
+                  ["Concession velocity", "See whether movement is accelerating or stalling."],
+                  ["Boundary tracking", "Know how much room remains before a position breaks."],
+                  ["Settlement quality", "Compare the final agreement to the original objectives."],
+                ].map(([title, body]) => (
+                  <div
+                    key={title}
+                    className="grid gap-3 border-b border-[#363735] pb-4 sm:grid-cols-[190px_1fr]"
+                  >
+                    <p className="text-sm font-semibold text-[#D9D5CA]">{title}</p>
+                    <p className="text-sm leading-6 text-[#888A84]">{body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-9">
+                <TextButton onClick={() => handleAction("Analytics")}>
+                  See the analytics layer
+                </TextButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="about" className="border-b border-[#3B3B39] bg-[#242526]">
+        <div className="mx-auto grid max-w-[1500px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[0.65fr_1fr] lg:items-center lg:px-12 lg:py-28">
+          <div>
+            <SectionLabel light>Built for the work</SectionLabel>
+
+            <blockquote className="mt-7 max-w-xl font-serif text-4xl leading-[1.02] tracking-[-0.04em] text-[#F1EEE6] sm:text-6xl">
+              “Preparation is not a script. It is a way of seeing.”
+            </blockquote>
+
+            <p className="mt-8 max-w-md text-sm leading-7 text-[#96938B]">
+              A focused workspace for teams who treat negotiation as a craft:
+              observable, repeatable, and worth improving.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-[1.1fr_0.9fr]">
+            <div className="relative min-h-[420px] overflow-hidden border border-[#4B4C48]">
+              <img
+                src={photos.workspace}
+                alt="Bright modern office interior"
+                loading="lazy"
+                className="image-shift h-full w-full object-cover grayscale-[25%]"
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-rows-[1fr_auto]">
+              <div className="relative min-h-[250px] overflow-hidden border border-[#4B4C48]">
+                <img
+                  src={photos.portrait}
+                  alt="Professionals working together in a meeting"
+                  loading="lazy"
+                  className="image-shift h-full w-full object-cover grayscale-[25%]"
+                />
+              </div>
+
+              <div className="border border-[#4B4C48] bg-[#1D1E20] p-5">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#9AA18A]">
+                  System status
+                </p>
+                <p className="mt-3 font-serif text-3xl text-[#E8E3D8]">
+                  Operational
+                </p>
+                <p className="mt-3 text-sm leading-6 text-[#858880]">
+                  Clear data. Calm decisions. Better conversations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#3B3B39] bg-[#191A1C]">
+        <div className="mx-auto max-w-[1500px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[0.7fr_1fr]">
+            <div>
+              <SectionLabel light>Inside the workspace</SectionLabel>
+              <h2 className="mt-7 max-w-md font-serif text-4xl leading-[0.98] tracking-[-0.045em] text-[#F1EEE6] sm:text-6xl">
+                See the conversation from more than one angle.
+              </h2>
+            </div>
+
+            <div>
+              <div className="flex flex-wrap gap-3 border-b border-[#3D3E3B] pb-5">
+                {["Simulation", "Practice", "Insights"].map((tab) => (
+                  <button
+                    type="button"
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`border-b pb-2 text-[11px] font-bold uppercase tracking-[0.16em] transition-colors ${
+                      activeTab === tab
+                        ? "border-[#E8E3D8] text-[#E8E3D8]"
+                        : "border-transparent text-[#777A74] hover:text-[#D8D3C8]"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-8 grid gap-6 sm:grid-cols-[0.7fr_1fr]">
+                <div className="border border-[#41423F] bg-[#202123] p-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#858880]">
+                    Current view
+                  </p>
+
+                  <h3 className="mt-5 font-serif text-3xl text-[#F1EEE6]">
+                    {activeTab === "Simulation"
+                      ? "Two agents. One moving deal."
+                      : activeTab === "Practice"
+                      ? "Your position. Their response."
+                      : "The pattern behind the outcome."}
+                  </h3>
+
+                  <p className="mt-5 text-sm leading-7 text-[#999B94]">
+                    {activeTab === "Simulation"
+                      ? "Observe both parties respond to objectives, pressure, and changing boundaries."
+                      : activeTab === "Practice"
+                      ? "Take the seat of one party and test the decisions you would make in the room."
+                      : "Review the signals that reveal momentum, risk, and agreement quality."}
+                  </p>
+                </div>
+
+                <div className="border border-[#41423F] bg-[#252628] p-5">
+                  <div className="flex items-center justify-between border-b border-[#41423F] pb-4">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#858880]">
+                      {activeTab} / live view
+                    </span>
+                    <span className="h-2 w-2 rounded-full bg-[#AAB79D]" />
+                  </div>
+
+                  <div className="mt-5 space-y-3">
+                    {[
+                      ["Position", "$48,000 → $50,000", "moving"],
+                      ["Concession velocity", "stable", "measured"],
+                      ["Agreement zone", "within 2 rounds", "likely"],
+                    ].map(([label, value, status]) => (
+                      <div
+                        key={label}
+                        className="grid grid-cols-[1fr_auto] gap-4 border-b border-[#3B3C39] pb-3"
+                      >
+                        <div>
+                          <p className="text-xs font-semibold text-[#DAD6CD]">{label}</p>
+                          <p className="mt-1 font-mono text-[10px] text-[#868981]">
+                            {value}
+                          </p>
+                        </div>
+                        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#AAB79D]">
+                          {status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#E8E3D8] text-[#1D1E20]">
+        <div className="mx-auto grid max-w-[1500px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_0.55fr] lg:items-end lg:px-12 lg:py-28">
+          <div>
+            <SectionLabel>Begin with the next conversation</SectionLabel>
+
+            <h2 className="mt-7 max-w-4xl font-serif text-5xl leading-[0.94] tracking-[-0.055em] sm:text-7xl">
+              Better outcomes start before the meeting.
+            </h2>
+          </div>
+
+          <div>
+            <p className="text-base leading-8 text-[#68655E]">
+              Build a scenario, configure the people involved, and give your
+              team a place to practice the decisions that matter.
+            </p>
+
+            <div className="mt-8">
               <button
                 type="button"
                 onClick={() => handleAction("Configure Agents")}
-                className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-slate-200 cursor-pointer"
+                className="group inline-flex items-center gap-4 border border-[#1D1E20] bg-[#1D1E20] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E8E3D8] transition hover:bg-[#303133]"
               >
-
-                Build your first session
-                <ArrowUpRight size={16} />
+                Launch your first negotiation
+                <Arrow className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </button>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="space-y-3">
-              {[
-                ["01", "Select your scenario", "Start with a realistic business situation."],
-                ["02", "Tune both parties", "Control goals, constraints, and personalities."],
-                ["03", "Run and analyze", "Review every move and improve your strategy."],
-              ].map(([number, title, description]) => (
-                <div
-                  key={number}
-                  className="flex gap-4 rounded-2xl border border-white/[0.08] bg-[#17161B] p-4"
-                >
-                  <span className="font-mono text-xs font-bold text-emerald-400">
-                    {number}
-                  </span>
-                  <div>
-                    <h3 className="text-sm font-bold text-white">{title}</h3>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">
-                      {description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+      <footer className="bg-[#191A1C]">
+        <div className="mx-auto max-w-[1500px] px-5 py-10 sm:px-8 lg:px-12">
+          <div className="grid gap-10 border-b border-[#3B3B39] pb-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.7fr_0.7fr_0.7fr]">
+            <div>
+              <Logo />
+              <p className="mt-6 max-w-xs text-sm leading-7 text-[#858880]">
+                Intelligent negotiation infrastructure for better preparation,
+                sharper decisions, and stronger outcomes.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#858880]">
+                Product
+              </p>
+              <div className="mt-5 space-y-3 text-sm text-[#B3B0A7]">
+                <a href="#product" className="block transition hover:text-[#E8E3D8]">Workspace</a>
+                <a href="#method" className="block transition hover:text-[#E8E3D8]">Method</a>
+                <a href="#practice" className="block transition hover:text-[#E8E3D8]">Practice</a>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#858880]">
+                Company
+              </p>
+              <div className="mt-5 space-y-3 text-sm text-[#B3B0A7]">
+                <a href="#about" className="block transition hover:text-[#E8E3D8]">About</a>
+                <a href="#" className="block transition hover:text-[#E8E3D8]">Contact</a>
+                <a href="#" className="block transition hover:text-[#E8E3D8]">Journal</a>
+              </div>
+            </div>
+
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#858880]">
+                Legal
+              </p>
+              <div className="mt-5 space-y-3 text-sm text-[#B3B0A7]">
+                <a href="#" className="block transition hover:text-[#E8E3D8]">Privacy</a>
+                <a href="#" className="block transition hover:text-[#E8E3D8]">Terms</a>
+                <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-[#858880]">
+                  System operational
+                </span>
+              </div>
             </div>
           </div>
-        </section>
 
-        {/* Final CTA */}
-        <section className="relative py-28 text-center">
-          <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/[0.08] blur-3xl" />
-
-          <div className="relative">
-            <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">
-              Your next advantage starts here
+          <div className="flex flex-col gap-3 pt-6 text-xs text-[#777A74] sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} NegoMind Ai. All rights reserved.
             </p>
-
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
-              Stop guessing. Start negotiating with intelligence.
-            </h2>
-
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-slate-400">
-              Build a scenario, configure your agents, and discover how better
-              preparation changes the outcome.
+            <p className="font-mono uppercase tracking-[0.16em]">
+              Think / Negotiate / Grow
             </p>
-
-            <button
-              type="button"
-              onClick={() => handleAction("Configure Agents")}
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-6 py-3.5 text-sm font-extrabold text-slate-950 shadow-[0_0_36px_rgba(52,211,153,0.2)] transition hover:bg-emerald-300 active:scale-95 cursor-pointer"
-            >
-
-              Launch your first negotiation
-              <ArrowUpRight size={17} />
-            </button>
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="flex flex-col gap-3 border-t border-white/[0.08] py-6 text-xs text-slate-600 sm:flex-row sm:items-center sm:justify-between">
-          <span>
-            © {new Date().getFullYear()} Negotiate.AI. Intelligent negotiation
-            infrastructure.
-          </span>
-          <span className="font-mono">SYSTEM STATUS: OPERATIONAL</span>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </main>
   );
 }
+
+export default LandingPage;

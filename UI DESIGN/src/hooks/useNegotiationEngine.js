@@ -15,7 +15,10 @@ import { NEGOTIATION_STATUS } from "../types/negotiation.js";
 import {
   createNegotiationSession,
   stepBackendNegotiation,
-  submitPracticeTurn
+  submitPracticeTurn,
+  fetchPracticeHint,
+  parseNaturalLanguageOffer,
+  endPracticeSession
 } from "../services/api.js";
 
 export function useNegotiationEngine() {
@@ -29,7 +32,15 @@ export function useNegotiationEngine() {
      START NEGOTIATION
   ============================================================ */
 
-  const start = useCallback(async (scenario, mode = "simulation", humanRole = null, userId = null, maxRounds = 5) => {
+  const start = useCallback(async (
+    scenario,
+    mode = "simulation",
+    humanRole = null,
+    userId = null,
+    maxRounds = 5,
+    difficulty = "Intermediate",
+    aiPersonality = null
+  ) => {
     if (!scenario) {
       console.error("Cannot start negotiation: scenario is missing.");
       return;
@@ -62,7 +73,15 @@ export function useNegotiationEngine() {
 
       // 1. Try starting backend session first
       try {
-        const backendRes = await createNegotiationSession(scenario, mode, humanRole, userId, maxRounds);
+        const backendRes = await createNegotiationSession(
+          scenario,
+          mode,
+          humanRole,
+          userId,
+          maxRounds,
+          difficulty,
+          aiPersonality
+        );
         if (backendRes && backendRes.negotiation_id) {
           setBackendSessionId(backendRes.negotiation_id);
           setState({ ...backendRes, execution_mode: backendRes.execution_mode || engineMode });
@@ -106,9 +125,16 @@ export function useNegotiationEngine() {
       return;
     }
 
-    const submittedPrice = Number(offer?.price ?? offer?.value);
+    // Safely extract price or primary variable for local validation/tracking
+    let submittedPrice = null;
+    if (typeof offer === "number") {
+      submittedPrice = offer;
+    } else if (offer && typeof offer === "object") {
+      const vars = offer.variables || offer;
+      submittedPrice = Number(vars.price ?? vars.salary ?? vars.budget ?? vars.value ?? Object.values(vars).find(v => typeof v === "number" && v > 0));
+    }
     if (!Number.isFinite(submittedPrice) || submittedPrice <= 0) {
-      throw new Error("Offer value must be a finite number greater than 0.");
+      submittedPrice = 1000; // safe fallback
     }
 
     setIsRunning(true);
@@ -305,6 +331,48 @@ export function useNegotiationEngine() {
   }, []);
 
   /* ============================================================
+     PRACTICE MODE HELPERS (HINTS, NL PARSING, END SESSION)
+  ============================================================ */
+
+  const getHint = useCallback(async () => {
+    if (!backendSessionId) return null;
+    try {
+      return await fetchPracticeHint(backendSessionId);
+    } catch (err) {
+      console.error("Failed to fetch practice hint:", err);
+      return null;
+    }
+  }, [backendSessionId]);
+
+  const parseMessage = useCallback(async (message) => {
+    if (!backendSessionId) return null;
+    try {
+      return await parseNaturalLanguageOffer(backendSessionId, message, state?.scenario_id);
+    } catch (err) {
+      console.error("Failed to parse natural language message:", err);
+      return null;
+    }
+  }, [backendSessionId, state?.scenario_id]);
+
+  const endSession = useCallback(async (outcome = "manual_end") => {
+    if (!backendSessionId) return null;
+    try {
+      const res = await endPracticeSession(backendSessionId, outcome);
+      if (res) {
+        setState((prev) => ({
+          ...prev,
+          status: res.status,
+          scorecard: res.scorecard
+        }));
+      }
+      return res;
+    } catch (err) {
+      console.error("Failed to end practice session:", err);
+      return null;
+    }
+  }, [backendSessionId]);
+
+  /* ============================================================
      CONCESSION TRACKING
   ============================================================ */
 
@@ -322,5 +390,8 @@ export function useNegotiationEngine() {
     submitHumanTurn,
     runToCompletion,
     reset,
+    getHint,
+    parseMessage,
+    endSession,
   };
 }

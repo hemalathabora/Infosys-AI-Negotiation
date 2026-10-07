@@ -9,6 +9,17 @@ from app.services.concession_tracking import (
     get_agent_previous_position
 )
 from app.services.deadlock_detection import detect_deadlock, attempt_deadlock_resolution
+from app.services.tradeoff_engine import (
+    get_scenario_variables,
+    calculate_utility,
+    detect_tradeoffs,
+    extract_normalized_offer_variables,
+)
+from app.services.practice_service import (
+    calculate_ai_stance,
+    generate_strategy_coaching,
+    calculate_negotiation_scorecard,
+)
 
 logger = logging.getLogger("negotiation_engine")
 
@@ -25,6 +36,7 @@ class NegotiationOrchestrator:
         mode: str = "simulation",  # "simulation" | "practice"
         human_role: Optional[str] = None,
         user_id: Optional[str] = None,
+        difficulty: Optional[str] = "Intermediate",
         current_offer: Optional[Dict[str, Any]] = None,
         previous_offer: Optional[Dict[str, Any]] = None,
         history: Optional[List[Dict[str, Any]]] = None,
@@ -35,6 +47,7 @@ class NegotiationOrchestrator:
         self.mode = mode
         self.human_role = human_role
         self.user_id = user_id
+        self.difficulty = difficulty or "Intermediate"
         self.max_rounds = max_rounds
         self.current_round = current_round
 
@@ -113,6 +126,8 @@ class NegotiationOrchestrator:
         # Load state & context
         state_context = {
             "negotiation_id": self.negotiation_id,
+            "scenario_id": self.scenario_id,
+            "difficulty": getattr(self, "difficulty", "Intermediate"),
             "current_round": self.current_round,
             "max_rounds": self.max_rounds,
             "status": self.status,
@@ -162,6 +177,11 @@ class NegotiationOrchestrator:
 
         params["concession_tracking"] = concession_info
 
+        # Multi-variable utility and trade-off calculation
+        vdefs = get_scenario_variables(self.scenario_id, agent.get("role"))
+        tradeoff_info = detect_tradeoffs(agent, self.current_offer, proposed_offer, vdefs, self.scenario_id)
+        utility_info = calculate_utility(agent, proposed_offer, vdefs, self.scenario_id)
+
         # Step 9: Save History with dynamic agent round number
         agent_round = sum(1 for h in self.history if h.get("agent_id") == agent_id) + 1
         self.current_round = max(self.current_round, agent_round)
@@ -175,6 +195,8 @@ class NegotiationOrchestrator:
             "reasoning": reasoning,
             "parameters": params,
             "concession_data": concession_info,
+            "tradeoff_data": tradeoff_info.model_dump(),
+            "utility_data": utility_info.model_dump(),
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
         self.history.append(history_item)
@@ -426,11 +448,30 @@ class NegotiationOrchestrator:
             self.current_round += 1
 
         price_val = extract_offer_price(human_offer)
+        if price_val is None:
+            norm_vars = extract_normalized_offer_variables(human_offer)
+            for k in ["price", "salary", "budget", "amount", "unit_price", "base_salary", "project_fee", "vehicle_price", "property_price", "monthly_rent", "investment_amount", "service_price"]:
+                if k in norm_vars:
+                    price_val = norm_vars[k]
+                    break
+            if price_val is None and norm_vars:
+                price_val = next(iter(norm_vars.values()))
+
         if price_val is None or price_val <= 0:
             raise ValueError("Human offer must contain a valid positive numeric price value greater than 0.")
 
+        # Validate multi-variable constraints and calculate utility
+        vdefs = get_scenario_variables(self.scenario_id, human_agent.get("role"))
+        human_util = calculate_utility(human_agent, human_offer, vdefs, self.scenario_id)
+
+        if decision == "accept" and not human_util.is_valid:
+            viol_str = "; ".join(human_util.violations)
+            raise ValueError(f"Cannot accept offer: violates hard constraint(s): {viol_str}")
+
         state_context = {
             "negotiation_id": self.negotiation_id,
+            "scenario_id": self.scenario_id,
+            "difficulty": getattr(self, "difficulty", "Intermediate"),
             "current_round": self.current_round,
             "max_rounds": self.max_rounds,
             "status": self.status,
@@ -448,6 +489,16 @@ class NegotiationOrchestrator:
             initial_position=init_pos
         )
 
+        tradeoff_info = detect_tradeoffs(human_agent, self.current_offer, human_offer, vdefs, self.scenario_id)
+        prev_human_turn = next((h for h in reversed(self.history) if h.get("agent_id") == agent_id), None)
+        coaching = generate_strategy_coaching(
+            user_turn={"concession_data": concession_info},
+            previous_turn=prev_human_turn,
+            user_profile=human_agent,
+            tradeoff_result=tradeoff_info,
+            utility_result=human_util
+        )
+
         reason_text = message or f"Human submitted offer of ${price_val:,.2f}."
 
         history_item = {
@@ -459,6 +510,9 @@ class NegotiationOrchestrator:
             "reasoning": reason_text,
             "parameters": {"concession_tracking": concession_info, "is_human": True},
             "concession_data": concession_info,
+            "tradeoff_data": tradeoff_info.model_dump(),
+            "utility_data": human_util.model_dump(),
+            "strategy_feedback": coaching,
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
         self.history.append(history_item)
@@ -505,13 +559,61 @@ class NegotiationOrchestrator:
             
         return self.get_state_dict()
 
+    def get_live_metrics(self) -> Dict[str, Any]:
+        """Calculates live round telemetry, utility scores, and trade-off metrics."""
+        agents = self.agents or []
+        human_agent = next((a for a in agents if a.get("participant_type") == "human"), agents[0] if agents else {})
+        ai_agent = next((a for a in agents if a.get("id") != human_agent.get("id")), agents[-1] if agents else {})
+
+        vdefs_h = get_scenario_variables(self.scenario_id, human_agent.get("role"))
+        vdefs_ai = get_scenario_variables(self.scenario_id, ai_agent.get("role"))
+
+        h_util = calculate_utility(human_agent, self.current_offer, vdefs_h, self.scenario_id)
+        ai_util = calculate_utility(ai_agent, self.current_offer, vdefs_ai, self.scenario_id)
+
+        ai_stance = calculate_ai_stance(ai_agent, self.history, ai_util.overall_score)
+
+        tradeoffs_count = sum(1 for h in self.history if h.get("tradeoff_data", {}).get("tradeoff_detected"))
+        concessions_count = sum(1 for h in self.history if float(h.get("concession_data", {}).get("concession_amount", 0.0)) > 0)
+
+        # Gap calculation
+        h_hist = [h for h in self.history if h.get("agent_id") == human_agent.get("id")]
+        ai_hist = [h for h in self.history if h.get("agent_id") == ai_agent.get("id")]
+
+        h_open = h_hist[0].get("value") if h_hist else None
+        ai_open = ai_hist[0].get("value") if ai_hist else None
+        open_gap = abs(h_open - ai_open) if (h_open is not None and ai_open is not None) else None
+
+        h_latest = h_hist[-1].get("value") if h_hist else None
+        ai_latest = ai_hist[-1].get("value") if ai_hist else None
+        curr_gap = abs(h_latest - ai_latest) if (h_latest is not None and ai_latest is not None) else None
+
+        conv_pct = None
+        if open_gap and open_gap > 0 and curr_gap is not None:
+            conv_pct = max(0.0, min(100.0, round((1.0 - (curr_gap / open_gap)) * 100.0, 1)))
+
+        return {
+            "human_utility_pct": round(h_util.overall_score * 100, 1),
+            "ai_utility_pct": round(ai_util.overall_score * 100, 1),
+            "ai_stance": ai_stance,
+            "opening_gap": open_gap,
+            "current_gap": curr_gap,
+            "convergence_pct": conv_pct,
+            "tradeoffs_detected": tradeoffs_count,
+            "concessions_count": concessions_count,
+            "zopa_status": "Active" if not self.deadlock_info.get("is_deadlock") else "Constrained",
+            "agreement_likelihood": "High" if (conv_pct or 0) > 60 else "Moderate" if (conv_pct or 0) > 25 else "Low"
+        }
+
     def get_state_dict(self) -> Dict[str, Any]:
         mode_label = "LLM Mode" if settings.LLM_PROVIDER.lower() in ["gemini", "openai"] else "Normal Mode"
+        vdefs = get_scenario_variables(self.scenario_id, self.human_role)
         return {
             "negotiation_id": self.negotiation_id,
             "scenario_id": self.scenario_id,
             "mode": self.mode,
             "human_role": self.human_role,
+            "difficulty": getattr(self, "difficulty", "Intermediate"),
             "user_id": self.user_id,
             "current_round": self.current_round,
             "max_rounds": self.max_rounds,
@@ -522,7 +624,9 @@ class NegotiationOrchestrator:
             "current_offer": self.current_offer,
             "participating_agents": self.agents,
             "history": self.history,
-            "deadlock_info": self.deadlock_info
+            "deadlock_info": self.deadlock_info,
+            "variables": {k: v.model_dump() for k, v in vdefs.items()},
+            "live_metrics": self.get_live_metrics()
         }
 
     to_dict = get_state_dict

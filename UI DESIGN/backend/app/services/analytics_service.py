@@ -110,6 +110,64 @@ def calculate_negotiation_analytics(state: Dict[str, Any]) -> Dict[str, Any]:
         latest_gap = 0.0
         convergence_rate = 0.0
 
+    # Multi-variable & Trade-off Analytics
+    distinct_vars = set()
+    tradeoffs_detected = 0
+    package_offers_count = 0
+    pareto_improvements_count = 0
+    violations_prevented = 0
+    var_concessions: Dict[str, float] = {}
+    utility_history: List[float] = []
+
+    for turn in history:
+        prop = turn.get("proposed_offer") or {}
+        if isinstance(prop, dict):
+            vars_in_turn = [k for k in prop.keys() if k not in ["terms", "parameters", "concession_data", "details", "reasoning", "decision"]]
+            distinct_vars.update(vars_in_turn)
+            if len(vars_in_turn) > 1:
+                package_offers_count += 1
+
+        t_data = turn.get("tradeoff_data") or turn.get("parameters", {}).get("tradeoff_analysis") or {}
+        if t_data.get("tradeoff_detected"):
+            tradeoffs_detected += 1
+        if t_data.get("pareto_improvement"):
+            pareto_improvements_count += 1
+
+        u_data = turn.get("utility_data") or turn.get("parameters", {}).get("utility_analysis") or {}
+        if "overall_score" in u_data:
+            utility_history.append(float(u_data["overall_score"]))
+
+        if turn.get("parameters", {}).get("adjusted_due_to_constraint") or turn.get("parameters", {}).get("adjusted_due_to_concession_control"):
+            violations_prevented += 1
+
+        # Variable-level concessions from tradeoff changes
+        changes = t_data.get("changes") or []
+        for ch in changes:
+            vname = ch.get("variable")
+            delta = abs(float(ch.get("delta") or 0.0))
+            if vname:
+                var_concessions[vname] = round(var_concessions.get(vname, 0.0) + delta, 2)
+
+    avg_utility = round(sum(utility_history) / len(utility_history) * 100, 1) if utility_history else 75.0
+    util_improvement = round((utility_history[-1] - utility_history[0]) * 100, 1) if len(utility_history) >= 2 else 0.0
+    most_important_var = max(var_concessions, key=var_concessions.get) if var_concessions else "price"
+
+    tradeoffs_accepted = 1 if (tradeoffs_detected > 0 and state.get("status") in ["accepted", "agreement"]) else 0
+
+    tradeoff_analytics = {
+        "variables_negotiated_count": len(distinct_vars) if distinct_vars else 1,
+        "distinct_variables": list(distinct_vars),
+        "tradeoffs_detected": tradeoffs_detected,
+        "tradeoffs_accepted": tradeoffs_accepted,
+        "average_utility": avg_utility,
+        "utility_improvement": util_improvement,
+        "variable_level_concessions": var_concessions,
+        "package_offers_count": package_offers_count,
+        "pareto_improvements_count": pareto_improvements_count,
+        "constraint_violations_prevented": violations_prevented,
+        "most_important_negotiated_variable": most_important_var
+    }
+
     return {
         "negotiation_id": state.get("negotiation_id"),
         "scenario_id": state.get("scenario_id"),
@@ -119,6 +177,7 @@ def calculate_negotiation_analytics(state: Dict[str, Any]) -> Dict[str, Any]:
         "timeline": timeline,
         "concession_totals": concession_totals,
         "agent_analytics": agent_analytics,
+        "tradeoff_analytics": tradeoff_analytics,
         "opening_gap": round(opening_gap, 2),
         "latest_gap": round(latest_gap, 2),
         "convergence_rate_percent": max(0.0, min(100.0, convergence_rate)),

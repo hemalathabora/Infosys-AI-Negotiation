@@ -8,7 +8,15 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000
  * Creates and starts a new negotiation session on the backend.
  * @param {import('../types/negotiation').Scenario} scenario
  */
-export async function createNegotiationSession(scenario, mode = "simulation", humanRole = null, userId = null, maxRounds = 5) {
+export async function createNegotiationSession(
+  scenario,
+  mode = "simulation",
+  humanRole = null,
+  userId = null,
+  maxRounds = 5,
+  difficulty = "Intermediate",
+  aiPersonality = null
+) {
   const payload = {
     scenario_id: scenario.scenario_id,
     scenario_name: scenario.scenario_name || scenario.name,
@@ -16,11 +24,14 @@ export async function createNegotiationSession(scenario, mode = "simulation", hu
     mode: mode,
     human_role: humanRole,
     user_id: userId,
+    difficulty: difficulty,
+    ai_personality: aiPersonality,
     agents: scenario.agents.map((agent) => ({
       id: agent.id,
       name: agent.name,
       role: agent.role,
       persona: agent.personality || agent.persona || "Collaborative",
+      personality: agent.personality || agent.persona || "Collaborative",
       goals: Array.isArray(agent.goal) ? agent.goal : [agent.goal],
       constraints: agent.constraints.map((c) => {
         if (typeof c === "string") return c;
@@ -73,6 +84,82 @@ export async function submitPracticeTurn(negotiationId, offer, message = "", dec
   if (!response.ok) {
     const errText = await response.text();
     throw new Error(`Failed to submit human practice turn: ${errText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetches an intelligent tactical hint for Practice Mode based on session state.
+ * @param {string} negotiationId
+ */
+export async function fetchPracticeHint(negotiationId) {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/hint`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to fetch negotiation hint: ${errText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Parses natural language user input into structured negotiation variables.
+ * @param {string} negotiationId
+ * @param {string} message
+ * @param {string} [scenarioId]
+ */
+export async function parseNaturalLanguageOffer(negotiationId, message, scenarioId = null) {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/parse-message`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message,
+      scenario_id: scenarioId
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to parse natural language offer: ${errText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Fetches live multi-variable metrics for active negotiation.
+ * @param {string} negotiationId
+ */
+export async function fetchNegotiationMetrics(negotiationId) {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/metrics`);
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to fetch negotiation metrics: ${errText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Manually ends a practice negotiation session and computes transparent scorecard.
+ * @param {string} negotiationId
+ * @param {string} [outcome]
+ */
+export async function endPracticeSession(negotiationId, outcome = "manual_end") {
+  const response = await fetch(`${API_BASE_URL}/negotiations/${negotiationId}/end?outcome=${encodeURIComponent(outcome)}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Failed to end practice negotiation session: ${errText}`);
   }
 
   return await response.json();

@@ -21,9 +21,21 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
         <header className="border-b border-[#292831] pb-6 print:border-slate-900">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-base font-extrabold text-white print:text-slate-900">NEGOMIND AI</p>
-              <p className="mt-1 text-xs text-textSecondary print:text-slate-600">AI-Driven Multi-Agent Negotiation Training & Simulation Platform</p>
-              <p className="mt-5 text-[11px] font-mono font-bold uppercase tracking-widest text-slate-400">NEGOTIATION SUMMARY REPORT</p>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/logo-icon.png"
+                  alt="NegoMind Ai"
+                  className="h-9 w-9 rounded-xl object-contain bg-white p-0.5 shadow-md border border-white/10 shrink-0"
+                />
+                <div>
+                  <p className="text-base font-black text-white print:text-slate-900 tracking-tight">
+                    NegoMind <span className="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Ai</span>
+                  </p>
+                  <p className="text-[10px] font-bold text-indigo-400/90 tracking-wider uppercase">THINK &bull; NEGOTIATE &bull; GROW</p>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-textSecondary print:text-slate-600">AI-Driven Multi-Agent Negotiation Training & Simulation Platform</p>
+              <p className="mt-4 text-[11px] font-mono font-bold uppercase tracking-widest text-slate-400">NEGOTIATION SUMMARY REPORT</p>
               <h1 className="mt-1 text-2xl font-extrabold text-white print:text-slate-900">{report.scenarioName}</h1>
               <p className="mt-1 text-xs text-textSecondary print:text-slate-600">Mode: {report.mode} · Generated: {report.generatedAt}</p>
               <span className="mt-3 inline-flex rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-bold uppercase text-emerald-400">{report.statusLabel}</span>

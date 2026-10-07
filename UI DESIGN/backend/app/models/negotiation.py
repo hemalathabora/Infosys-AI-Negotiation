@@ -10,6 +10,7 @@ class NegotiationModel(Base):
     scenario_id = Column(String, nullable=False, default="vendor_pricing")
     mode = Column(String, nullable=True, default="simulation")
     human_role = Column(String, nullable=True)
+    difficulty = Column(String, nullable=True, default="Intermediate")
     current_round = Column(Integer, nullable=False, default=0)
     max_rounds = Column(Integer, nullable=False, default=8)
     current_agent_turn = Column(String, nullable=True)
@@ -18,9 +19,18 @@ class NegotiationModel(Base):
     current_offer_json = Column(Text, nullable=True)
     previous_offer_json = Column(Text, nullable=True)
     deadlock_info_json = Column(Text, nullable=True)
+    metrics_json = Column(Text, nullable=True)
     final_result = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    @property
+    def live_metrics(self):
+        return json.loads(self.metrics_json) if self.metrics_json else {}
+
+    @live_metrics.setter
+    def live_metrics(self, value):
+        self.metrics_json = json.dumps(value) if value is not None else None
 
     @property
     def participating_agents(self):

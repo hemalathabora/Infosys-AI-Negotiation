@@ -381,6 +381,22 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
             }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col justify-center">
+            {/* Brand Logo & Tagline */}
+            <div className="mb-6 flex items-center gap-3">
+              <img
+                src="/logo-icon.png"
+                alt="NegoMind Ai"
+                className="h-11 w-11 rounded-xl object-contain bg-white p-1 shadow-lg border border-white/10 shrink-0"
+              />
+              <div>
+                <span className="text-2xl font-black tracking-tight text-white">
+                  NegoMind <span className="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Ai</span>
+                </span>
+                <p className="text-[10px] font-bold text-indigo-400/90 tracking-widest uppercase">
+                  THINK &bull; NEGOTIATE &bull; GROW
+                </p>
+              </div>
+            </div>
 
             {/* Heading and tab switcher */}
             <div className="mb-6">
@@ -668,6 +684,17 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
           <div className="relative z-10 flex h-full flex-col justify-between p-10 xl:p-16">
 
             <div className="max-w-xl">
+              <div className="mb-6 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/10 p-2 pr-4 backdrop-blur-md shadow-xl">
+                <img
+                  src="/logo-icon.png"
+                  alt="NegoMind Ai"
+                  className="h-10 w-10 rounded-xl object-contain bg-white p-1 shadow-md"
+                />
+                <div>
+                  <p className="text-sm font-black text-white tracking-tight">NegoMind Ai</p>
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-indigo-300">Think • Negotiate • Grow</p>
+                </div>
+              </div>
 
               <p className="mb-4 text-xs font-black uppercase tracking-[0.3em] text-emerald-400">
                 Autonomous negotiation systems

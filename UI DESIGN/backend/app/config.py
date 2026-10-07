@@ -35,10 +35,21 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> List[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip() and origin.strip() != "*"]
 
     @property
     def smtp_enabled(self) -> bool:
         return bool(self.SMTP_USERNAME and self.SMTP_PASSWORD)
 
 settings = Settings()
+
+import re
+
+def mask_secrets(text: str) -> str:
+    if not text:
+        return text
+    # Mask postgres/database password: user:password@
+    masked = re.sub(r":([^:@/]+)@", r":***@", text)
+    # Mask Gemini / API key AIzaSy...
+    masked = re.sub(r"AIza[0-9A-Za-z-_]{30,}", "[REDACTED_API_KEY]", masked)
+    return masked

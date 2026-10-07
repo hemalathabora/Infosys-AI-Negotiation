@@ -1,11 +1,15 @@
-# NegoMind AI: AI-Driven Multi-Agent Negotiation Training & Simulation Platform
+<p align="center">
+  <img src="logo.png" alt="NegoMind Ai Logo" width="220" />
+</p>
 
-An academic and enterprise-grade multi-agent negotiation simulation and training platform featuring a **Python FastAPI backend**, **dual-mode reasoning engine** (Google Gemini LLM / OpenAI & Deterministic Rule Engine), **Role-Aware Concession Telemetry**, and a modern **React 19 + Vite frontend**.
+# NegoMind Ai: AI-Driven Multi-Agent Negotiation Training & Simulation Platform
+### *THINK • NEGOTIATE • GROW*
+
+An academic and enterprise-grade multi-agent negotiation simulation and training platform featuring a **Python FastAPI backend**, **dual-mode reasoning engine** (Google Gemini LLM / OpenAI & Deterministic Rule Engine), **Multi-Variable Trade-off Engine**, **AI Interactive Practice Mode**, **Role-Aware Concession Telemetry**, and a modern **React 19 + Vite frontend**.
 
 > 🔗 **GitHub Repository**: [https://github.com/hemalathabora/Infosys-AI-Negotiation](https://github.com/hemalathabora/Infosys-AI-Negotiation)
 
-
-> 🔗 **Deployment link**:https://negomind-ai.vercel.app/
+> 🔗 **Deployment link**: [https://negomind-ai.vercel.app/](https://negomind-ai.vercel.app/)
 
 ---
 
@@ -46,9 +50,12 @@ graph TD
 | **Practice Mode (Human vs AI)** | M3 | `backend/app/services/orchestrator.py`, `src/pages/NegotiationArena.jsx` | ✅ IMPLEMENTED | Interactive human-in-the-loop negotiation with input validation and AI counter-responses. |
 | **Concession Analytics Telemetry** | M3 | `backend/app/services/concession_tracking.py` | ✅ IMPLEMENTED | Single-source math engine calculating step size, step %, cumulative decay, ZOPA, and capacity. |
 | **Deadlock Detection & Resolution** | M3 | `backend/app/services/deadlock_detection.py` | ✅ IMPLEMENTED | Stagnation detection, repeated offer checks, non-overlapping constraint breakdown, and suggestion logic. |
+| **Multi-Variable Trade-off Engine** | Advanced | `backend/app/services/tradeoff_engine.py`, `backend/app/schemas/tradeoff.py` | ✅ IMPLEMENTED | Multi-variable package calculations, Pareto efficiency optimization, weight balancing, and boundary guardrails. |
+| **AI Interactive Practice Mode** | Advanced | `backend/app/services/practice_service.py`, `src/pages/NegotiationArena.jsx` | ✅ IMPLEMENTED | Real-time human turn execution, natural language offer parsing, adaptive difficulty levels (Beginner to Expert), and coaching feedback. |
+| **Brand Identity & Visual Assets** | Design | `public/logo.png`, `src/components/TopNavigation.jsx` | ✅ IMPLEMENTED | Official NegoMind Ai logo (*Think • Negotiate • Grow*) integrated into navigation, auth, reports, landing page, and favicon. |
 | **Outcome Screen & Session Summary** | M4 | `src/components/OutcomeScreen.jsx` | ✅ IMPLEMENTED | Visual breakdown of agreement terms, round count, transcript, and concession trajectory. |
 | **Report Generation & Export** | M4 | `src/pages/Reports.jsx`, `src/services/negotiationReport.js` | ✅ IMPLEMENTED | Comprehensive report layout supporting browser print-to-PDF export (`window.print()`). |
-| **Automated Test Suite** | M4 | `backend/tests/` | ✅ IMPLEMENTED | 62 passing pytest tests verifying all 4 milestones. |
+| **Automated Test Suite** | Full System | `backend/tests/` | ✅ IMPLEMENTED | **120 passing pytest tests (100% pass rate)** verifying all system engines and API flows. |
 | **Production Deployment Setup** | M4 | `backend/render.yaml`, `vercel.json` | ✅ IMPLEMENTED | Verified Render backend spec, Vercel frontend config, and Supabase PostgreSQL driver support. |
 
 ---
@@ -140,6 +147,37 @@ flowchart TD
 - **Rate of Concession Decay**: $\frac{\text{Avg(Early Concessions)} - \text{Avg(Recent Concessions)}}{\text{Avg(Early Concessions)}} \times 100\%$.
 - **Remaining Concession Capacity**: Distance from current offer to agent's hard constraint limit.
 - **ZOPA (Zone of Possible Agreement)**: Overlap between Buyer Maximum Limit and Vendor Minimum Floor ($\text{Max}_{\text{Buyer}} - \text{Min}_{\text{Vendor}}$).
+
+---
+
+## 🔄 Multi-Variable Trade-off Engine
+
+Negotiations in the real world rarely hinge on a single number. NegoMind Ai incorporates an analytical **Multi-Variable Trade-off Engine** (`backend/app/services/tradeoff_engine.py`) that models complex deals involving price, delivery schedules, payment terms, warranties, and scope.
+
+### Key Capabilities
+- **Multi-Issue Variable Modeling**: Automatically configures issue definitions per scenario (e.g., Price, Delivery Days, Payment Terms, Warranty Months).
+- **Weighted Multi-Attribute Utility Function**: Calculates total offer utility ($U \in [0.0, 1.0]$) using normalized weights:
+  $$U(\vec{x}) = \sum_{i} w_i \cdot u_i(x_i)$$
+- **Hard Constraints vs. Soft Preferences**: Hard boundaries strictly enforce feasibility (e.g. buyer maximum budget, seller minimum price), while soft attributes impact utility without automatically breaking the negotiation.
+- **Give-and-Take Trade-off Detection**: Compares consecutive offers to classify whether a movement is a **Pareto Trade-off** (conceding on one variable to gain on another), a **Pure Concession**, or a **Stance Hardening**.
+- **Pareto Efficiency Suggestions**: Recommends win-win package adjustments that increase or preserve utility for both agents.
+
+---
+
+## 🎮 AI Interactive Practice Mode
+
+The **AI Interactive Practice Arena** (`backend/app/services/practice_service.py` & `src/pages/NegotiationArena.jsx`) enables users to hone real-world negotiation skills against reactive AI counterparts.
+
+### Key Capabilities
+- **Natural Language Parsing**: Translates human statements (e.g., *"I can do $46,000 if you deliver in 14 days"*) into structured multi-variable offers via regex heuristics and LLM inference.
+- **Adaptive Difficulty Levels**:
+  - `Beginner`: AI makes generous concessions (40–60%) and readily accepts balanced trade-offs.
+  - `Intermediate`: Realistic pacing (20–35% concessions) requiring value exchange.
+  - `Advanced`: Tougher stance (10–20% concessions) holding firm on critical variables.
+  - `Expert`: Uncompromising (5–10% concessions), aggressively claims surplus, exploits weak positions.
+- **Dynamic AI Counteroffers**: AI personas (Aggressive, Collaborative, Risk-Averse) dynamically calculate package counteroffers based on opponent trade-offs.
+- **In-Session Coaching Hints**: Provides actionable strategic advice (`/api/negotiations/{id}/hint`) analyzing ZOPA capacity, concession momentum, and leverage.
+- **Performance Scorecard**: Evaluates sessions across Deal Efficiency, Value Claimed, Trade-off Agility, and Strategy Adherence (0–100%).
 
 ---
 
@@ -335,23 +373,27 @@ python -m pytest tests -v
 ```
 
 ### Test Suite Execution Summary
-- **Total Tests**: 62
-- **Status**: 62 Passed (100% pass rate)
-- **Execution Time**: ~5.4 seconds
+- **Total Tests**: 120
+- **Status**: 120 Passed (100% pass rate)
+- **Execution Time**: ~3.2 seconds
 
 | Area / Module | Test Count | Status |
 | :--- | :---: | :---: |
+| Multi-Variable Trade-off Engine (`test_tradeoff_engine.py`) | 11 | PASSED |
+| Interactive AI Practice Arena (`test_interactive_practice.py`) | 16 | PASSED |
+| Google OAuth Flow & Account Linking (`test_google_oauth.py`) | 16 | PASSED |
+| Health & System Diagnostics (`test_health.py`) | 7 | PASSED |
+| Practice Mode Baseline (`test_practice_mode.py`) | 12 | PASSED |
+| Concession Telemetry & ZOPA (`test_concession_tracking.py`) | 13 | PASSED |
+| Milestone 3 Orchestration & Deadlock (`test_milestone3.py`) | 10 | PASSED |
+| Offer Evaluation Logic (`test_offer_evaluation.py`) | 6 | PASSED |
+| Reasoning & Guardrails (`test_reasoning.py`) | 4 | PASSED |
+| Multi-Round Simulation (`test_multi_round_vendor_pricing.py`) | 4 | PASSED |
+| Auth & User Avatar (`test_auth_avatar.py`) | 4 | PASSED |
 | Agent Profile API (`test_agents.py`) | 3 | PASSED |
+| Analytics & Guide Bot (`test_analytics_and_guide.py`) | 3 | PASSED |
 | Session State (`test_negotiation.py`) | 2 | PASSED |
 | Turn Execution (`test_orchestrator.py`) | 1 | PASSED |
-| Reasoning & Guardrails (`test_reasoning.py`) | 4 | PASSED |
-| Offer Evaluation (`test_offer_evaluation.py`) | 6 | PASSED |
-| Concession Telemetry (`test_concession_tracking.py`) | 13 | PASSED |
-| Practice Mode (`test_practice_mode.py`) | 12 | PASSED |
-| Milestone 3 Integration (`test_milestone3.py`) | 10 | PASSED |
-| Multi-Round Simulation (`test_multi_round_vendor_pricing.py`) | 4 | PASSED |
-| Analytics & Guide Bot (`test_analytics_and_guide.py`) | 3 | PASSED |
-| Auth & User Avatar (`test_auth_avatar.py`) | 4 | PASSED |
 
 ---
 

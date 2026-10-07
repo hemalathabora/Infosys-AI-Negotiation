@@ -71,27 +71,35 @@ export default function TopNavigation({
   };
 
   return (
-    <header className="relative z-50 border-b border-[#3B3B39] bg-[#191A1C]/95 text-[#E8E3D8] backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
-        {/* Brand / Logo */}
-        <a href="#top" onClick={handleLogoClick} className="group flex items-center gap-3 cursor-pointer select-none">
-          <span className="flex h-9 w-9 items-center justify-center border border-[#C7C1B5]/30 bg-[#E8E3D8] p-1.5 transition-transform duration-300 group-hover:rotate-3">
-            <img
-              src="/logo-icon.png"
-              alt="NegoMind Ai"
-              className="h-full w-full object-contain"
-            />
-          </span>
+    <header className="sticky top-0 z-30 flex flex-col transition-colors duration-200">
+      {/* Top Navbar Main Header */}
+      <div
+        className={`flex h-16 items-center justify-between border-b px-3 sm:px-6 ${
+          isDark
+            ? "border-[#1F1E26] bg-[#0C0C0F]"
+            : "border-slate-200 bg-white"
+        }`}
+      >
+        {/* Left side - Logo & Project Title */}
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => onNavigate && onNavigate(isAuthenticated ? "Dashboard" : "Landing")}
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1 shadow-md border border-white/10 overflow-hidden group-hover:scale-105 transition-transform">
+            <img src="/logo-icon.png" alt="NegoMind AI" className="h-full w-full object-contain" />
+          </div>
 
-          <span className="leading-none">
-            <span className="block text-[12px] font-bold uppercase tracking-[0.22em] text-[#E8E3D8]">
-              NegoMind
-            </span>
-            <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.18em] text-[#96938B]">
-              Negotiation intelligence
-            </span>
-          </span>
-        </a>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <p className={`text-base font-black tracking-tight font-sans ${isDark ? "text-white" : "text-slate-900"}`}>
+                NegoMind <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 font-black">Ai</span>
+              </p>
+            </div>
+            <p className={`text-[10px] font-semibold tracking-wider hidden md:block ${isDark ? "text-[#71707E]" : "text-slate-500"}`}>
+              THINK • NEGOTIATE • GROW
+            </p>
+          </div>
+        </div>
 
         {/* Center Navigation Links */}
         <nav className="hidden items-center gap-8 lg:flex">

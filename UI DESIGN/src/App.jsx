@@ -154,9 +154,9 @@ function MainAppContent() {
         return (
           <div data-guide="agent-configuration-shell" className="flex-1">
             <AgentConfiguration
-              onNegotiationStart={async (scenario, mode, humanRole, maxRounds) => {
+              onNegotiationStart={async (scenario, mode, humanRole, maxRounds, difficulty, aiPersonality) => {
                 setActiveScenario(scenario);
-                await negotiation.start(scenario, mode, humanRole, userId, maxRounds);
+                await negotiation.start(scenario, mode, humanRole, userId, maxRounds, difficulty, aiPersonality);
                 setActivePage("Negotiation Arena");
               }}
               onNegotiationReset={negotiation.reset}

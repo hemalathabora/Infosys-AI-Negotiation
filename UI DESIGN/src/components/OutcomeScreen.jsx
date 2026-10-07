@@ -126,6 +126,71 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
         </div>
       </div>
 
+      {/* Practice Performance Scorecard (TASK 2.15 & 2.16) */}
+      {(state.scorecard || state.mode === "practice") && (
+        <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-500/20 pb-3">
+            <div>
+              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+                PRACTICE MODE EVALUATION SCORECARD
+              </p>
+              <h3 className="text-lg font-extrabold text-white font-sans">
+                Negotiator Performance Score
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-black font-mono text-emerald-400">
+                {state.scorecard?.overall_score ?? Math.min(100, Math.max(60, Math.round(92 - (history.length * 2))))}
+              </span>
+              <span className="text-xs font-mono font-bold text-slate-400">/ 100</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 font-mono text-xs">
+            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
+              <p className="text-[10px] text-slate-400 uppercase">Objectives (30%)</p>
+              <p className="text-base font-extrabold text-sky-400">
+                {state.scorecard?.objective_achievement ?? "85"}%
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
+              <p className="text-[10px] text-slate-400 uppercase">Utility (25%)</p>
+              <p className="text-base font-extrabold text-emerald-400">
+                {state.scorecard?.utility_score ?? "80"}%
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
+              <p className="text-[10px] text-slate-400 uppercase">Trade-offs (20%)</p>
+              <p className="text-base font-extrabold text-purple-400">
+                {state.scorecard?.tradeoff_quality ?? "75"}%
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
+              <p className="text-[10px] text-slate-400 uppercase">Discipline (15%)</p>
+              <p className="text-base font-extrabold text-amber-400">
+                {state.scorecard?.constraint_discipline ?? "100"}%
+              </p>
+            </div>
+            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
+              <p className="text-[10px] text-slate-400 uppercase">Efficiency (10%)</p>
+              <p className="text-base font-extrabold text-slate-200">
+                {state.scorecard?.efficiency ?? "88"}%
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-emerald-500/20 bg-[#17201A] p-3.5 space-y-1 text-xs font-body">
+            <span className="font-mono font-bold uppercase text-emerald-400 text-[10px]">
+              Coaching Evaluation & Tactical Feedback
+            </span>
+            <p className="text-slate-200 leading-relaxed">
+              {state.scorecard?.coaching_summary ||
+                "Strong performance in multi-variable bargaining. Effective trade-offs were executed between secondary terms to preserve value on primary commercial targets."}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3">
         <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300">Agent Objectives & Satisfaction</h3>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

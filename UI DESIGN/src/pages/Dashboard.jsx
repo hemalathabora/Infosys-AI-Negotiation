@@ -147,35 +147,115 @@ export default function Dashboard({
               <button
                 type="button"
                 onClick={onClearHistory}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[#522026] bg-[#35161B] px-3.5 py-2 text-xs font-medium text-[#F87171] hover:bg-[#451B21] transition"
+                className="inline-flex justify-center items-center gap-1.5 rounded-sm border border-[#522026] bg-[#35161B] px-3.5 py-2 text-xs font-medium text-[#F87171] hover:bg-[#451B21] transition"
               >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                 </svg>
                 Reset Engine History
               </button>
 
               <button
-                type="button"
-                onClick={() => onNavigate("Configure Agents")}
-                className="
-                  inline-flex items-center gap-2
-                  rounded-xl
-                  bg-slate-100 hover:bg-white
-                  px-4 py-2
-                  text-xs sm:text-sm
-                  font-bold
-                  text-slate-950
-                  border border-slate-200
-                  shadow-md
-                  transition-all
-                  duration-150
-                  active:scale-95
-                "
-              >
-                <span className="text-base font-bold">+</span>
-                Configure New Session
-              </button>
+  type="button"
+  onClick={() => onNavigate("Configure Agents")}
+  className="
+    group relative
+    inline-flex items-center gap-2
+    overflow-hidden
+    rounded-sm
+    bg-slate-100 hover:bg-white
+    px-4 py-2
+    text-xs sm:text-sm
+    font-bold
+    text-slate-950
+    border border-slate-200
+    shadow-md
+
+    transition-all duration-300 ease-out
+    hover:-translate-y-1
+    hover:shadow-[0_8px_25px_rgba(255,255,255,0.18)]
+    active:translate-y-0
+    active:scale-[0.97]
+  "
+>
+  {/* Animated shine */}
+  <span
+    className="
+      pointer-events-none
+      absolute inset-0
+      -translate-x-full
+      bg-gradient-to-r
+      from-transparent
+      via-white/70
+      to-transparent
+      skew-x-[-20deg]
+      transition-transform duration-700
+      group-hover:translate-x-full
+    "
+  />
+
+  {/* Animated glow */}
+  <span
+    className="
+      pointer-events-none
+      absolute -inset-1
+      rounded-sm
+      bg-white/20
+      opacity-0
+      blur-md
+      transition-opacity duration-300
+      group-hover:opacity-100
+    "
+  />
+
+  {/* Icon */}
+  <span
+    className="
+      relative z-10
+      flex h-5 w-5
+      items-center justify-center
+      rounded-full
+      bg-slate-950
+      text-slate-100
+      text-sm
+
+      transition-all duration-300
+      group-hover:rotate-90
+      group-hover:scale-110
+      group-hover:shadow-[0_0_10px_rgba(15,23,42,0.5)]
+    "
+  >
+    +
+  </span>
+
+  {/* Text */}
+  <span
+    className="
+      relative z-10
+      transition-all duration-300
+      group-hover:tracking-wide
+    "
+  >
+    Configure New Session
+  </span>
+
+  {/* Arrow */}
+  <span
+    className="
+      relative z-10
+      ml-0
+      -translate-x-1
+      opacity-0
+      transition-all duration-300
+
+      group-hover:translate-x-0
+      group-hover:opacity-100
+    "
+  >
+    →
+  </span>
+</button>
+              
             </div>
           </div>
         </div>
@@ -188,7 +268,7 @@ export default function Dashboard({
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
 
           {/* Total Simulations */}
-          <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-indigo-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-indigo-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-indigo-500 to-blue-500" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -208,7 +288,7 @@ export default function Dashboard({
 
 
           {/* Agreement Rate */}
-          <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -228,7 +308,7 @@ export default function Dashboard({
 
 
           {/* Active Deadlocks */}
-          <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-500 to-orange-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -248,7 +328,7 @@ export default function Dashboard({
 
 
           {/* Efficiency Metric */}
-          <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-blue-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-blue-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 to-cyan-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import NegoMindLogo from "../components/NegoMindLogo";
 
 const navLinks = [
   { label: "Product", href: "#product" },
@@ -22,26 +23,7 @@ const photos = {
 };
 
 function Logo() {
-  return (
-    <a href="#top" className="group flex items-center gap-3">
-      <span className="flex h-9 w-9 items-center justify-center border border-[#C7C1B5]/30 bg-[#E8E3D8] p-1.5 transition-transform duration-300 group-hover:rotate-3">
-        <img
-          src="/logo-icon.png"
-          alt="NegoMind Ai"
-          className="h-full w-full object-contain"
-        />
-      </span>
-
-      <span className="leading-none">
-        <span className="block text-[12px] font-bold uppercase tracking-[0.22em] text-[#E8E3D8]">
-          NegoMind
-        </span>
-        <span className="mt-1 block font-mono text-[9px] uppercase tracking-[0.18em] text-[#96938B]">
-          Negotiation intelligence
-        </span>
-      </span>
-    </a>
-  );
+  return <NegoMindLogo size={42} />;
 }
 
 function Arrow({ className = "" }) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import UserProfileDropdown from "./UserProfileDropdown";
+import NegoMindLogo from "./NegoMindLogo";
 
 const navLinks = [
   { label: "Product", href: "#product" },
@@ -12,13 +13,14 @@ const navLinks = [
 export default function TopNavigation({
   onMenuToggle,
   isMenuOpen,
-  theme,
+  theme = "dark",
   onThemeChange,
   activePage,
   onNavigate,
   onReplayIntro,
   onOpenAuthModal,
 }) {
+  const isDark = theme === "dark" || theme !== "light";
   const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -71,35 +73,10 @@ export default function TopNavigation({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex flex-col transition-colors duration-200">
-      {/* Top Navbar Main Header */}
-      <div
-        className={`flex h-16 items-center justify-between border-b px-3 sm:px-6 ${
-          isDark
-            ? "border-[#1F1E26] bg-[#0C0C0F]"
-            : "border-slate-200 bg-white"
-        }`}
-      >
-        {/* Left side - Logo & Project Title */}
-        <div
-          className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => onNavigate && onNavigate(isAuthenticated ? "Dashboard" : "Landing")}
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1 shadow-md border border-white/10 overflow-hidden group-hover:scale-105 transition-transform">
-            <img src="/logo-icon.png" alt="NegoMind AI" className="h-full w-full object-contain" />
-          </div>
-
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className={`text-base font-black tracking-tight font-sans ${isDark ? "text-white" : "text-slate-900"}`}>
-                NegoMind <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 font-black">Ai</span>
-              </p>
-            </div>
-            <p className={`text-[10px] font-semibold tracking-wider hidden md:block ${isDark ? "text-[#71707E]" : "text-slate-500"}`}>
-              THINK • NEGOTIATE • GROW
-            </p>
-          </div>
-        </div>
+    <header className="sticky top-0 z-50 border-b border-[#3B3B39] bg-[#191A1C]/95 text-[#E8E3D8] backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
+        {/* Brand / Logo */}
+        <NegoMindLogo size={42} onClick={handleLogoClick} />
 
         {/* Center Navigation Links */}
         <nav className="hidden items-center gap-8 lg:flex">

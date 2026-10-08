@@ -82,7 +82,7 @@ export default function TopNavigation({
   };
 
   return (
-    <header className="sticky top-0 z-50 flex flex-col border-b border-[#3B3B39] bg-[#191A1C]/95 text-[#E8E3D8] backdrop-blur-md">
+    <header className="sticky top-0 z-50 flex flex-col border-b border-[#26242C] bg-[#0C0C0F]/90 text-[#F8FAFC] backdrop-blur-md">
       {/* Top Navbar Main Header */}
       <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
         {/* Left Side - Brand / Logo */}
@@ -98,7 +98,7 @@ export default function TopNavigation({
                 key={link.label}
                 href={link.page ? "#" : link.href}
                 onClick={(e) => handleNavClick(e, link)}
-                className="relative py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA79E] transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#E8E3D8] after:transition-all hover:text-[#E8E3D8] hover:after:w-full"
+                className="relative py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-slate-100 after:transition-all hover:text-slate-100 hover:after:w-full"
               >
                 {link.label}
               </a>
@@ -118,7 +118,7 @@ export default function TopNavigation({
             <button
               type="button"
               onClick={handleSignInClick}
-              className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#AAA79E] transition-colors hover:text-[#E8E3D8] cursor-pointer"
+              className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 transition-colors hover:text-slate-100 cursor-pointer"
             >
               Sign in
             </button>
@@ -129,7 +129,7 @@ export default function TopNavigation({
             <button
               type="button"
               onClick={handleWorkspaceClick}
-              className="group inline-flex items-center justify-center gap-3 border border-[#E8E3D8] bg-[#E8E3D8] px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#191A1C] transition-all duration-300 hover:bg-[#FFFFFF] active:translate-y-px cursor-pointer"
+              className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950 transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] active:translate-y-px cursor-pointer"
             >
               <span>Enter the workspace</span>
               <span className="inline-block text-base leading-none transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
@@ -147,17 +147,17 @@ export default function TopNavigation({
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-[#4B4A45] bg-[#191A1C]"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-[#302F39] bg-[#16151A]"
           >
-            <span className="h-px w-4 bg-[#E8E3D8]" />
-            <span className="h-px w-4 bg-[#E8E3D8]" />
+            <span className="h-px w-4 bg-slate-200" />
+            <span className="h-px w-4 bg-slate-200" />
           </button>
         </div>
       </div>
 
       {/* Sub-Navbar Breadcrumb & Menu Bar (Below Main Navbar for Logged In Users) */}
       {isAuthenticated && (
-        <div className="border-t border-[#3B3B39] bg-[#141517] px-5 sm:px-8 lg:px-12 text-[#E8E3D8]">
+        <div className="border-t border-[#26242C] bg-[#121116] px-5 sm:px-8 lg:px-12 text-[#F8FAFC]">
           <div className="mx-auto flex h-11 max-w-[1500px] items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Menu Toggle Button */}
@@ -166,8 +166,8 @@ export default function TopNavigation({
                   type="button"
                   onClick={onMenuToggle}
                   className={`group inline-flex items-center gap-2 border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer ${isMenuOpen
-                      ? "border-[#E8E3D8] bg-[#E8E3D8] text-[#191A1C]"
-                      : "border-[#4B4A45] bg-[#222326] text-[#AAA79E] hover:border-[#E8E3D8] hover:text-[#E8E3D8]"
+                      ? "border-slate-200 bg-slate-100 text-slate-950"
+                      : "border-[#302F39] bg-[#1B1A22] text-slate-300 hover:border-[#424050] hover:bg-[#23212C] hover:text-slate-100"
                     }`}
                   title="Toggle Dashboard Navigation Menu"
                 >
@@ -181,16 +181,16 @@ export default function TopNavigation({
               )}
 
               {/* Breadcrumb Navigation Path */}
-              <div className="flex items-center gap-2 font-mono text-[11px] text-[#8E8B83]">
-                <span className="text-[#AAA79E]">NegoMind</span>
-                <span className="text-[#565852]">/</span>
-                <span className="font-bold text-[#E8E3D8] uppercase tracking-wider">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
+                <span className="text-slate-400">NegoMind</span>
+                <span className="text-slate-600">/</span>
+                <span className="font-bold text-slate-100 uppercase tracking-wider">
                   {activePage || "Dashboard"}
                 </span>
               </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#777A74]">
+            <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>System Control Hub</span>
             </div>
@@ -200,9 +200,9 @@ export default function TopNavigation({
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#3B3B39] bg-[#191A1C] px-5 py-5 lg:hidden">
+        <div className="border-t border-[#26242C] bg-[#121116] px-5 py-5 lg:hidden">
           {!isAuthenticated && (
-            <nav className="flex flex-col gap-4 mb-5 border-b border-[#3B3B39] pb-4">
+            <nav className="flex flex-col gap-4 mb-5 border-b border-[#26242C] pb-4">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -211,7 +211,7 @@ export default function TopNavigation({
                     setMobileMenuOpen(false);
                     handleNavClick(e, link);
                   }}
-                  className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#AAA79E] hover:text-[#E8E3D8]"
+                  className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400 hover:text-slate-100"
                 >
                   {link.label}
                 </a>
@@ -229,7 +229,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       onMenuToggle();
                     }}
-                    className="flex items-center gap-2 border border-[#4B4A45] bg-[#222326] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-[#E8E3D8]"
+                    className="flex items-center gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-100"
                   >
                     <span>Dashboard Menu</span>
                   </button>
@@ -247,7 +247,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleSignInClick();
                     }}
-                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#AAA79E] hover:text-[#E8E3D8]"
+                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 hover:text-slate-100"
                   >
                     Sign in
                   </button>
@@ -258,7 +258,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleWorkspaceClick();
                     }}
-                    className="group inline-flex items-center justify-center gap-3 border border-[#E8E3D8] bg-[#E8E3D8] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#191A1C]"
+                    className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950"
                   >
                     <span>Enter workspace</span>
                     <span>↗</span>
@@ -348,8 +348,8 @@ function LlmStatusBadge() {
 
   if (status.loading) {
     return (
-      <div className="inline-flex items-center rounded-md gap-2 border border-[#4B4A45] bg-[#222326] px-3 py-1.5 text-[10px] font-mono font-bold text-[#AAA79E]">
-        <span className="h-1.5 w-1.5 rounded-full bg-[#AAA79E] animate-pulse" />
+      <div className="inline-flex items-center rounded-md gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[10px] font-mono font-bold text-slate-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-pulse" />
         Engine...
       </div>
     );
@@ -364,23 +364,23 @@ function LlmStatusBadge() {
       title={isOn ? "Gemini LLM is Active. Click to turn OFF." : "Normal Mode is Active. Click to turn Gemini LLM ON."}
       className={`group inline-flex items-center rounded-md gap-2.5 border px-3 py-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer ${isOn
           ? "border-emerald-500/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
-          : "border-[#4B4A45] bg-[#222326] text-[#AAA79E] hover:border-[#8E8B83] hover:text-[#E8E3D8]"
+          : "border-[#302F39] bg-[#1B1A22] text-slate-400 hover:border-[#424050] hover:text-slate-100"
         }`}
     >
       <div className="flex items-center gap-2">
-        <span className={`h-2 w-2 rounded-full ${isOn ? "bg-emerald-400 animate-pulse" : "bg-[#8E8B83]"}`} />
+        <span className={`h-2 w-2 rounded-full ${isOn ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
         <span className="font-sans font-bold uppercase tracking-[0.14em]">
           {isOn ? "Gemini LLM" : "Normal Mode"}
         </span>
       </div>
 
-      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${isOn ? "bg-emerald-500" : "bg-[#4B4A45]"
+      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${isOn ? "bg-emerald-500" : "bg-[#302F39]"
         }`}>
         <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-200 ${isOn ? "translate-x-3" : "translate-x-0"
           }`} />
       </div>
 
-      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${isOn ? "text-emerald-400" : "text-[#AAA79E]"
+      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${isOn ? "text-emerald-400" : "text-slate-400"
         }`}>
         {isOn ? "ON" : "OFF"}
       </span>

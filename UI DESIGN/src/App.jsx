@@ -12,11 +12,17 @@ import NegotiationArena from "./pages/NegotiationArena";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
 import AuthPage from "./pages/AuthPage";
+import AboutPage from "./pages/AboutPage.jsx";
+import Footer from "./components/Footer.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 import NegotiationScenariosView from "./components/scenarios/NegotiationScenariosView";
 import GuideBot from "./components/GuideBot.jsx";
 import { useNegotiationEngine } from "./hooks/useNegotiationEngine.js";
 import { useNegotiationHistory } from "./hooks/useNegotiationHistory.js";
+import ContactPage from "./pages/ContactPage.jsx";
+import PrivacyPage from "./pages/PrivacyPage.jsx";
+import TermsPage from "./pages/TermsPage.jsx";
+import PolicyPage from "./pages/PolicyPage.jsx";
 
 export default function App() {
   const isOauthCallback = Boolean(window.opener) && (
@@ -121,9 +127,19 @@ function MainAppContent() {
       case "Landing":
         return <LandingPage onNavigate={setActivePage} />;
 
+      case "About":
+        return <AboutPage onNavigate={setActivePage} />;
+      case "ContactPage":
+        return <ContactPage onNavigate={setActivePage} />;
+      case "PrivacyPage":
+        return <PrivacyPage onNavigate={setActivePage} />;
+      case "TermsPage":
+        return <TermsPage onNavigate={setActivePage} />;
+      case "PolicyPage":
+        return <PolicyPage onNavigate={setActivePage} />;
       case "Dashboard":
         return (
-          <div data-guide="dashboard-shell" className="min-h-0 flex-1">
+          <div data-guide="dashboard-shell" className="w-full flex-1">
             <Dashboard
               onNavigate={setActivePage}
               activeScenario={activeScenario}
@@ -134,8 +150,6 @@ function MainAppContent() {
             />
           </div>
         );
-
-      case "Negotiation Scenarios":
       case "Scenarios":
         return (
           <div data-guide="scenarios-shell" className="flex-1 overflow-y-auto">
@@ -203,7 +217,7 @@ function MainAppContent() {
 
       default:
         return isAuthenticated ? (
-          <div data-guide="dashboard-shell" className="min-h-0 flex-1">
+          <div data-guide="dashboard-shell" className="w-full flex-1">
             <Dashboard
               onNavigate={setActivePage}
               activeScenario={activeScenario}
@@ -224,77 +238,72 @@ function MainAppContent() {
   ============================================================ */
 
   return (
-    <div
-      className={`
-        flex
-        h-screen
-        w-full
-        flex-col
-        overflow-hidden
-        transition-colors
-        duration-200
-        ${
-          isDark
-            ? "bg-[#0B0F17] text-[#F8FAFC]"
-            : "bg-[#F8FAFC] text-[#0F172A]"
-        }
-      `}
-    >
-      {showLoader && (
-        <CinematicLoader
-          key={loaderKey}
-          onComplete={() => setShowLoader(false)}
-        />
-      )}
+  <div
+    className={`
+      min-h-screen
+      w-full
+      bg-[#0C0C0F]
+      transition-colors
+      duration-200
+      ${
+        isDark
+          ? "text-[#F8FAFC]"
+          : "text-[#0F172A]"
+      }
+    `}
+  >
+    {showLoader && (
+      <CinematicLoader
+        key={loaderKey}
+        onComplete={() => setShowLoader(false)}
+      />
+    )}
 
-      {/* ======================================================
-          TOP NAVIGATION
-      ======================================================= */}
+    {/* Navbar */}
+    <header className="print:hidden">
+      <TopNavigation
+        onMenuToggle={() => setSidebarOpen((value) => !value)}
+        isMenuOpen={sidebarOpen}
+        theme={theme}
+        onThemeChange={setTheme}
+        activePage={activePage}
+        onNavigate={setActivePage}
+        onReplayIntro={handleReplayIntro}
+        onOpenAuthModal={handleOpenAuthModal}
+      />
+    </header>
 
-      <header className="shrink-0 print:hidden">
-        <TopNavigation
-          onMenuToggle={() => setSidebarOpen((value) => !value)}
-          isMenuOpen={sidebarOpen}
-          theme={theme}
-          onThemeChange={setTheme}
-          activePage={activePage}
-          onNavigate={setActivePage}
-          onReplayIntro={handleReplayIntro}
-          onOpenAuthModal={handleOpenAuthModal}
-        />
-      </header>
+    {/* Sidebar */}
+    {isAuthenticated && (
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        activePage={activePage}
+        onNavigate={setActivePage}
+        stats={stats}
+        history={history}
+        activeScenario={activeScenario}
+        negotiation={negotiation}
+        onClearHistory={clearHistory}
+        onReplayIntro={handleReplayIntro}
+      />
+    )}
 
-      {/* ======================================================
-          STAGGERED MENU OVERLAY (FOR LOGGED IN USERS)
-      ======================================================= */}
+    {/* Page */}
+    <main className="w-full bg-[#0C0C0F]">
+      {renderPage()}
+    </main>
 
-      {isAuthenticated && (
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          activePage={activePage}
-          onNavigate={setActivePage}
-          stats={stats}
-          history={history}
-          activeScenario={activeScenario}
-          negotiation={negotiation}
-          onClearHistory={clearHistory}
-          onReplayIntro={handleReplayIntro}
-        />
-      )}
+    {/* Footer */}
+    <Footer onNavigate={setActivePage} />
 
-      {/* ======================================================
-          MAIN PAGE CONTENT AREA
-      ======================================================= */}
-
-      <div className="flex min-h-0 flex-1 overflow-hidden bg-[#0C0C0F]">
-        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
-          {renderPage()}
-        </div>
-      </div>
-
-      {/* Floating AI Guide Bot & General AI Chatbot Assistant */}
-      <GuideBot currentPage={activePage} negotiationId={negotiation?.state?.negotiation_id} />
-    </div>
-  );
+    {/* Guide Bot */}
+    {isAuthenticated && (
+      <GuideBot
+        currentPage={activePage}
+        negotiationId={negotiation?.state?.negotiation_id}
+      />
+    )}
+  </div>
+);
 }

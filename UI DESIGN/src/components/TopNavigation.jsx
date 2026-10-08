@@ -7,7 +7,7 @@ const navLinks = [
   { label: "Product", href: "#product" },
   { label: "Method", href: "#method" },
   { label: "Practice", href: "#practice" },
-  { label: "About", href: "#about" },
+  { label: "About", page: "About" },
 ];
 
 export default function TopNavigation({
@@ -24,18 +24,27 @@ export default function TopNavigation({
   const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavClick = (e, href) => {
+  const handleNavClick = (e, link) => {
     e.preventDefault();
+    if (link.page) {
+      if (onNavigate) {
+        onNavigate(link.page);
+      }
+
+      setMobileMenuOpen(false);
+      return;
+    }
+
     if (activePage !== "Landing") {
       if (onNavigate) onNavigate("Landing");
       setTimeout(() => {
-        const element = document.querySelector(href);
+        const element = document.querySelector(link.href);
         if (element) {
           element.scrollIntoView({ behavior: "smooth" });
         }
       }, 120);
     } else {
-      const element = document.querySelector(href);
+      const element = document.querySelector(link.href);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
       }
@@ -78,7 +87,7 @@ export default function TopNavigation({
       <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
         {/* Left Side - Brand / Logo */}
         <div className="flex items-center gap-4">
-          <NegoMindLogo size={44} onClick={handleLogoClick} />
+          <NegoMindLogo size={44} onClick={handleLogoClick} onNavigate={onNavigate} />
         </div>
 
         {/* Center Navigation Links - ONLY shown when NOT logged in */}
@@ -87,8 +96,8 @@ export default function TopNavigation({
             {navLinks.map((link) => (
               <a
                 key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
+                href={link.page ? "#" : link.href}
+                onClick={(e) => handleNavClick(e, link)}
                 className="relative py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#AAA79E] transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#E8E3D8] after:transition-all hover:text-[#E8E3D8] hover:after:w-full"
               >
                 {link.label}
@@ -156,11 +165,10 @@ export default function TopNavigation({
                 <button
                   type="button"
                   onClick={onMenuToggle}
-                  className={`group inline-flex items-center gap-2 border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer ${
-                    isMenuOpen
+                  className={`group inline-flex items-center gap-2 border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer ${isMenuOpen
                       ? "border-[#E8E3D8] bg-[#E8E3D8] text-[#191A1C]"
                       : "border-[#4B4A45] bg-[#222326] text-[#AAA79E] hover:border-[#E8E3D8] hover:text-[#E8E3D8]"
-                  }`}
+                    }`}
                   title="Toggle Dashboard Navigation Menu"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -198,10 +206,10 @@ export default function TopNavigation({
               {navLinks.map((link) => (
                 <a
                   key={link.label}
-                  href={link.href}
+                  href={link.page ? "#" : link.href}
                   onClick={(e) => {
                     setMobileMenuOpen(false);
-                    handleNavClick(e, link.href);
+                    handleNavClick(e, link);
                   }}
                   className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#AAA79E] hover:text-[#E8E3D8]"
                 >
@@ -340,7 +348,7 @@ function LlmStatusBadge() {
 
   if (status.loading) {
     return (
-      <div className="inline-flex items-center gap-2 border border-[#4B4A45] bg-[#222326] px-3 py-1.5 text-[10px] font-mono font-bold text-[#AAA79E]">
+      <div className="inline-flex items-center rounded-md gap-2 border border-[#4B4A45] bg-[#222326] px-3 py-1.5 text-[10px] font-mono font-bold text-[#AAA79E]">
         <span className="h-1.5 w-1.5 rounded-full bg-[#AAA79E] animate-pulse" />
         Engine...
       </div>
@@ -354,11 +362,10 @@ function LlmStatusBadge() {
       type="button"
       onClick={handleToggle}
       title={isOn ? "Gemini LLM is Active. Click to turn OFF." : "Normal Mode is Active. Click to turn Gemini LLM ON."}
-      className={`group inline-flex items-center gap-2.5 border px-3 py-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer ${
-        isOn
+      className={`group inline-flex items-center rounded-md gap-2.5 border px-3 py-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer ${isOn
           ? "border-emerald-500/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
           : "border-[#4B4A45] bg-[#222326] text-[#AAA79E] hover:border-[#8E8B83] hover:text-[#E8E3D8]"
-      }`}
+        }`}
     >
       <div className="flex items-center gap-2">
         <span className={`h-2 w-2 rounded-full ${isOn ? "bg-emerald-400 animate-pulse" : "bg-[#8E8B83]"}`} />
@@ -367,17 +374,14 @@ function LlmStatusBadge() {
         </span>
       </div>
 
-      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${
-        isOn ? "bg-emerald-500" : "bg-[#4B4A45]"
-      }`}>
-        <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
-          isOn ? "translate-x-3" : "translate-x-0"
-        }`} />
+      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${isOn ? "bg-emerald-500" : "bg-[#4B4A45]"
+        }`}>
+        <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-200 ${isOn ? "translate-x-3" : "translate-x-0"
+          }`} />
       </div>
 
-      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${
-        isOn ? "text-emerald-400" : "text-[#AAA79E]"
-      }`}>
+      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${isOn ? "text-emerald-400" : "text-[#AAA79E]"
+        }`}>
         {isOn ? "ON" : "OFF"}
       </span>
     </button>

@@ -244,7 +244,7 @@ function LandingPage({ onNavigate }) {
   return (
     <main
       id="top"
-      className="min-h-screen overflow-hidden bg-[#191A1C] text-[#E8E3D8]"
+      className="min-h-screen overflow-x-hidden bg-[#191A1C] text-[#E8E3D8]"
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
@@ -769,7 +769,7 @@ function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      <footer className="bg-[#191A1C]">
+      {/* <footer className="bg-[#191A1C]">
         <div className="mx-auto max-w-[1500px] px-5 py-10 sm:px-8 lg:px-12">
           <div className="grid gap-10 border-b border-[#3B3B39] pb-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.7fr_0.7fr_0.7fr]">
             <div>
@@ -825,7 +825,7 @@ function LandingPage({ onNavigate }) {
             </p>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </main>
   );
 }

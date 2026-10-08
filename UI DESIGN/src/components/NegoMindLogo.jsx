@@ -4,10 +4,21 @@ export default function NegoMindLogo({
   size = 44,
   showWordmark = true,
   className = "",
+  onNavigate
 }) {
+  const handleAction = (page) => {
+    if (onNavigate) {
+      onNavigate(page);
+    }
+  };
+
   return (
     <a
-      href="#top"
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        handleAction("Dashboard");
+      }}
       aria-label="NegoMind"
       className={`group inline-flex items-center gap-3 ${className}`}
     >

@@ -1,48 +1,104 @@
 export default function GuideBotButton({ onClick }) {
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
-      {/* Floating Popup Badge */}
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+      {/* Assistant label */}
       <button
         type="button"
         onClick={onClick}
-        className="group relative flex items-center gap-2 rounded-full border border-[#38bdf8]/50 bg-[#071522]/90 px-3.5 py-1.5 shadow-[0_0_20px_rgba(56,189,248,0.25)] backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-[#7dd3fc]"
+        className="group flex items-center gap-2 rounded-full border border-[#A8C686]/70 bg-[#344A30]/95 px-4 py-2 shadow-[0_12px_35px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#C4DEA5] hover:bg-[#405A38]"
       >
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#38bdf8] opacity-75"></span>
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-[#38bdf8]"></span>
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#B9D98F] opacity-60" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#C4E59D]" />
         </span>
-        <span className="text-[11px] font-bold tracking-wider uppercase text-[#bfe7ff]">
-          Ask NegoMind AI ✦
+
+        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-[#EAF4DD]">
+          Ask NegoMind AI
+        </span>
+
+        <span className="text-sm text-[#C4E59D] transition-transform duration-300 group-hover:translate-x-0.5">
+          ✦
         </span>
       </button>
 
-      {/* Small Circle Floating Action Button */}
+      {/* Robot button */}
       <button
         type="button"
         onClick={onClick}
-        aria-label="Open AI Assistant Chatbot"
-        className="group relative flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#38bdf8] bg-gradient-to-tr from-[#081827] via-[#0d2a40] to-[#123e5e] text-[#7dd3fc] shadow-[0_0_25px_rgba(56,189,248,0.35)] transition-all duration-300 hover:scale-110 hover:border-[#7dd3fc] hover:shadow-[0_0_35px_rgba(56,189,248,0.5)] active:scale-95"
+        aria-label="Open NegoMind AI assistant"
+        className="group relative flex h-16 w-16 items-center justify-center rounded-[22px] border border-[#B6D58F] bg-gradient-to-br from-[#607D4F] via-[#4A683D] to-[#36532F] text-[#F0F6E8] shadow-[0_16px_45px_rgba(0,0,0,0.45),0_0_28px_rgba(182,213,143,0.24)] transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:border-[#D7EBC0] hover:shadow-[0_18px_50px_rgba(0,0,0,0.5),0_0_34px_rgba(196,229,157,0.38)] active:translate-y-0 active:scale-95"
       >
-        {/* Pulsing Green Status Indicator */}
-        <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex h-4 w-4 rounded-full border-2 border-[#081827] bg-emerald-400"></span>
-        </span>
+        {/* Outer glow */}
+        <span className="absolute inset-0 rounded-[22px] bg-[#B6D58F]/15 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-100" />
 
-        {/* AI Chat Bot Icon */}
+        {/* Robot icon */}
         <svg
-          className="h-6 w-6 text-[#7dd3fc] transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110"
+          aria-hidden="true"
+          viewBox="0 0 64 64"
+          className="relative h-9 w-9 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-3"
           fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
         >
+          {/* Antenna */}
           <path
+            d="M32 14V8"
+            stroke="currentColor"
             strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-4l-4 4-4-4z"
+            strokeWidth="3"
           />
+
+          <circle
+            cx="32"
+            cy="6"
+            r="2.5"
+            className="fill-[#D1EBAE] stroke-[#D1EBAE]"
+          />
+
+          {/* Robot head */}
+          <rect
+            x="13"
+            y="15"
+            width="38"
+            height="31"
+            rx="9"
+            className="fill-[#4E6D41] stroke-current"
+            strokeWidth="2.5"
+          />
+
+          {/* Ear pieces */}
+          <path
+            d="M13 27H9.5C8.67 27 8 27.67 8 28.5V33.5C8 34.33 8.67 35 9.5 35H13M51 27H54.5C55.33 27 56 27.67 56 28.5V33.5C56 34.33 55.33 35 54.5 35H51"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="2.5"
+          />
+
+          {/* Eyes */}
+          <circle cx="24" cy="29" r="3" className="fill-[#D1EBAE]" />
+          <circle cx="40" cy="29" r="3" className="fill-[#D1EBAE]" />
+
+          {/* Mouth */}
+          <path
+            d="M24 38C27.5 40.5 36.5 40.5 40 38"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="2.5"
+          />
+
+          {/* Chest/body */}
+          <path
+            d="M22 46V51C22 53.21 23.79 55 26 55H38C40.21 55 42 53.21 42 51V46"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeWidth="2.5"
+          />
+
+          <circle cx="32" cy="50" r="2" className="fill-[#D1EBAE]" />
         </svg>
+
+        {/* Status indicator */}
+        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-[#191A1C] bg-[#D1EBAE]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#4A683D]" />
+        </span>
       </button>
     </div>
   );

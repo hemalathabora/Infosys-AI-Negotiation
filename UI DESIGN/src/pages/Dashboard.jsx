@@ -156,9 +156,9 @@ export default function Dashboard({
               </button>
 
               <button
-  type="button"
-  onClick={() => onNavigate("Configure Agents")}
-  className="
+                type="button"
+                onClick={() => onNavigate("Scenarios")}
+                className="
     group relative
     inline-flex items-center gap-2
     overflow-hidden
@@ -177,10 +177,10 @@ export default function Dashboard({
     active:translate-y-0
     active:scale-[0.97]
   "
->
-  {/* Animated shine */}
-  <span
-    className="
+              >
+                {/* Animated shine */}
+                <span
+                  className="
       pointer-events-none
       absolute inset-0
       -translate-x-full
@@ -192,11 +192,11 @@ export default function Dashboard({
       transition-transform duration-700
       group-hover:translate-x-full
     "
-  />
+                />
 
-  {/* Animated glow */}
-  <span
-    className="
+                {/* Animated glow */}
+                <span
+                  className="
       pointer-events-none
       absolute -inset-1
       rounded-sm
@@ -206,11 +206,11 @@ export default function Dashboard({
       transition-opacity duration-300
       group-hover:opacity-100
     "
-  />
+                />
 
-  {/* Icon */}
-  <span
-    className="
+                {/* Icon */}
+                <span
+                  className="
       relative z-10
       flex h-5 w-5
       items-center justify-center
@@ -224,24 +224,24 @@ export default function Dashboard({
       group-hover:scale-110
       group-hover:shadow-[0_0_10px_rgba(15,23,42,0.5)]
     "
-  >
-    +
-  </span>
+                >
+                  +
+                </span>
 
-  {/* Text */}
-  <span
-    className="
+                {/* Text */}
+                <span
+                  className="
       relative z-10
       transition-all duration-300
       group-hover:tracking-wide
     "
-  >
-    Configure New Session
-  </span>
+                >
+                  Configure New Session
+                </span>
 
-  {/* Arrow */}
-  <span
-    className="
+                {/* Arrow */}
+                <span
+                  className="
       relative z-10
       ml-0
       -translate-x-1
@@ -251,11 +251,11 @@ export default function Dashboard({
       group-hover:translate-x-0
       group-hover:opacity-100
     "
-  >
-    →
-  </span>
-</button>
-              
+                >
+                  →
+                </span>
+              </button>
+
             </div>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default function Dashboard({
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
 
           {/* Total Simulations */}
-          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-indigo-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-md border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-indigo-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-indigo-500 to-blue-500" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -288,7 +288,7 @@ export default function Dashboard({
 
 
           {/* Agreement Rate */}
-          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-md border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -308,7 +308,7 @@ export default function Dashboard({
 
 
           {/* Active Deadlocks */}
-          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-md border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-amber-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-500 to-orange-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -328,7 +328,7 @@ export default function Dashboard({
 
 
           {/* Efficiency Metric */}
-          <div className="group relative overflow-hidden rounded-sm border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-blue-500/50 hover:shadow-cardHover">
+          <div className="group relative overflow-hidden rounded-md border border-border/80 bg-card/90 p-5 backdrop-blur-md transition-all duration-200 hover:border-blue-500/50 hover:shadow-cardHover">
             <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-blue-500 to-cyan-400" />
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
@@ -626,11 +626,10 @@ export default function Dashboard({
                         <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
                         <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>
                         <td className="px-4 py-3.5">
-                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${
-                            item.result === "Agreement"
-                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                              : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
-                          }`}>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${item.result === "Agreement"
+                            ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                            : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
+                            }`}>
                             {item.result}
                           </span>
                         </td>
@@ -660,9 +659,8 @@ export default function Dashboard({
               {activityTimeline.length > 0 ? (
                 activityTimeline.map((act, idx) => (
                   <div key={idx} className="relative space-y-1">
-                    <div className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-card ${
-                      act.type === "live" ? "bg-emerald-400 animate-pulse" : "bg-indigo-500"
-                    }`} />
+                    <div className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-card ${act.type === "live" ? "bg-emerald-400 animate-pulse" : "bg-indigo-500"
+                      }`} />
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-semibold text-textPrimary font-sans">{act.title}</p>
                       <span className="font-mono text-[10px] text-textMuted">{act.time}</span>
@@ -680,7 +678,6 @@ export default function Dashboard({
 
 
         </div>
-
       </div>
     </main>
   );

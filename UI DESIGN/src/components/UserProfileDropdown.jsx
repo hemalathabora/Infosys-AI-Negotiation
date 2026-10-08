@@ -43,7 +43,7 @@ export default function UserProfileDropdown({ isDark }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2.5 border px-3 py-1.5 transition-all duration-200 cursor-pointer ${
+        className={`flex items-center rounded-md gap-2.5 border px-3 py-1.5 transition-all duration-200 cursor-pointer ${
           isDark
             ? "border-[#4B4A45] bg-[#222326] text-[#E8E3D8] hover:border-[#E8E3D8]"
             : "border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200"

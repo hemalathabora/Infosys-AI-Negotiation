@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import ScenarioDescription from "../components/ScenarioDescription";
 import StartNegotiationButton from "../components/StartNegotiationButton";
@@ -12,7 +12,7 @@ import { useScenarioConfiguration } from "../hooks/useScenarioConfiguration.js";
 import { useNegotiationEngine } from "../hooks/useNegotiationEngine.js";
 import { scenarioList } from "../data/scenarios.js";
 
-export default function AgentConfiguration({ onNegotiationStart, onNegotiationReset }) {
+export default function AgentConfiguration({ onNegotiationStart, onNegotiationReset, initialScenario }) {
   const {
     selectedScenarioId,
     selectedScenario,
@@ -23,6 +23,17 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
     selectScenario,
     retry,
   } = useScenarioConfiguration();
+
+  // Sync the scenario from the Scenarios page into this page
+  useEffect(() => {
+    if (initialScenario) {
+      const id = initialScenario.scenario_id || initialScenario.id;
+      if (id && id !== selectedScenarioId) {
+        selectScenario(id);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialScenario]);
 
   const negotiation = useNegotiationEngine();
   const [isStarting, setIsStarting] = useState(false);
@@ -99,6 +110,24 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
               </p>
             </div>
           </div>
+
+          {/* Pre-selected Scenario Banner (from Scenarios page) */}
+          {initialScenario && selectedScenario && (
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Scenario Pre-Selected</p>
+                <p className="text-sm font-bold text-white truncate">
+                  {selectedScenario.scenario_name || selectedScenario.name}
+                </p>
+              </div>
+              <span className="text-xs text-slate-400 font-body shrink-0">Selected from Scenarios page</span>
+            </div>
+          )}
 
           {/* Mode Switcher Banner */}
           <div className="rounded-2xl border border-[#302F39] bg-[#201F25] p-5 shadow-sm space-y-4 font-sans">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import ScenarioDescription from "../components/ScenarioDescription";
+import AgentCard from "../components/AgentCard";
 import StartNegotiationButton from "../components/StartNegotiationButton";
 import ReadyBanner from "../components/ReadyBanner";
 import LoadingState from "../components/LoadingState";
@@ -22,6 +23,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
     configurationValid,
     selectScenario,
     retry,
+    updateAgentConstraint,
+    updateAgentPersonality,
   } = useScenarioConfiguration();
 
   // Sync the scenario from the Scenarios page into this page
@@ -418,6 +421,48 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
         {isLoading && <LoadingState message="Loading scenario configuration..." />}
         {!isLoading && error && <ErrorState onRetry={retry} />}
         {!isLoading && !error && agents.length === 0 && <EmptyState />}
+
+        {/* =====================================================
+            3. AGENT CONFIGURATION CARDS
+        ====================================================== */}
+        {!isLoading && !error && agents.length > 0 && (
+          <section aria-labelledby="agents-heading" className="space-y-5">
+            <div className="flex items-center gap-3">
+              <div>
+                <h2 id="agents-heading" className="text-lg font-bold text-white font-sans flex items-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  Agent Configuration
+                </h2>
+                <p className="mt-0.5 text-xs text-textMuted font-body">
+                  Review and tune each negotiating agent's goals, constraints, and personality.
+                </p>
+              </div>
+              <div className="ml-auto flex items-center gap-2 rounded-xl border border-[#302F39] bg-[#201F25] px-3 py-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-mono text-xs font-bold text-emerald-400">
+                  {agents.length} AGENT{agents.length !== 1 ? "S" : ""} LOADED
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              {agents.map((agent, index) => (
+                <AgentCard
+                  key={agent.id}
+                  agent={agent}
+                  index={index + 1}
+                  onConstraintChange={updateAgentConstraint}
+                  onPersonalityChange={updateAgentPersonality}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* =====================================================
             3. UNIFIED SYMMETRICAL ACTION BAR (READY BANNER + CTA)

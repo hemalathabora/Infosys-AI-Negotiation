@@ -659,7 +659,7 @@ export default function NegotiationHistory({ onNavigate }) {
           /* Table of History Records */
           <div className="space-y-4">
             <div className="overflow-x-auto rounded-2xl border border-[#2D2C36] bg-[#201F25]">
-              <table className="w-full text-left text-xs">
+              <table className="w-full min-w-[760px] text-left text-xs">
                 <thead className="border-b border-[#2D2C36] bg-[#17161B] font-mono text-[10px] uppercase text-slate-400">
                   <tr>
                     <th className="px-4 py-3.5">Scenario</th>

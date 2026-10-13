@@ -93,8 +93,8 @@ function ProductPreview() {
         </span>
       </div>
 
-      <div className="grid min-h-[390px] grid-cols-[1fr_220px]">
-        <div className="border-r border-[#3A3B3D] p-5">
+      <div className="grid min-h-[390px] grid-cols-1 md:grid-cols-[1fr_220px]">
+        <div className="border-b md:border-b-0 md:border-r border-[#3A3B3D] p-4 sm:p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#7F817A]">
@@ -322,7 +322,7 @@ function LandingPage({ onNavigate }) {
             <div className="max-w-4xl editorial-reveal">
               <SectionLabel light>Negotiation intelligence infrastructure</SectionLabel>
 
-              <h1 className="mt-7 max-w-4xl font-serif text-5xl leading-[0.92] tracking-[-0.055em] text-[#F1EEE6] sm:text-7xl lg:text-[8.2rem]">
+              <h1 className="mt-7 max-w-4xl font-serif text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-[8.2rem] leading-[0.95] tracking-[-0.05em] text-[#F1EEE6] break-words">
                 Make the next move with clarity.
               </h1>
 

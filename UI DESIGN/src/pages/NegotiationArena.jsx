@@ -404,7 +404,7 @@ export default function NegotiationArena({
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="font-mono text-xs font-bold text-white bg-[#222129] px-3.5 py-2 rounded-xl border border-[#302F39]">
                 Round {state.current_round} of {maxRounds}
               </span>
@@ -1151,12 +1151,12 @@ export default function NegotiationArena({
                     </div>
                   )}
 
-                  <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3 pt-2">
                     <button
                       type="button"
                       onClick={() => handleHumanSubmit("reject")}
                       disabled={isRunning || isDone}
-                      className="rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                      className="rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Reject Offer
                     </button>
@@ -1165,7 +1165,7 @@ export default function NegotiationArena({
                       type="button"
                       onClick={() => handleHumanSubmit("accept")}
                       disabled={isRunning || isDone}
-                      className="rounded-xl border border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-4 py-2.5 text-xs font-extrabold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                      className="rounded-xl border border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-4 py-2.5 text-xs font-extrabold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Accept Offer
                     </button>
@@ -1173,7 +1173,7 @@ export default function NegotiationArena({
                     <button
                       type="submit"
                       disabled={isRunning || isDone}
-                      className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-6 py-2.5 text-xs font-extrabold border border-emerald-300 shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-6 py-2.5 text-xs font-extrabold border border-emerald-300 shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Submit Counteroffer →
                     </button>

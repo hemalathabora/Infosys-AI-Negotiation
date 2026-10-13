@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import UserProfileDropdown from "./UserProfileDropdown";
 import NegoMindLogo from "./NegoMindLogo";
+import DownloadAppButton from "./DownloadAppButton";
+import PwaInstallModal from "./PwaInstallModal";
+import { usePwaInstall } from "../hooks/usePwaInstall";
 
 const navLinks = [
   { label: "Product", href: "#product" },
@@ -23,6 +26,29 @@ export default function TopNavigation({
   const isDark = theme === "dark" || theme !== "light";
   const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { isInstalled, promptInstall } = usePwaInstall();
+  const [pwaModalOpen, setPwaModalOpen] = useState(false);
+  const [pwaModalState, setPwaModalState] = useState("prompt_unavailable");
+
+  const handleDownloadAppClick = async () => {
+    const res = await promptInstall();
+    if (res?.status === "accepted") {
+      setPwaModalState("accepted");
+      setPwaModalOpen(true);
+    } else if (res?.status === "already_installed") {
+      setPwaModalState("already_installed");
+      setPwaModalOpen(true);
+    } else if (res?.status === "ios_safari") {
+      setPwaModalState("ios_safari");
+      setPwaModalOpen(true);
+    } else if (res?.status === "dismissed") {
+      // User closed native prompt
+    } else {
+      setPwaModalState("prompt_unavailable");
+      setPwaModalOpen(true);
+    }
+  };
 
   const handleNavClick = (e, link) => {
     e.preventDefault();
@@ -90,9 +116,9 @@ export default function TopNavigation({
           <NegoMindLogo size={44} onClick={handleLogoClick} onNavigate={onNavigate} />
         </div>
 
-        {/* Center Navigation Links - ONLY shown when NOT logged in */}
+        {/* Center Navigation Links & Download App Button - ONLY shown when NOT logged in */}
         {!isAuthenticated && (
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-6 xl:gap-8 lg:flex">
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -103,6 +129,11 @@ export default function TopNavigation({
                 {link.label}
               </a>
             ))}
+            <DownloadAppButton
+              variant="navbar"
+              onClick={handleDownloadAppClick}
+              isInstalled={isInstalled}
+            />
           </nav>
         )}
 
@@ -139,8 +170,15 @@ export default function TopNavigation({
           )}
         </div>
 
-        {/* Mobile Navigation Toggle */}
-        <div className="flex items-center gap-3 lg:hidden">
+        {/* Mobile Navigation Toggle & Compact Download Button */}
+        <div className="flex items-center gap-2.5 lg:hidden">
+          {!isAuthenticated && (
+            <DownloadAppButton
+              variant="headerCompact"
+              onClick={handleDownloadAppClick}
+              isInstalled={isInstalled}
+            />
+          )}
           {isAuthenticated && <UserProfileDropdown isDark={true} />}
           <button
             type="button"
@@ -216,25 +254,47 @@ export default function TopNavigation({
                   {link.label}
                 </a>
               ))}
+              <div className="pt-2">
+                <DownloadAppButton
+                  variant="mobile"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleDownloadAppClick();
+                  }}
+                  isInstalled={isInstalled}
+                />
+              </div>
             </nav>
           )}
 
           <div className="flex flex-col gap-4">
             {isAuthenticated && (
-              <div className="flex items-center justify-between gap-3">
-                {onMenuToggle && (
-                  <button
-                    type="button"
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-3">
+                  {onMenuToggle && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onMenuToggle();
+                      }}
+                      className="flex items-center gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-100"
+                    >
+                      <span>Dashboard Menu</span>
+                    </button>
+                  )}
+                  <LlmStatusBadge />
+                </div>
+                {!isInstalled && (
+                  <DownloadAppButton
+                    variant="mobile"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      onMenuToggle();
+                      handleDownloadAppClick();
                     }}
-                    className="flex items-center gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-100"
-                  >
-                    <span>Dashboard Menu</span>
-                  </button>
+                    isInstalled={isInstalled}
+                  />
                 )}
-                <LlmStatusBadge />
               </div>
             )}
 
@@ -247,7 +307,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleSignInClick();
                     }}
-                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 hover:text-slate-100"
+                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 hover:text-slate-100 cursor-pointer"
                   >
                     Sign in
                   </button>
@@ -258,7 +318,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleWorkspaceClick();
                     }}
-                    className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950"
+                    className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950 cursor-pointer"
                   >
                     <span>Enter workspace</span>
                     <span>↗</span>
@@ -269,6 +329,13 @@ export default function TopNavigation({
           </div>
         </div>
       )}
+
+      {/* PWA Installation Guidance Modal */}
+      <PwaInstallModal
+        isOpen={pwaModalOpen}
+        onClose={() => setPwaModalOpen(false)}
+        modalState={pwaModalState}
+      />
     </header>
   );
 }

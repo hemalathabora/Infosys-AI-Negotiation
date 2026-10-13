@@ -369,7 +369,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
   };
 
   return (
-    <main className="relative h-[98%] max-h-screen w-[97%] overflow-hidden bg-[#0C0B12] text-white">
+    <main className="relative min-h-screen w-full overflow-y-auto lg:overflow-hidden bg-[#0C0B12] text-white">
       {/* Ambient background lighting */}
       <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[140px]" />
       <div className="pointer-events-none absolute -bottom-40 right-0 h-[560px] w-[560px] rounded-full bg-indigo-500/10 blur-[140px]" />
@@ -377,7 +377,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
       <div className="relative grid h-full min-h-0 lg:grid-cols-2">
         {/* Authentication panel */}
         <section
-          className={`relative z-20  min-h-0 overflow-y-auto bg-[#0C0B12] px-5 py-5 transition-transform duration-700 ease-in-out sm:px-10 lg:col-start-1 lg:row-start-1 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-6 xl:px-20 ${isSignup ? "lg:translate-x-full" : "lg:translate-x-0"
+          className={`relative z-20 min-h-0 overflow-y-auto bg-[#0C0B12] px-4 py-6 transition-transform duration-700 ease-in-out sm:px-10 lg:col-start-1 lg:row-start-1 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-6 xl:px-20 ${isSignup ? "lg:translate-x-full" : "lg:translate-x-0"
             }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col justify-center">
@@ -386,11 +386,11 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
 
             {/* Heading and tab switcher */}
             <div className="mb-6">
-              <div className="w-full flex justify-around mb-5 inline-flex rounded-2xl border border-[#2F2E3E] bg-[#161522]/80 py-1.5 px-0.5 shadow-xl backdrop-blur-md">
+              <div className="w-full flex justify-between mb-5 rounded-2xl border border-[#2F2E3E] bg-[#161522]/80 p-1 shadow-xl backdrop-blur-md gap-1">
                 <button
                   type="button"
                   onClick={() => switchMode("signin")}
-                  className={`rounded-xl px-24 py-2.5 text-md font-black transition-all ${!isSignup
+                  className={`flex-1 rounded-xl py-2.5 text-sm sm:text-base font-black transition-all cursor-pointer ${!isSignup
                     ? "bg-[#29283A] text-emerald-400 shadow-lg"
                     : "text-slate-500 hover:text-slate-200"
                     }`}
@@ -401,7 +401,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                 <button
                   type="button"
                   onClick={() => switchMode("signup")}
-                  className={`rounded-xl px-20 py-2.5 text-md font-black transition-all ${isSignup
+                  className={`flex-1 rounded-xl py-2.5 text-sm sm:text-base font-black transition-all cursor-pointer ${isSignup
                     ? "bg-[#29283A] text-emerald-400 shadow-lg"
                     : "text-slate-500 hover:text-slate-200"
                     }`}

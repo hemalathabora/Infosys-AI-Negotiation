@@ -617,7 +617,7 @@ export default function Dashboard({
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-border/60">
-              <table className="w-full text-left text-xs font-body">
+              <table className="w-full min-w-[580px] text-left text-xs font-body">
                 <thead className="border-b border-border/80 bg-slate-900/60 font-mono text-[11px] uppercase tracking-wider text-textMuted">
                   <tr>
                     <th className="px-4 py-3">Scenario</th>

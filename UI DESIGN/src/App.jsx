@@ -173,6 +173,7 @@ function MainAppContent() {
           </div>
         );
       case "Scenarios":
+      case "Negotiation Scenarios":
         return (
           <div data-guide="scenarios-shell" className="flex-1 overflow-y-auto">
             <NegotiationScenariosView

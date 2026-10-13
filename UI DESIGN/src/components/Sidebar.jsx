@@ -55,7 +55,7 @@ export default function Sidebar({
   onReplayIntro,
 }) {
   function handleMenuItemClick(item) {
-    onNavigate?.(item.label);
+    onNavigate?.(item.page || item.label);
     onClose?.();
   }
 

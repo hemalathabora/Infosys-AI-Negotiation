@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd \"UI DESIGN\" && npm run build",
+  "outputDirectory": "UI DESIGN/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

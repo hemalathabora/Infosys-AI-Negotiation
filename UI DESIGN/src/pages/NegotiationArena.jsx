@@ -490,7 +490,7 @@ export default function NegotiationArena({
         {/* =====================================================
             4. MAIN WORKSPACE GRID (LEFT: METRICS vs RIGHT: TRANSCRIPT)
         ====================================================== */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
           {/* LEFT PANEL: Live Negotiation Metrics & Agent Stance */}
           <div className="lg:col-span-4 space-y-6">
@@ -770,7 +770,7 @@ export default function NegotiationArena({
           </div>
 
           {/* RIGHT PANEL: Negotiation Transcript */}
-          <div className="lg:col-span-8 space-y-4">
+          <div className="lg:col-span-8 space-y-4 flex flex-col">
             <div className="flex items-center justify-between border-b border-[#2D2C36] pb-3">
               <h2 className="text-base font-bold text-white font-sans flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-emerald-400">
@@ -782,7 +782,7 @@ export default function NegotiationArena({
             </div>
 
             {history.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#302F39] bg-[#1A191E] p-10 text-center space-y-4">
+              <div className="rounded-2xl border border-dashed border-[#302F39] bg-[#1A191E] p-10 text-center space-y-4 flex-1 min-h-[500px] flex flex-col items-center justify-center">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#25242C] text-slate-400 font-mono text-sm">
                   💬
                 </div>
@@ -821,7 +821,7 @@ export default function NegotiationArena({
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+              <div className="space-y-4 max-h-[900px] overflow-y-auto pr-1 flex-1">
                 {history.map((turn, idx) => {
                   const agent = agents.find((a) => a.id === turn.agent_id) || { id: turn.agent_id, name: turn.agent_id, role: turn.agent_id };
                   const turnHist = history.slice(0, idx + 1);

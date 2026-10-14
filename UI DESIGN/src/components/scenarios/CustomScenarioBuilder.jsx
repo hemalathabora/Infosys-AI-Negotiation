@@ -266,7 +266,7 @@ export default function CustomScenarioBuilder({
         category: saved.category,
         isCustom: true,
         participants: saved.participants.map((p) => p.role),
-        agents: (saved.agents && saved.agents.length >= 2) ? saved.agents : saved.participants.map((p, i) => ({
+        agents: (saved.agents && saved.agents.length >= 2) ? saved.agents : saved.participants.map((p, _i) => ({
           id: p.role.toLowerCase().replace(/\s+/g, "_"),
           name: p.name,
           role: p.role,

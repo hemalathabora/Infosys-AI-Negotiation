@@ -1,4 +1,4 @@
-export default function ReadyBanner({ isValid, agentCount }) {
+export default function ReadyBanner({ isValid, agentCount, invalidReason }) {
   return (
     <div className="h-full flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-[#302F39] bg-[#222129] p-6 shadow-sm">
       <div className="flex items-center gap-4">
@@ -31,7 +31,7 @@ export default function ReadyBanner({ isValid, agentCount }) {
           <p className="text-xs text-textSecondary font-body mt-0.5">
             {isValid
               ? "All constraints validated. Ready to send parameters to orchestrator."
-              : "Complete the constraint parameters for both Party A and Party B."}
+              : (invalidReason || "Complete the constraint parameters for both Party A and Party B.")}
           </p>
         </div>
       </div>

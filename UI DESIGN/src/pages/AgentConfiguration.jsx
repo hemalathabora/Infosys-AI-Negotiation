@@ -1,4 +1,136 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
+// ---------------------------------------------------------------------------
+// Helper: extract the primary numeric constraint value from an agent
+// ---------------------------------------------------------------------------
+function extractConstraintValue(agent) {
+  const c = agent?.constraints?.[0];
+  if (!c) return null;
+  const raw =
+    typeof c === "object"
+      ? (c.defaultValue ?? c.value ?? null)
+      : String(c).replace(/[^0-9.]/g, "");
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : null;
+}
+
+// ---------------------------------------------------------------------------
+// Helper: compute ZOPA from the two loaded agents
+// ---------------------------------------------------------------------------
+function computeZopa(agents) {
+  if (!agents || agents.length < 2) return null;
+  const a = agents[0];
+  const b = agents[1];
+  const aVal = extractConstraintValue(a);
+  const bVal = extractConstraintValue(b);
+  if (aVal === null || bVal === null) return null;
+
+  const aText = ((a.role || "") + " " + (a.constraints?.[0]?.text || "")).toLowerCase();
+  const aIsFloor =
+    /min|seller|vendor|freelancer|landlord|supplier|candidate|founder|provider|manager|head|worker/.test(aText);
+
+  const floor = aIsFloor ? aVal : bVal;
+  const ceiling = aIsFloor ? bVal : aVal;
+  const floorAgent = aIsFloor ? a : b;
+  const ceilingAgent = aIsFloor ? b : a;
+
+  return { floor, ceiling, gap: ceiling - floor, isPositive: ceiling >= floor, floorAgent, ceilingAgent };
+}
+
+// ---------------------------------------------------------------------------
+// ZopaVisualizer sub-component
+// ---------------------------------------------------------------------------
+function ZopaVisualizer({ agents }) {
+  const zopa = useMemo(() => computeZopa(agents), [agents]);
+  if (!zopa) return null;
+
+  const { floor, ceiling, gap, isPositive, floorAgent, ceilingAgent } = zopa;
+  const min = Math.min(floor, ceiling) * 0.85;
+  const max = Math.max(floor, ceiling) * 1.15;
+  const range = max - min || 1;
+  const floorPct = ((floor - min) / range) * 100;
+  const ceilPct = ((ceiling - min) / range) * 100;
+  const leftPct = Math.min(floorPct, ceilPct);
+  const widthPct = Math.abs(ceilPct - floorPct);
+  const fmt = (n) => n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : `$${n.toLocaleString()}`;
+
+  return (
+    <section aria-label="ZOPA Zone of Possible Agreement" className="rounded-2xl border border-[#302F39] bg-[#1E1D24] p-5 space-y-4 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            ZOPA Pre-flight Analysis
+          </p>
+          <p className="text-[11px] text-slate-400 font-body mt-0.5">
+            Zone of Possible Agreement — checks if an overlap exists before negotiation starts.
+          </p>
+        </div>
+        <span className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 font-mono text-xs font-bold ${
+          isPositive ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-red-500/30 bg-red-500/10 text-red-400"
+        }`}>
+          {isPositive ? (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+              ZOPA: +{fmt(gap)} overlap
+            </>
+          ) : (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              GAP: {fmt(Math.abs(gap))} apart
+            </>
+          )}
+        </span>
+      </div>
+
+      {/* Visual bar */}
+      <div className="relative w-full h-8 rounded-full bg-[#2B2A33] overflow-hidden">
+        <div
+          className={`absolute top-0 h-full rounded-full transition-all duration-500 ${
+            isPositive ? "bg-emerald-500/30" : "bg-red-500/30"
+          }`}
+          style={{ left: `${leftPct}%`, width: `${Math.max(widthPct, 1)}%` }}
+        />
+        <div className="absolute top-0 h-full w-0.5 bg-sky-400" style={{ left: `${floorPct}%` }} />
+        <div className="absolute top-0 h-full w-0.5 bg-purple-400" style={{ left: `${ceilPct}%` }} />
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-between text-[11px] font-mono">
+        <div className="flex items-center gap-1.5 text-sky-300">
+          <span className="inline-block h-2 w-2 rounded-full bg-sky-400" />
+          <span className="font-bold">{floorAgent?.name}</span>
+          <span className="text-slate-400">floor {fmt(floor)}</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-purple-300">
+          <span className="text-slate-400">ceiling {fmt(ceiling)}</span>
+          <span className="font-bold">{ceilingAgent?.name}</span>
+          <span className="inline-block h-2 w-2 rounded-full bg-purple-400" />
+        </div>
+      </div>
+
+      {/* Warning if no agreement zone */}
+      {!isPositive && (
+        <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-red-400 mt-0.5 shrink-0">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <p className="text-xs text-red-300 font-body">
+            <span className="font-bold">No agreement zone detected.</span> The constraint values create a gap of{" "}
+            <span className="font-bold">{fmt(Math.abs(gap))}</span> between the floor and ceiling. Adjust agent
+            constraints above to create an overlap, or expect a likely deadlock or breakdown.
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
 
 import ScenarioDescription from "../components/ScenarioDescription";
 import AgentCard from "../components/AgentCard";
@@ -41,14 +173,53 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
   const negotiation = useNegotiationEngine();
   const [isStarting, setIsStarting] = useState(false);
 
-  // Milestone 3: Participant Mode ("simulation" | "practice") & Human Role Selection
-  const [mode, setMode] = useState("simulation");
-  const [humanRole, setHumanRole] = useState("");
-  const [maxRounds, setMaxRounds] = useState(5);
-  const [difficulty, setDifficulty] = useState("Intermediate");
-  const [aiPersonality, setAiPersonality] = useState("Collaborative");
+  // -------------------------------------------------------------------------
+  // Milestone 3: Participant Mode & Human Role Selection
+  // Auto-saved to localStorage so settings survive navigation
+  // -------------------------------------------------------------------------
+  const [mode, setMode] = useState(
+    () => localStorage.getItem("nego_mode") || "simulation"
+  );
+  const [humanRole, setHumanRole] = useState(
+    () => localStorage.getItem("nego_humanRole") || ""
+  );
+  const [maxRounds, setMaxRounds] = useState(
+    () => Number(localStorage.getItem("nego_maxRounds")) || 5
+  );
+  const [difficulty, setDifficulty] = useState(
+    () => localStorage.getItem("nego_difficulty") || "Intermediate"
+  );
+  const [aiPersonality, setAiPersonality] = useState(
+    () => localStorage.getItem("nego_aiPersonality") || "Collaborative"
+  );
+
+  // Persist to localStorage on every change
+  useEffect(() => { localStorage.setItem("nego_mode", mode); }, [mode]);
+  useEffect(() => { localStorage.setItem("nego_humanRole", humanRole); }, [humanRole]);
+  useEffect(() => { localStorage.setItem("nego_maxRounds", String(maxRounds)); }, [maxRounds]);
+  useEffect(() => { localStorage.setItem("nego_difficulty", difficulty); }, [difficulty]);
+  useEffect(() => { localStorage.setItem("nego_aiPersonality", aiPersonality); }, [aiPersonality]);
 
   const activeHumanRole = humanRole || (agents[0]?.role || "buyer");
+
+  // -------------------------------------------------------------------------
+  // Validation reason — clear human-readable explanation of what is missing
+  // -------------------------------------------------------------------------
+  const invalidReason = useMemo(() => {
+    if (!selectedScenario) return "Select a scenario to continue.";
+    if (agents.length === 0) return "Agent configuration is loading.";
+    const allReady = agents.every(
+      (a) => a.name && a.role && a.goal && a.constraints?.length && a.personality
+    );
+    if (!allReady) return "Complete the constraint parameters for both agents.";
+    if (mode === "practice" && !humanRole) return "Choose your human role to start Practice Mode.";
+    return null;
+  }, [selectedScenario, agents, mode, humanRole]);
+
+  // -------------------------------------------------------------------------
+  // ZOPA — derived live from agents constraints
+  // -------------------------------------------------------------------------
+  const zopaData = useMemo(() => computeZopa(agents), [agents]);
 
   async function handleStartNegotiation() {
     if (!configurationValid || !selectedScenario || isStarting) return;
@@ -73,7 +244,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
       negotiation.reset();
     }
     selectScenario(scenarioId);
-    setHumanRole(""); // reset role for scenario
+    setHumanRole(""); // reset role for new scenario
+    localStorage.removeItem("nego_humanRole");
   }
 
   const agentChecks = agents.map(
@@ -465,19 +637,31 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
         )}
 
         {/* =====================================================
-            3. UNIFIED SYMMETRICAL ACTION BAR (READY BANNER + CTA)
+            4. ZOPA PRE-FLIGHT VISUALIZER
+        ====================================================== */}
+        {!isLoading && !error && agents.length > 0 && zopaData && (
+          <ZopaVisualizer agents={agents} />
+        )}
+
+        {/* =====================================================
+            5. UNIFIED SYMMETRICAL ACTION BAR (READY BANNER + CTA)
         ====================================================== */}
         {!isLoading && !error && agents.length > 0 && (
           <section className="pt-2">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               <div className="lg:col-span-7 h-full">
-                <ReadyBanner isValid={configurationValid} agentCount={configuredAgentCount} />
+                <ReadyBanner
+                  isValid={configurationValid}
+                  agentCount={configuredAgentCount}
+                  invalidReason={invalidReason}
+                />
               </div>
               <div className="lg:col-span-5 h-full">
                 <StartNegotiationButton
                   disabled={!configurationValid}
                   isStarting={isStarting}
                   onClick={handleStartNegotiation}
+                  statusMessage={invalidReason}
                 />
               </div>
             </div>

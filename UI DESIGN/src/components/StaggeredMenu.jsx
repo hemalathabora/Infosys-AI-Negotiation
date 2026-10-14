@@ -86,40 +86,7 @@ function MenuIcon({ name }) {
   }
 }
 
-function MetricCard({ label, value, tone = "neutral" }) {
-  const toneClasses = {
-    neutral: "border-white/10 bg-white/[0.04] text-white",
-    emerald: "border-emerald-400/20 bg-emerald-400/[0.08] text-emerald-300",
-    amber: "border-amber-400/20 bg-amber-400/[0.08] text-amber-300",
-    blue: "border-blue-400/20 bg-blue-400/[0.08] text-blue-300",
-  };
-
-  return (
-    <div className={`rounded-xl border p-3 ${toneClasses[tone] || toneClasses.neutral}`}>
-      <p className="font-mono text-[9px] font-bold uppercase tracking-widest opacity-70">
-        {label}
-      </p>
-      <p className="mt-1 font-mono text-xl font-black">
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function FeaturePanel({ stats, onNavigate, onClearHistory, onReplayIntro, closeMenu }) {
-  const safeStats = {
-    totalSimulations: 0,
-    agreementRate: 0,
-    deadlocksCount: 0,
-    avgRounds: "0.0",
-    ...stats,
-  };
-
-  const handleAction = (callback) => {
-    callback?.();
-    closeMenu?.();
-  };
-
+function FeaturePanel({ stats: _stats, onNavigate: _onNavigate, onClearHistory: _onClearHistory, onReplayIntro: _onReplayIntro, closeMenu }) {
   return (
     <div className="mt-6 space-y-5 border-t border-white/10 pt-5">
 
@@ -140,7 +107,7 @@ export const StaggeredMenu = ({
   accentColor = "#34D399",
   isFixed = true,
   closeOnClickAway = true,
-  showToggleButton = false,
+  showToggleButton: _showToggleButton = false,
   onMenuOpen,
   onMenuClose,
   stats,

@@ -17,13 +17,12 @@ export default function TopNavigation({
   onMenuToggle,
   isMenuOpen,
   theme = "dark",
-  onThemeChange,
+  onThemeChange: _onThemeChange,
   activePage,
   onNavigate,
-  onReplayIntro,
+  onReplayIntro: _onReplayIntro,
   onOpenAuthModal,
 }) {
-  const isDark = theme === "dark" || theme !== "light";
   const { isAuthenticated } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -391,6 +390,8 @@ function LlmStatusBadge() {
     runCheck();
     const interval = setInterval(runCheck, 8000);
     return () => clearInterval(interval);
+  // checkLlm is defined in component scope and stable — intentionally omitted
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleToggle = async (e) => {

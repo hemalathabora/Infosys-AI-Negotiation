@@ -2,6 +2,7 @@ export default function StartNegotiationButton({
   disabled,
   isStarting,
   onClick,
+  statusMessage,
 }) {
   return (
     <button
@@ -65,7 +66,9 @@ export default function StartNegotiationButton({
             {isStarting ? "Initializing Engine..." : "Launch Negotiation Simulation"}
           </p>
           <p className="text-xs font-medium text-slate-600 font-body">
-            Transmits agent parameters to orchestrator.
+            {disabled && statusMessage
+              ? statusMessage
+              : "Transmits agent parameters to orchestrator."}
           </p>
         </div>
       </div>

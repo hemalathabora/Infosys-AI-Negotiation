@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { fetchDashboardAnalytics } from "../services/api.js";
 
@@ -94,6 +94,19 @@ export default function Dashboard({
   const agent2Offer = prevOffer ? `$${Math.round(prevOffer).toLocaleString()}` : "$52,000";
   const currentRound = engineState?.current_round ?? 1;
 
+  // Take only the latest 4 sessions for dashboard overview
+  const latestHistory = useMemo(() => {
+    if (!Array.isArray(history)) return [];
+    return [...history]
+      .sort((a, b) => {
+        const timeA = a.timestamp || (a.created_at ? new Date(a.created_at).getTime() : 0);
+        const timeB = b.timestamp || (b.created_at ? new Date(b.created_at).getTime() : 0);
+        if (timeA && timeB && timeA !== timeB) return timeB - timeA;
+        return 0;
+      })
+      .slice(0, 4);
+  }, [history]);
+
   // Calculate dynamic activity timeline from actual history & current state
   const activityTimeline = [];
   if (hasActiveSession) {
@@ -105,7 +118,7 @@ export default function Dashboard({
     });
   }
 
-  history.slice(0, 4).forEach((session) => {
+  latestHistory.forEach((session) => {
     activityTimeline.push({
       title: `Negotiation: ${session.scenario}`,
       detail: `Outcome: ${session.result} settled in ${session.rounds} rounds (${session.settlement || "N/A"}).`,
@@ -629,8 +642,8 @@ export default function Dashboard({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {history.length > 0 ? (
-                    history.map((item, idx) => (
+                  {latestHistory.length > 0 ? (
+                    latestHistory.map((item, idx) => (
                       <tr key={item.id || idx} className="hover:bg-white/[0.02] transition-colors">
                         <td className="px-4 py-3.5 font-semibold text-textPrimary">{item.scenario}</td>
                         <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
@@ -665,6 +678,19 @@ export default function Dashboard({
                 </tbody>
               </table>
             </div>
+
+            {history.length > 4 && (
+              <div className="flex items-center justify-between pt-1 px-1 text-xs text-textMuted border-t border-border/40 font-body">
+                <span>Showing latest 4 of {history.length} sessions</span>
+                <button
+                  type="button"
+                  onClick={() => onNavigate("Negotiation History")}
+                  className="font-medium text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+                >
+                  View full history ({history.length}) →
+                </button>
+              </div>
+            )}
 
           </div>
 

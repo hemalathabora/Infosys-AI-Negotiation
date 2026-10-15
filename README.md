@@ -1,9 +1,13 @@
 <p align="center">
-  <img src="logo.png" alt="NegoMind Ai Logo" width="220" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="logo.png">
+    <img src="logo.png" alt="NegoMind — Negotiation Intelligence" width="480" />
+  </picture>
 </p>
 
-# NegoMind Ai: AI-Driven Multi-Agent Negotiation Training & Simulation Platform
-### *THINK • NEGOTIATE • GROW*
+# NegoMind: AI-Driven Multi-Agent Negotiation Training & Simulation Platform
+### *NEGOTIATION INTELLIGENCE*
 
 An academic and enterprise-grade multi-agent negotiation simulation and training platform featuring a **Python FastAPI backend**, **dual-mode reasoning engine** (Google Gemini LLM / OpenAI & Deterministic Rule Engine), **Multi-Variable Trade-off Engine**, **AI Interactive Practice Mode**, **Role-Aware Concession Telemetry**, and a modern **React 19 + Vite frontend**.
 
@@ -52,7 +56,7 @@ graph TD
 | **Deadlock Detection & Resolution** | M3 | `backend/app/services/deadlock_detection.py` | ✅ IMPLEMENTED | Stagnation detection, repeated offer checks, non-overlapping constraint breakdown, and suggestion logic. |
 | **Multi-Variable Trade-off Engine** | Advanced | `backend/app/services/tradeoff_engine.py`, `backend/app/schemas/tradeoff.py` | ✅ IMPLEMENTED | Multi-variable package calculations, Pareto efficiency optimization, weight balancing, and boundary guardrails. |
 | **AI Interactive Practice Mode** | Advanced | `backend/app/services/practice_service.py`, `src/pages/NegotiationArena.jsx` | ✅ IMPLEMENTED | Real-time human turn execution, natural language offer parsing, adaptive difficulty levels (Beginner to Expert), and coaching feedback. |
-| **Brand Identity & Visual Assets** | Design | `public/logo.png`, `src/components/TopNavigation.jsx` | ✅ IMPLEMENTED | Official NegoMind Ai logo (*Think • Negotiate • Grow*) integrated into navigation, auth, reports, landing page, and favicon. |
+| **Brand Identity & Visual Assets** | Design | `public/logo-icon.png`, `src/components/NegoMindLogo.jsx` | ✅ IMPLEMENTED | Official NegoMind geometric mark (*Negotiation Intelligence*) integrated into navigation, auth, reports, landing page, and favicon. |
 | **Outcome Screen & Session Summary** | M4 | `src/components/OutcomeScreen.jsx` | ✅ IMPLEMENTED | Visual breakdown of agreement terms, round count, transcript, and concession trajectory. |
 | **Report Generation & Export** | M4 | `src/pages/Reports.jsx`, `src/services/negotiationReport.js` | ✅ IMPLEMENTED | Comprehensive report layout supporting browser print-to-PDF export (`window.print()`). |
 | **Automated Test Suite** | Full System | `backend/tests/` | ✅ IMPLEMENTED | **120 passing pytest tests (100% pass rate)** verifying all system engines and API flows. |

@@ -40,7 +40,7 @@ export default function PwaInstallModal({ isOpen, onClose, modalState }) {
         {/* Modal Header */}
         <div className="flex items-center gap-3 border-b border-border pb-4">
           <div className="h-10 w-10 shrink-0">
-            <NegoMindLogo size={40} />
+            <NegoMindLogo size={40} showWordmark={false} />
           </div>
           <div>
             <div className="flex items-center gap-2">

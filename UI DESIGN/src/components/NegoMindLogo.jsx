@@ -4,27 +4,31 @@ export default function NegoMindLogo({
   size = 44,
   showWordmark = true,
   className = "",
-  onNavigate
+  onNavigate,
+  onClick,
 }) {
-  const handleAction = (page) => {
+  const handleClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(e);
+      return;
+    }
     if (onNavigate) {
-      onNavigate(page);
+      e.preventDefault();
+      onNavigate("Dashboard");
     }
   };
 
   return (
     <a
       href="#"
-      onClick={(e) => {
-        e.preventDefault();
-        handleAction("Dashboard");
-      }}
-      aria-label="NegoMind"
-      className={`group inline-flex items-center gap-3 ${className}`}
+      onClick={handleClick}
+      aria-label="NegoMind - Negotiation Intelligence"
+      className={`group inline-flex items-center gap-3 select-none ${className}`}
     >
-      {/* Logo */}
+      {/* 2nd Logo Mark: Cream faceted tile */}
       <div
-        className="flex shrink-0 items-center justify-center overflow-hidden rounded-[5px]"
+        className="flex shrink-0 items-center justify-center overflow-hidden rounded-[6px] shadow-sm transition-transform duration-200 group-hover:scale-[1.03]"
         style={{
           width: size,
           height: size,
@@ -32,14 +36,14 @@ export default function NegoMindLogo({
         }}
       >
         <svg
-          width={size * 0.78}
-          height={size * 0.78}
+          width={size * 0.8}
+          height={size * 0.8}
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
         >
-          {/* Left negotiating position */}
+          {/* Left negotiating position - deep charcoal black */}
           <path
             d="
               M18 18
@@ -51,7 +55,7 @@ export default function NegoMindLogo({
             fill="#191A1C"
           />
 
-          {/* Right negotiating position */}
+          {/* Right negotiating position - muted olive/sage green */}
           <path
             d="
               M82 18
@@ -63,7 +67,7 @@ export default function NegoMindLogo({
             fill="#737B69"
           />
 
-          {/* Central negotiation / agreement point */}
+          {/* Central negotiation agreement point - teal outline triangle */}
           <path
             d="
               M42 35
@@ -74,7 +78,7 @@ export default function NegoMindLogo({
             fill="#62858B"
           />
 
-          {/* Small central negative-space cut */}
+          {/* Central negative space core cut */}
           <path
             d="
               M48 42
@@ -87,14 +91,12 @@ export default function NegoMindLogo({
         </svg>
       </div>
 
-      {/* Wordmark */}
+      {/* 2nd Logo Wordmark */}
       {showWordmark && (
         <div className="flex flex-col justify-center leading-none">
           <span
-            className="whitespace-nowrap text-[13px] font-bold uppercase"
+            className="whitespace-nowrap text-[13px] font-bold uppercase tracking-[0.19em] text-textPrimary dark:text-[#E8E3D8] transition-colors"
             style={{
-              color: "#E8E3D8",
-              letterSpacing: "0.19em",
               fontFamily:
                 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
             }}
@@ -103,10 +105,8 @@ export default function NegoMindLogo({
           </span>
 
           <span
-            className="mt-[5px] whitespace-nowrap text-[8px] font-medium uppercase"
+            className="mt-[5px] whitespace-nowrap text-[8px] font-semibold uppercase tracking-[0.18em] text-textMuted dark:text-[#8E918B] transition-colors"
             style={{
-              color: "#777A74",
-              letterSpacing: "0.18em",
               fontFamily:
                 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
             }}

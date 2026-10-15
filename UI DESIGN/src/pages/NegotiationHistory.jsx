@@ -6,6 +6,7 @@ import {
   downloadNegotiationExport,
   downloadAllNegotiationHistory
 } from "../services/api.js";
+import NegoMindLogo from "../components/NegoMindLogo";
 
 function outcomeBadgeClass(outcome) {
   const o = String(outcome || "").toLowerCase();
@@ -405,19 +406,7 @@ export default function NegotiationHistory({ onNavigate }) {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <img
-                  src="/logo-icon.png"
-                  alt="NegoMind Ai"
-                  className="h-9 w-9 rounded-xl object-contain bg-white p-0.5 shadow-md border border-white/10 shrink-0"
-                />
-                <div>
-                  <p className="text-base font-black text-textPrimary tracking-tight">
-                    NegoMind <span className="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Ai</span>
-                  </p>
-                  <p className="text-[10px] font-bold text-indigo-400/90 tracking-wider uppercase">
-                    AUDIT TRAIL &bull; ARCHIVE &bull; ANALYTICS
-                  </p>
-                </div>
+                <NegoMindLogo size={38} onNavigate={onNavigate} />
               </div>
               <h1 className="mt-4 text-2xl font-extrabold text-textPrimary">Negotiation History</h1>
               <p className="mt-1 text-xs text-textSecondary">

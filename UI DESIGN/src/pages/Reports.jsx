@@ -1,4 +1,5 @@
 import { buildNegotiationReportData, formatCurrency, safeText } from "../services/negotiationReport.js";
+import NegoMindLogo from "../components/NegoMindLogo";
 
 function decisionClass(decision) {
   if (decision === "ACCEPT") return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
@@ -22,17 +23,7 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <img
-                  src="/logo-icon.png"
-                  alt="NegoMind Ai"
-                  className="h-9 w-9 rounded-xl object-contain bg-white p-0.5 shadow-md border border-white/10 shrink-0"
-                />
-                <div>
-                  <p className="text-base font-black text-textPrimary print:text-slate-900 tracking-tight">
-                    NegoMind <span className="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Ai</span>
-                  </p>
-                  <p className="text-[10px] font-bold text-indigo-400/90 tracking-wider uppercase">THINK &bull; NEGOTIATE &bull; GROW</p>
-                </div>
+                <NegoMindLogo size={38} onNavigate={onNavigate} />
               </div>
               <p className="mt-2 text-xs text-textSecondary print:text-slate-600">AI-Driven Multi-Agent Negotiation Training & Simulation Platform</p>
               <p className="mt-4 text-[11px] font-mono font-bold uppercase tracking-widest text-textMuted">NEGOTIATION SUMMARY REPORT</p>

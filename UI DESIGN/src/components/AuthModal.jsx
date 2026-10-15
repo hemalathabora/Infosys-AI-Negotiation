@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import OAuthModal from "./OAuthModal";
+import NegoMindLogo from "./NegoMindLogo";
 import { startGoogleSignIn, startGithubSignIn } from "../services/oauthService";
 
 export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
@@ -260,16 +261,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
           </button>
 
           {/* Top Title Bar */}
-          <div className="text-center mb-5">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white p-1.5 border border-indigo-500/30 mb-2.5 shadow-[0_0_24px_rgba(99,102,241,0.25)]">
-              <img
-                src="/logo-icon.png"
-                alt="NegoMind Ai"
-                className="h-full w-full object-contain"
-              />
-            </div>
+          <div className="text-center mb-5 flex flex-col items-center">
+            <NegoMindLogo size={50} showWordmark={false} className="mb-2.5" />
             <h2 className="text-xl font-black tracking-tight text-textPrimary">
-              {activeTab === "otp" ? "Email Verification" : "NegoMind Ai Portal"}
+              {activeTab === "otp" ? "Email Verification" : "NegoMind Portal"}
             </h2>
             <p className="text-xs text-textMuted mt-1">
               {activeTab === "signin" && "Sign in to access your negotiation agent simulations"}

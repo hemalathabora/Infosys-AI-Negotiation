@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: [
     "./index.html",
     "./src/**/*.{js,jsx}",
@@ -9,46 +10,46 @@ export default {
     extend: {
       /*
        * ============================================================
-       * ENTERPRISE AI NEGOTIATION - COLOR SYSTEM
+       * ENTERPRISE AI NEGOTIATION - COLOR SYSTEM (THEME-AWARE)
        * ============================================================
        */
 
       colors: {
-        // Outer Application & Sidebar (Matte Pitch Black like reference image left part)
-        bg: "#0C0C0F",
-        header: "#0C0C0F",
-        sidebar: "#0C0C0F",
+        // Outer Application & Sidebar
+        bg: "var(--bg)",
+        header: "var(--header)",
+        sidebar: "var(--sidebar)",
 
-        // Elevated Main Panel (Right part warm dark charcoal container from image)
-        mainPanel: "#17161B",
+        // Elevated Main Panel
+        mainPanel: "var(--main-panel)",
 
         // Inset Cards & Inner Surfaces
-        card: "#201F25",
-        cardAlt: "#25242C",
+        card: "var(--card)",
+        cardAlt: "var(--card-alt)",
 
         // Borders & Dividers
-        border: "#2A2931",
-        borderSubtle: "#302F39",
-        borderGlow: "#3D3B48",
+        border: "var(--border)",
+        borderSubtle: "var(--border-subtle)",
+        borderGlow: "var(--border-glow)",
 
-        // Primary Brand Accent: Clean Off-White / White
-        primary: "#F8FAFC",
-        primaryBright: "#FFFFFF",
-        brandWhite: "#F1F5F9",
-        azure: "#3B82F6",
-        azureBright: "#60A5FA",
+        // Primary Brand Accent
+        primary: "var(--primary)",
+        primaryBright: "var(--primary-bright)",
+        brandWhite: "var(--brand-white)",
+        azure: "var(--azure)",
+        azureBright: "var(--azure-bright)",
 
         // Status & Badge Tones
-        success: "#10B981",
-        successBright: "#34D399",
-        warning: "#F59E0B",
-        warningBright: "#FBBF24",
-        danger: "#EF4444",
+        success: "var(--success)",
+        successBright: "var(--success-bright)",
+        warning: "var(--warning)",
+        warningBright: "var(--warning-bright)",
+        danger: "var(--danger)",
 
         // Typography Hierarchy
-        textPrimary: "#F8FAFC",
-        textSecondary: "#A1A1AA",
-        textMuted: "#71717A",
+        textPrimary: "var(--text-primary)",
+        textSecondary: "var(--text-secondary)",
+        textMuted: "var(--text-muted)",
       },
 
       /*

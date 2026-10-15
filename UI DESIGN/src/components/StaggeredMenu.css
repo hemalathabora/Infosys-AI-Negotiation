@@ -58,9 +58,10 @@
   right: 0;
   width: clamp(250px, 22vw, 330px);
   height: 100%;
-  background: #121117;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  background: var(--main-panel);
+  color: var(--text-primary);
+  border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -72,10 +73,21 @@
   scrollbar-color: rgba(52, 211, 153, 0.45) transparent;
 }
 
+.dark .staggered-menu-panel {
+  background: #121117;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
 [data-position='left'] .staggered-menu-panel {
   right: auto;
   left: 0;
   border-left: none;
+  border-right: 1px solid var(--border);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
+}
+
+.dark [data-position='left'] .staggered-menu-panel {
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
 }
@@ -105,6 +117,10 @@
 .sm-panel-heading {
   margin-bottom: 6px;
   padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dark .sm-panel-heading {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -120,10 +136,14 @@
 
 .sm-panel-title {
   margin: 4px 0 0;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 22px;
   font-weight: 800;
   letter-spacing: -0.04em;
+}
+
+.dark .sm-panel-title {
+  color: #ffffff;
 }
 
 .sm-panel-title span {
@@ -151,9 +171,9 @@
   width: 100%;
   align-items: center;
   gap: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
-  color: #f8fafc;
+  border: 1px solid var(--border);
+  background: var(--card-alt);
+  color: var(--text-primary);
   cursor: pointer;
   text-align: left;
   padding: 12px 14px;
@@ -161,10 +181,21 @@
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
+.dark .sm-panel-button {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: #f8fafc;
+}
+
 .sm-panel-button:hover {
+  background: var(--border);
+  border-color: rgba(52, 211, 153, 0.4);
+  transform: translateX(2px);
+}
+
+.dark .sm-panel-button:hover {
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(52, 211, 153, 0.3);
-  transform: translateX(2px);
 }
 
 .sm-panel-itemIcon {
@@ -174,11 +205,17 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
   border-radius: 14px;
+  background: var(--card);
+  color: #059669;
+  transition: 160ms ease;
+}
+
+.dark .sm-panel-itemIcon {
+  border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.05);
   color: #a7f3d0;
-  transition: 160ms ease;
 }
 
 .sm-panel-button:hover .sm-panel-itemIcon {
@@ -199,13 +236,17 @@
   display: inline-block;
   font-size: 16px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--text-primary);
   will-change: transform;
+}
+
+.dark .sm-panel-itemLabel {
+  color: #ffffff;
 }
 
 .sm-panel-itemDescription {
   overflow: hidden;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.4;
   text-overflow: ellipsis;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 import PerformanceScorecard from "../components/PerformanceScorecard";
 
 function formatValue(value) {
@@ -11,19 +12,19 @@ function formatValue(value) {
  */
 function Metric({ label, value, detail, badge }) {
   return (
-    <div className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-5 shadow-md flex flex-col justify-between space-y-3">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-md flex flex-col justify-between space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+        <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
           {label}
         </p>
         {badge && (
-          <span className="rounded-lg border border-[#302F39] bg-[#1A191E] px-2 py-0.5 font-mono text-[10px] text-slate-300 font-semibold">
+          <span className="rounded-lg border border-border bg-cardAlt px-2 py-0.5 font-mono text-[10px] text-textSecondary font-semibold">
             {badge}
           </span>
         )}
       </div>
       <div>
-        <p className="text-2xl sm:text-3xl font-extrabold text-white font-mono tracking-tight">{value}</p>
+        <p className="text-2xl sm:text-3xl font-extrabold text-textPrimary font-mono tracking-tight">{value}</p>
         <p className="mt-1 text-xs text-textSecondary font-body">{detail}</p>
       </div>
     </div>
@@ -49,22 +50,22 @@ function OfferBar({ offer, maxValue, agent, index }) {
 
   return (
     <div className="grid grid-cols-[100px_1fr_92px] items-center gap-3 text-xs sm:grid-cols-[140px_1fr_110px]">
-      <div className="truncate font-medium text-white font-sans">
+      <div className="truncate font-medium text-textPrimary font-sans">
         R{offer.round || 1} · {agent?.name || offer.agent_id || "Agent"}
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-[#1A191E] border border-[#2D2C36]">
+      <div className="h-2.5 overflow-hidden rounded-full bg-cardAlt border border-border">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             isFirst
-              ? "bg-slate-500"
+              ? "bg-slate-400 dark:bg-slate-500"
               : agent?.id === "buyer" || agent?.id === "candidate" || index % 2 === 0
-                ? "bg-gradient-to-r from-slate-200 to-white"
-                : "bg-gradient-to-r from-emerald-500 to-teal-400"
+                ? "bg-gradient-to-r from-slate-400 to-slate-200 dark:from-slate-200 dark:to-white"
+                : "bg-gradient-to-r from-emerald-600 to-teal-500 dark:from-emerald-500 dark:to-teal-400"
           }`}
           style={{ width: `${width}%` }}
         />
       </div>
-      <div className="text-right font-mono font-bold text-white">
+      <div className="text-right font-mono font-bold text-textPrimary">
         {formatValue(val)}
       </div>
     </div>
@@ -75,6 +76,7 @@ function OfferBar({ offer, maxValue, agent, index }) {
  * Bid Convergence & Saturation SVG Graph Component
  */
 function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2Name = "Party 02 (Vendor)" }) {
+  const { isDark } = useTheme();
   const [_hoverPoint, _setHoverPoint] = useState(null);
   const safeHistory = Array.isArray(history) ? history : [];
 
@@ -134,36 +136,42 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
   const eqX = getX(finalIdx);
   const eqY = getY((finalPoint.p1 + finalPoint.p2) / 2);
 
+  const primaryStroke = isDark ? "#FFFFFF" : "#0F172A";
+  const gridStroke = isDark ? "#2B2A33" : "#E2E8F0";
+  const pillBg = isDark ? "#101015" : "#FFFFFF";
+  const circleFill = isDark ? "#17161B" : "#FFFFFF";
+  const labelText = isDark ? "#9494A0" : "#64748B";
+
   return (
     <div className="space-y-4">
       {/* Legend & Stat Highlights */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#2B2A33] pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <div className="flex items-center gap-5 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-white shadow-sm border border-slate-300" />
-            <span className="text-white font-bold">{party1Name} (Upward Anchor)</span>
+            <span className="h-3 w-3 rounded-full bg-slate-900 dark:bg-white shadow-sm border border-border" />
+            <span className="text-textPrimary font-bold">{party1Name} (Upward Anchor)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-emerald-400 shadow-sm" />
-            <span className="text-emerald-400 font-bold">{party2Name} (Downward Ask)</span>
+            <span className="h-3 w-3 rounded-full bg-emerald-500 dark:bg-emerald-400 shadow-sm" />
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold">{party2Name} (Downward Ask)</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 font-mono text-xs">
-          <span className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-bold text-emerald-400">
+          <span className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 font-bold text-emerald-600 dark:text-emerald-400">
             SATURATION EQUILIBRIUM REACHED @ {formatValue(finalPoint.p1)}
           </span>
         </div>
       </div>
 
       {/* SVG Canvas */}
-      <div className="relative w-full overflow-hidden rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4">
+      <div className="relative w-full overflow-hidden rounded-xl border border-border bg-cardAlt p-4">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto overflow-visible select-none">
           <defs>
             {/* Grid Patterns */}
             <linearGradient id="p1Grad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0.0" />
+              <stop offset="0%" stopColor={primaryStroke} stopOpacity="0.25" />
+              <stop offset="100%" stopColor={primaryStroke} stopOpacity="0.0" />
             </linearGradient>
             <linearGradient id="p2Grad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
@@ -179,7 +187,7 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
               y1={padding + ratio * (height - 2 * padding)}
               x2={width - padding}
               y2={padding + ratio * (height - 2 * padding)}
-              stroke="#2B2A33"
+              stroke={gridStroke}
               strokeDasharray="4 4"
               strokeWidth="1"
             />
@@ -198,7 +206,7 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
           />
 
           {/* Line 1 Path (Party 1) */}
-          <path d={pathP1} fill="none" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
+          <path d={pathP1} fill="none" stroke={primaryStroke} strokeWidth="3" strokeLinecap="round" />
 
           {/* Line 2 Path (Party 2) */}
           <path d={pathP2} fill="none" stroke="#10B981" strokeWidth="3" strokeLinecap="round" />
@@ -213,15 +221,15 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
             return (
               <g key={idx} className="cursor-pointer group">
                 {/* Party 1 Dot (Buyer) */}
-                <circle cx={cx} cy={cy1} r="5" fill="#17161B" stroke="#FFFFFF" strokeWidth="2.5" />
+                <circle cx={cx} cy={cy1} r="5" fill={circleFill} stroke={primaryStroke} strokeWidth="2.5" />
 
                 {/* Party 2 Dot (Vendor) */}
-                <circle cx={cx} cy={cy2} r="5" fill="#17161B" stroke="#10B981" strokeWidth="2.5" />
+                <circle cx={cx} cy={cy2} r="5" fill={circleFill} stroke="#10B981" strokeWidth="2.5" />
 
                 {/* Price Label for Party 2 (Vendor - Top curve) */}
                 {!isFinal && (
                   <g transform={`translate(${cx}, ${cy2 - 12})`}>
-                    <rect x="-26" y="-13" width="52" height="16" rx="4" fill="#101015" stroke="#10B981" strokeWidth="0.8" opacity="0.95" />
+                    <rect x="-26" y="-13" width="52" height="16" rx="4" fill={pillBg} stroke="#10B981" strokeWidth="0.8" opacity="0.95" />
                     <text x="0" y="-1" fill="#10B981" fontSize="9.5" fontFamily="JetBrains Mono" fontWeight="700" textAnchor="middle">
                       {formatValue(p.p2)}
                     </text>
@@ -231,8 +239,8 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
                 {/* Price Label for Party 1 (Buyer - Bottom curve) */}
                 {!isFinal && (
                   <g transform={`translate(${cx}, ${cy1 + 14})`}>
-                    <rect x="-26" y="-3" width="52" height="16" rx="4" fill="#101015" stroke="#64748B" strokeWidth="0.8" opacity="0.95" />
-                    <text x="0" y="9" fill="#FFFFFF" fontSize="9.5" fontFamily="JetBrains Mono" fontWeight="700" textAnchor="middle">
+                    <rect x="-26" y="-3" width="52" height="16" rx="4" fill={pillBg} stroke={isDark ? "#64748B" : "#94A3B8"} strokeWidth="0.8" opacity="0.95" />
+                    <text x="0" y="9" fill={primaryStroke} fontSize="9.5" fontFamily="JetBrains Mono" fontWeight="700" textAnchor="middle">
                       {formatValue(p.p1)}
                     </text>
                   </g>
@@ -249,7 +257,7 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
                 )}
 
                 {/* X-Axis Round Labels */}
-                <text x={cx} y={height - 10} fill="#9494A0" fontSize="11" fontFamily="JetBrains Mono" textAnchor="middle">
+                <text x={cx} y={height - 10} fill={labelText} fontSize="11" fontFamily="JetBrains Mono" textAnchor="middle">
                   R{p.round}
                 </text>
               </g>
@@ -258,25 +266,25 @@ function SaturationGraph({ history = [], party1Name = "Party 01 (Buyer)", party2
 
           {/* Equilibrium Highlight Dot */}
           <circle cx={eqX} cy={eqY} r="9" fill="#10B981" fillOpacity="0.2" className="animate-ping" />
-          <circle cx={eqX} cy={eqY} r="6" fill="#10B981" stroke="#FFFFFF" strokeWidth="2" />
+          <circle cx={eqX} cy={eqY} r="6" fill="#10B981" stroke={primaryStroke} strokeWidth="2" />
         </svg>
       </div>
 
       {/* Analytical Summary Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs pt-1">
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3.5 space-y-1">
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Target Saturation Spread</p>
-          <p className="text-base font-extrabold text-emerald-400">$0 (100% Converged)</p>
+        <div className="rounded-xl border border-border bg-cardAlt p-3.5 space-y-1">
+          <p className="text-[10px] text-textMuted font-bold uppercase">Target Saturation Spread</p>
+          <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">$0 (100% Converged)</p>
         </div>
 
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3.5 space-y-1">
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Rate of Concession Decay</p>
-          <p className="text-base font-extrabold text-white">0.00 Slope (Saturated)</p>
+        <div className="rounded-xl border border-border bg-cardAlt p-3.5 space-y-1">
+          <p className="text-[10px] text-textMuted font-bold uppercase">Rate of Concession Decay</p>
+          <p className="text-base font-extrabold text-textPrimary">0.00 Slope (Saturated)</p>
         </div>
 
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3.5 space-y-1">
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Utility Efficiency</p>
-          <p className="text-base font-extrabold text-white">98.5% Pareto Optimal</p>
+        <div className="rounded-xl border border-border bg-cardAlt p-3.5 space-y-1">
+          <p className="text-[10px] text-textMuted font-bold uppercase">Utility Efficiency</p>
+          <p className="text-base font-extrabold text-textPrimary">98.5% Pareto Optimal</p>
         </div>
       </div>
     </div>
@@ -328,20 +336,20 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
   const totalMovement = Object.values(concessionTotals).reduce((sum, value) => sum + value, 0);
 
   return (
-    <main data-guide="reports-panel" className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
+    <main data-guide="reports-panel" className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
       <div className="mx-auto max-w-[1500px] space-y-8">
 
         {/* 1. SYMMETRICAL HEADER */}
-        <header className="border-b border-[#292831] pb-6 space-y-4">
+        <header className="border-b border-border pb-6 space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <p className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-400">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+                <p className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
                   QUANTITATIVE TELEMETRY & CONVERGENCE
                 </p>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-textPrimary font-sans">
                 {currentScenario.scenario_name || currentScenario.name}
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
@@ -353,20 +361,20 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               {/* MODE BADGE */}
               <div className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-mono font-bold ${
                 isLlmMode
-                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 shadow-sm"
-                  : "border-indigo-500/40 bg-indigo-500/10 text-indigo-300 shadow-sm"
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                  : "border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 shadow-sm"
               }`}>
-                <span className={`h-2 w-2 rounded-full ${isLlmMode ? "bg-emerald-400 animate-pulse" : "bg-indigo-400"}`} />
+                <span className={`h-2 w-2 rounded-full ${isLlmMode ? "bg-emerald-500 dark:bg-emerald-400 animate-pulse" : "bg-indigo-500 dark:bg-indigo-400"}`} />
                 Performed by: {activeMode}
               </div>
 
               {/* STATUS BADGE */}
               <div className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-mono font-bold ${
                 isAgreement
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm"
-                  : "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                  : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
               }`}>
-                <span className={isAgreement ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-400"} />
+                <span className={isAgreement ? "h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" : "h-2 w-2 rounded-full bg-amber-500 dark:bg-amber-400"} />
                 {isAgreement ? "AGREEMENT SATURATED" : "SESSION DEADLOCK"}
               </div>
             </div>
@@ -376,31 +384,31 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
         {/* EXPLICIT MODE EXECUTION BANNER */}
         <section className={`rounded-2xl border p-5 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono ${
           isLlmMode
-            ? "border-emerald-500/40 bg-[#14261F]"
-            : "border-[#353344] bg-[#1E1D28]"
+            ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-[#14261F]"
+            : "border-border bg-cardAlt"
         }`}>
           <div className="flex items-center gap-3.5">
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border font-bold text-xs ${
-              isLlmMode ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-300" : "border-indigo-400/50 bg-indigo-500/20 text-indigo-300"
+              isLlmMode ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300" : "border-indigo-400/50 bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
             }`}>
               {isLlmMode ? "LLM" : "NORM"}
             </div>
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">
                 EXECUTION PROTOCOL MODE TELEMETRY
               </p>
-              <p className="text-sm sm:text-base font-extrabold text-white font-sans mt-0.5">
-                Operation Performed By: <span className={isLlmMode ? "text-emerald-400 font-black" : "text-indigo-300 font-black"}>{activeMode}</span>
+              <p className="text-sm sm:text-base font-extrabold text-textPrimary font-sans mt-0.5">
+                Operation Performed By: <span className={isLlmMode ? "text-emerald-600 dark:text-emerald-400 font-black" : "text-indigo-600 dark:text-indigo-300 font-black"}>{activeMode}</span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-body">Reasoning Engine:</span>
+            <span className="text-textMuted font-body">Reasoning Engine:</span>
             <span className={`rounded-lg border px-3 py-1 font-bold ${
               isLlmMode
-                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
-                : "border-indigo-500/40 bg-indigo-500/15 text-indigo-200"
+                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
+                : "border-indigo-500/40 bg-indigo-500/15 text-indigo-600 dark:text-indigo-200"
             }`}>
               {isLlmMode ? "LLM Mode (Generative AI Reasoning)" : "Normal Mode (Rule-Based Concession Engine)"}
             </span>
@@ -451,13 +459,13 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
         </section>
 
         {/* 3. PRIMARY HIGHLIGHT: BID CONVERGENCE & SATURATION GRAPH CARD */}
-        <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#2B2A33] pb-4">
+        <section className="rounded-2xl border border-border bg-card p-6 shadow-md space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border pb-4">
             <div>
-              <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+              <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
                 EQUILIBRIUM VISUALIZATION
               </p>
-              <h2 className="text-lg sm:text-xl font-bold text-white font-sans">
+              <h2 className="text-lg sm:text-xl font-bold text-textPrimary font-sans">
                 Bid Convergence & Saturation Curve
               </h2>
             </div>
@@ -478,13 +486,13 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
           {/* Offer Trajectory Bars (Span 7) */}
-          <div className="lg:col-span-7 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-5 flex flex-col justify-between">
+          <div className="lg:col-span-7 rounded-2xl border border-border bg-card p-6 shadow-md space-y-5 flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="border-b border-[#2B2A33] pb-3">
-                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+              <div className="border-b border-border pb-3">
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
                   POSITION PROGRESSION
                 </p>
-                <h2 className="text-lg font-bold text-white font-sans">
+                <h2 className="text-lg font-bold text-textPrimary font-sans">
                   Offer Trajectory Sequence
                 </h2>
               </div>
@@ -507,13 +515,13 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
           </div>
 
           {/* Agent Flexibility & Executive Action (Span 5) */}
-          <div className="lg:col-span-5 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-6 flex flex-col justify-between">
+          <div className="lg:col-span-5 rounded-2xl border border-border bg-card p-6 shadow-md space-y-6 flex flex-col justify-between">
             <div className="space-y-5">
-              <div className="border-b border-[#2B2A33] pb-3">
-                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+              <div className="border-b border-border pb-3">
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
                   CONCESSION ANALYSIS & BOUNDARIES
                 </p>
-                <h2 className="text-lg font-bold text-white font-sans">
+                <h2 className="text-lg font-bold text-textPrimary font-sans">
                   Agent Flexibility & Decay Telemetry
                 </h2>
               </div>
@@ -530,30 +538,30 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
                   const interpretation = agentAnalysis?.interpretation;
 
                   return (
-                    <div key={agent.id} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4 space-y-3 font-mono">
-                      <div className="flex items-center justify-between border-b border-[#2D2C36] pb-2">
-                        <span className="text-sm font-bold text-white font-sans">{agent.name}</span>
-                        <span className="text-xs text-emerald-400 font-bold">
+                    <div key={agent.id} className="rounded-xl border border-border bg-cardAlt p-4 space-y-3 font-mono">
+                      <div className="flex items-center justify-between border-b border-border pb-2">
+                        <span className="text-sm font-bold text-textPrimary font-sans">{agent.name}</span>
+                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                           True Concession: {formatValue(moved)}
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
-                        <div>Initial: <span className="font-bold text-white">{formatValue(initPos)}</span></div>
-                        <div>Target: <span className="font-bold text-white">{formatValue(targetPos)}</span></div>
-                        <div>Current: <span className="font-bold text-white">{formatValue(currPos)}</span></div>
-                        <div>Capacity Left: <span className="font-bold text-indigo-300">{formatValue(remainingCap)}</span></div>
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-textSecondary">
+                        <div>Initial: <span className="font-bold text-textPrimary">{formatValue(initPos)}</span></div>
+                        <div>Target: <span className="font-bold text-textPrimary">{formatValue(targetPos)}</span></div>
+                        <div>Current: <span className="font-bold text-textPrimary">{formatValue(currPos)}</span></div>
+                        <div>Capacity Left: <span className="font-bold text-indigo-600 dark:text-indigo-300">{formatValue(remainingCap)}</span></div>
                       </div>
 
-                      <div className="border-t border-[#2D2C36] pt-2 text-[11px] flex items-center justify-between">
-                        <span className="text-slate-400">Rate of Concession Decay:</span>
-                        <span className="font-bold text-white">
+                      <div className="border-t border-border pt-2 text-[11px] flex items-center justify-between">
+                        <span className="text-textMuted">Rate of Concession Decay:</span>
+                        <span className="font-bold text-textPrimary">
                           {decayRate !== null && decayRate !== undefined ? `${decayRate}%` : "Insufficient rounds"}
                         </span>
                       </div>
 
                       {interpretation && (
-                        <p className="text-[11px] font-sans text-indigo-300 italic pt-1 border-t border-[#2D2C36]/50 leading-relaxed">
+                        <p className="text-[11px] font-sans text-indigo-600 dark:text-indigo-300 italic pt-1 border-t border-border/50 leading-relaxed">
                           "{interpretation}"
                         </p>
                       )}
@@ -567,7 +575,7 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate("Reports")}
-                className="w-full rounded-xl bg-slate-100 hover:bg-white text-slate-950 px-5 py-3 text-xs font-bold border border-slate-200 shadow-md transition text-center"
+                className="w-full rounded-xl bg-primary hover:bg-primaryBright text-slate-950 px-5 py-3 text-xs font-bold border border-primaryBright shadow-md transition text-center cursor-pointer"
               >
                 Generate Full Executive Audit Report →
               </button>
@@ -579,13 +587,13 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
 
         {/* 5. SESSION HISTORY & ENGINE MODE AUDIT TABLE */}
         {safeHistory.length > 0 && (
-          <section className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[#2B2A33] pb-3">
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-md space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border pb-3">
               <div>
-                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">
                   HISTORICAL TELEMETRY AUDIT
                 </p>
-                <h3 className="text-lg font-bold text-white font-sans">
+                <h3 className="text-lg font-bold text-textPrimary font-sans">
                   Session Execution Mode Breakdown
                 </h3>
               </div>
@@ -594,10 +602,10 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               </p>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-[#2D2C36] bg-[#1A191E]">
+            <div className="overflow-x-auto rounded-xl border border-border bg-cardAlt">
               <table className="w-full text-left text-xs font-body">
                 <thead>
-                  <tr className="border-b border-[#2D2C36] bg-[#17161B] font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                  <tr className="border-b border-border bg-card font-mono text-[11px] uppercase tracking-wider text-textMuted">
                     <th className="px-4 py-3.5">Scenario</th>
                     <th className="px-4 py-3.5">Parties</th>
                     <th className="px-4 py-3.5">Executed By (Mode)</th>
@@ -606,35 +614,35 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
                     <th className="px-4 py-3.5">Settlement</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2B2A33]">
+                <tbody className="divide-y divide-border">
                   {safeHistory.map((item, idx) => {
                     const itemMode = item.mode || "Normal Mode";
                     const isItemLlm = itemMode === "LLM Mode" || String(itemMode).toLowerCase().includes("llm");
                     return (
-                      <tr key={item.id || idx} className="hover:bg-[#201F25] transition-colors">
-                        <td className="px-4 py-3.5 font-semibold text-white">{item.scenario}</td>
-                        <td className="px-4 py-3.5 text-slate-300">{item.agents}</td>
+                      <tr key={item.id || idx} className="hover:bg-mainPanel/50 transition-colors">
+                        <td className="px-4 py-3.5 font-semibold text-textPrimary">{item.scenario}</td>
+                        <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
                         <td className="px-4 py-3.5">
                           <span className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-mono text-[11px] font-bold ${
                             isItemLlm
-                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
-                              : "border-indigo-500/40 bg-indigo-500/10 text-indigo-300"
+                              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                              : "border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300"
                           }`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${isItemLlm ? "bg-emerald-400" : "bg-indigo-400"}`} />
+                            <span className={`h-1.5 w-1.5 rounded-full ${isItemLlm ? "bg-emerald-500 dark:bg-emerald-400" : "bg-indigo-500 dark:bg-indigo-400"}`} />
                             {itemMode}
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 font-mono text-slate-400">{item.rounds}</td>
+                        <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>
                         <td className="px-4 py-3.5">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${
                             item.result === "Agreement"
-                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                              : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
+                              ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                              : "bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400"
                           }`}>
                             {item.result}
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 font-mono font-extrabold text-emerald-400">{item.settlement || "N/A"}</td>
+                        <td className="px-4 py-3.5 font-mono font-extrabold text-emerald-600 dark:text-emerald-400">{item.settlement || "N/A"}</td>
                       </tr>
                     );
                   })}

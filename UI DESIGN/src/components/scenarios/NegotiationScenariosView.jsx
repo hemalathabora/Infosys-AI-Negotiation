@@ -6,6 +6,7 @@ import {
   duplicateCustomScenario
 } from "../../services/api";
 import CustomScenarioBuilder from "./CustomScenarioBuilder";
+import { useTheme } from "../../context/ThemeContext";
 
 const CATEGORIES = [
   "All",
@@ -32,7 +33,7 @@ function getCategoryColor(cat = "") {
   if (c.includes("project")) return "border-indigo-500/30 bg-indigo-500/10 text-indigo-400";
   if (c.includes("housing")) return "border-rose-500/30 bg-rose-500/10 text-rose-400";
   if (c.includes("business")) return "border-yellow-500/30 bg-yellow-500/10 text-yellow-400";
-  return "border-slate-500/30 bg-slate-500/10 text-slate-300";
+  return "border-slate-500/30 bg-slate-500/10 text-slate-400";
 }
 
 function ScenarioIcon({ category = "" }) {
@@ -53,8 +54,10 @@ export default function NegotiationScenariosView({
   onSelectScenario,
   onNavigate,
   userId = null,
-  isDark = true
+  isDark: isDarkProp,
 }) {
+  const themeContext = useTheme();
+  const isDark = isDarkProp !== undefined ? isDarkProp : (themeContext ? themeContext.isDark : true);
   const [activeTab, setActiveTab] = useState("all"); // 'all', 'existing', 'more', 'custom'
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -188,20 +191,20 @@ export default function NegotiationScenariosView({
   };
 
   return (
-    <div className={`min-h-full w-full p-4 sm:p-8 ${isDark ? "bg-[#0C0C0F] text-white" : "bg-slate-50 text-slate-900"}`}>
+    <div className="min-h-full w-full p-4 sm:p-8 bg-mainPanel text-textPrimary">
       {/* Top Banner / Header */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-500 dark:text-emerald-400">
               NegoMind AI Simulation Library
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight mt-1 text-textPrimary">
             NEGOTIATION SCENARIOS
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-textMuted mt-1">
             Select built-in business negotiations or design custom multi-agent simulation scenarios.
           </p>
         </div>
@@ -209,7 +212,7 @@ export default function NegotiationScenariosView({
         {/* Create Custom Button */}
         <button
           onClick={handleOpenBuilderCreate}
-          className="flex items-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-black shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:bg-emerald-300 hover:scale-[1.02] transition active:scale-95 cursor-pointer"
+          className="flex items-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 text-xs font-black uppercase tracking-wider text-slate-950 shadow-[0_0_20px_rgba(52,211,153,0.3)] hover:bg-emerald-300 hover:scale-[1.02] transition active:scale-95 cursor-pointer"
         >
           <span>+ Create Custom Scenario</span>
         </button>
@@ -218,7 +221,7 @@ export default function NegotiationScenariosView({
       {/* Navigation Sub-Tabs & Filters */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Sub-Tabs */}
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-1.5">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-cardAlt p-1.5">
           {[
             { id: "all", label: "All Scenarios", count: predefinedList.length + customScenarios.length },
             { id: "existing", label: "Existing Scenarios", count: 3 },
@@ -230,8 +233,8 @@ export default function NegotiationScenariosView({
               onClick={() => setActiveTab(tab.id)}
               className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-emerald-500 text-black shadow-sm"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                  ? "bg-emerald-500 text-slate-950 shadow-sm"
+                  : "text-textMuted hover:text-textPrimary hover:bg-card"
               }`}
             >
               {tab.label} ({tab.count})
@@ -247,14 +250,14 @@ export default function NegotiationScenariosView({
               placeholder="Search scenarios..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-card px-3.5 py-1.5 text-xs text-textPrimary placeholder-textMuted focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-xl border border-white/10 bg-[#1A1924] px-3 py-1.5 text-xs text-white focus:outline-none"
+            className="rounded-xl border border-border bg-card px-3 py-1.5 text-xs text-textPrimary focus:outline-none"
           >
             <option value="name">Sort by Name</option>
             <option value="category">Sort by Category</option>
@@ -270,8 +273,8 @@ export default function NegotiationScenariosView({
             onClick={() => setSelectedCategory(cat)}
             className={`rounded-full border px-3.5 py-1 text-[11px] font-semibold transition whitespace-nowrap cursor-pointer ${
               selectedCategory === cat
-                ? "border-emerald-400 bg-emerald-400/20 text-emerald-300"
-                : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20 hover:text-white"
+                ? "border-emerald-400 bg-emerald-400/20 text-emerald-600 dark:text-emerald-300"
+                : "border-border bg-cardAlt text-textMuted hover:border-borderHover hover:text-textPrimary"
             }`}
           >
             {cat}
@@ -283,10 +286,10 @@ export default function NegotiationScenariosView({
       {(activeTab === "all" || activeTab === "existing") && !searchQuery && selectedCategory === "All" && (
         <div className="mb-10">
           <div className="mb-4 flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
               CORE BUILT-IN SCENARIOS
             </span>
-            <div className="h-[1px] flex-1 bg-white/10" />
+            <div className="h-[1px] flex-1 bg-border" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -295,7 +298,6 @@ export default function NegotiationScenariosView({
                 key={s.scenario_id}
                 scenario={s}
                 onStart={() => handleStartScenario(s)}
-                isDark={isDark}
               />
             ))}
           </div>
@@ -306,10 +308,10 @@ export default function NegotiationScenariosView({
       {(activeTab === "all" || activeTab === "more") && !searchQuery && selectedCategory === "All" && (
         <div className="mb-10">
           <div className="mb-4 flex items-center gap-2">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
               PREDEFINED SCENARIOS (MORE)
             </span>
-            <div className="h-[1px] flex-1 bg-white/10" />
+            <div className="h-[1px] flex-1 bg-border" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -318,7 +320,6 @@ export default function NegotiationScenariosView({
                 key={s.scenario_id}
                 scenario={s}
                 onStart={() => handleStartScenario(s)}
-                isDark={isDark}
               />
             ))}
           </div>
@@ -330,15 +331,15 @@ export default function NegotiationScenariosView({
         <div className="mb-10">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
                 MY CUSTOM SCENARIOS
               </span>
-              <div className="h-[1px] w-24 bg-white/10" />
+              <div className="h-[1px] w-24 bg-border" />
             </div>
 
             <button
               onClick={handleOpenBuilderCreate}
-              className="text-xs font-bold text-emerald-400 hover:underline"
+              className="text-xs font-bold text-emerald-500 dark:text-emerald-400 hover:underline"
             >
               + Add Custom Scenario
             </button>
@@ -350,11 +351,11 @@ export default function NegotiationScenariosView({
               onClick={handleOpenBuilderCreate}
               className="group flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-500/40 bg-emerald-500/[0.03] p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-500/[0.08] transition min-h-[200px]"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 text-xl font-black group-hover:scale-110 transition">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 text-xl font-black group-hover:scale-110 transition">
                 +
               </div>
-              <h3 className="mt-3 font-bold text-sm text-white">Create Custom Scenario</h3>
-              <p className="mt-1 text-xs text-slate-400">
+              <h3 className="mt-3 font-bold text-sm text-textPrimary">Create Custom Scenario</h3>
+              <p className="mt-1 text-xs text-textMuted">
                 Build custom roles, objectives, variables, and constraint guardrails.
               </p>
             </div>
@@ -368,7 +369,6 @@ export default function NegotiationScenariosView({
                 onEdit={() => handleOpenBuilderEdit(s)}
                 onDuplicate={() => handleDuplicate(s.scenario_id)}
                 onDelete={() => setDeletingId(s.scenario_id)}
-                isDark={isDark}
               />
             ))}
           </div>
@@ -379,13 +379,13 @@ export default function NegotiationScenariosView({
       {(searchQuery || selectedCategory !== "All") && (
         <div className="mb-10">
           <div className="mb-4 flex items-center justify-between">
-            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
               SEARCH & FILTERED RESULTS ({allDisplayScenarios.length})
             </span>
           </div>
 
           {allDisplayScenarios.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center text-slate-400">
+            <div className="rounded-2xl border border-border bg-card p-8 text-center text-textMuted">
               No matching negotiation scenarios found for "{searchQuery || selectedCategory}".
             </div>
           ) : (
@@ -399,14 +399,12 @@ export default function NegotiationScenariosView({
                     onEdit={() => handleOpenBuilderEdit(s)}
                     onDuplicate={() => handleDuplicate(s.scenario_id)}
                     onDelete={() => setDeletingId(s.scenario_id)}
-                    isDark={isDark}
                   />
                 ) : (
                   <ScenarioCard
                     key={s.scenario_id}
                     scenario={s}
                     onStart={() => handleStartScenario(s)}
-                    isDark={isDark}
                   />
                 )
               )}
@@ -433,22 +431,22 @@ export default function NegotiationScenariosView({
       {/* Deletion Confirmation Modal */}
       {deletingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl border border-rose-500/40 bg-[#121118] p-6 shadow-2xl text-white space-y-4">
-            <h3 className="text-lg font-bold text-rose-400">Delete Custom Scenario?</h3>
-            <p className="text-xs text-slate-300">
+          <div className="w-full max-w-md rounded-2xl border border-rose-500/40 bg-card p-6 shadow-2xl text-textPrimary space-y-4">
+            <h3 className="text-lg font-bold text-rose-500 dark:text-rose-400">Delete Custom Scenario?</h3>
+            <p className="text-xs text-textSecondary">
               Are you sure you want to delete this custom scenario? This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setDeletingId(null)}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10"
+                className="rounded-xl border border-border bg-cardAlt px-4 py-2 text-xs font-bold text-textSecondary hover:bg-border transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
                 disabled={isDeleting}
-                className="rounded-xl bg-rose-500 px-4 py-2 text-xs font-bold text-white hover:bg-rose-600 disabled:opacity-50"
+                className="rounded-xl bg-rose-500 px-4 py-2 text-xs font-bold text-white hover:bg-rose-600 disabled:opacity-50 transition cursor-pointer"
               >
                 {isDeleting ? "Deleting..." : "Delete Scenario"}
               </button>
@@ -460,12 +458,12 @@ export default function NegotiationScenariosView({
   );
 }
 
-function ScenarioCard({ scenario, onStart, isDark }) {
+function ScenarioCard({ scenario, onStart }) {
   const catColor = getCategoryColor(scenario.category);
   const icon = ScenarioIcon({ category: scenario.category });
 
   return (
-    <div className={`flex flex-col justify-between rounded-2xl border p-5 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(52,211,153,0.15)] ${isDark ? "border-[#1F1E26] bg-[#121117]" : "border-slate-200 bg-white"}`}>
+    <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(52,211,153,0.15)]">
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
           <span className="text-2xl">{icon}</span>
@@ -474,23 +472,23 @@ function ScenarioCard({ scenario, onStart, isDark }) {
           </span>
         </div>
 
-        <h3 className="text-base font-black tracking-tight text-white mb-1">
+        <h3 className="text-base font-black tracking-tight text-textPrimary mb-1">
           {scenario.scenario_name || scenario.name}
         </h3>
 
-        <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+        <p className="text-xs text-textMuted line-clamp-2 mb-4 leading-relaxed">
           {scenario.description}
         </p>
 
-        <div className="mb-4 rounded-xl bg-black/40 p-2.5 border border-white/5 flex items-center justify-between text-xs">
-          <span className="text-slate-400 text-[11px]">Participants:</span>
-          <span className="font-mono font-bold text-emerald-400">{scenario.participantsStr || "Buyer vs Vendor"}</span>
+        <div className="mb-4 rounded-xl bg-cardAlt p-2.5 border border-border flex items-center justify-between text-xs">
+          <span className="text-textMuted text-[11px]">Participants:</span>
+          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{scenario.participantsStr || "Buyer vs Vendor"}</span>
         </div>
       </div>
 
       <button
         onClick={onStart}
-        className="w-full rounded-xl bg-emerald-500/10 border border-emerald-500/30 py-2.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500 hover:text-black transition cursor-pointer"
+        className="w-full rounded-xl bg-emerald-500/10 border border-emerald-500/30 py-2.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer"
       >
         Start Negotiation →
       </button>
@@ -498,17 +496,17 @@ function ScenarioCard({ scenario, onStart, isDark }) {
   );
 }
 
-function CustomScenarioCard({ scenario, onStart, onEdit, onDuplicate, onDelete, isDark }) {
+function CustomScenarioCard({ scenario, onStart, onEdit, onDuplicate, onDelete }) {
   const catColor = getCategoryColor(scenario.category);
   const icon = ScenarioIcon({ category: scenario.category });
 
   return (
-    <div className={`flex flex-col justify-between rounded-2xl border p-5 transition-all border-emerald-500/40 bg-[#14131D] hover:shadow-[0_0_20px_rgba(52,211,153,0.2)]`}>
+    <div className="flex flex-col justify-between rounded-2xl border p-5 transition-all border-emerald-500/40 bg-card hover:shadow-[0_0_20px_rgba(52,211,153,0.2)]">
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
             <span className="text-2xl">{icon}</span>
-            <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-mono text-[9px] font-bold uppercase text-emerald-400">
+            <span className="rounded-md bg-emerald-500/20 px-2 py-0.5 font-mono text-[9px] font-bold uppercase text-emerald-600 dark:text-emerald-400">
               CUSTOM
             </span>
           </div>
@@ -517,32 +515,32 @@ function CustomScenarioCard({ scenario, onStart, onEdit, onDuplicate, onDelete, 
           </span>
         </div>
 
-        <h3 className="text-base font-black tracking-tight text-white mb-1">
+        <h3 className="text-base font-black tracking-tight text-textPrimary mb-1">
           {scenario.scenario_name || scenario.name}
         </h3>
 
-        <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">
+        <p className="text-xs text-textMuted line-clamp-2 mb-4 leading-relaxed">
           {scenario.description}
         </p>
 
-        <div className="mb-4 rounded-xl bg-black/40 p-2.5 border border-white/5 flex items-center justify-between text-xs">
-          <span className="text-slate-400 text-[11px]">Participants:</span>
-          <span className="font-mono font-bold text-emerald-400">{scenario.participantsStr}</span>
+        <div className="mb-4 rounded-xl bg-cardAlt p-2.5 border border-border flex items-center justify-between text-xs">
+          <span className="text-textMuted text-[11px]">Participants:</span>
+          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{scenario.participantsStr}</span>
         </div>
       </div>
 
       <div className="space-y-2">
         <button
           onClick={onStart}
-          className="w-full rounded-xl bg-emerald-400 py-2 text-xs font-black text-black hover:bg-emerald-300 transition cursor-pointer"
+          className="w-full rounded-xl bg-emerald-400 py-2 text-xs font-black text-slate-950 hover:bg-emerald-300 transition cursor-pointer"
         >
           🚀 Start Negotiation
         </button>
 
         <div className="flex items-center justify-between gap-2 pt-1 text-[11px]">
-          <button onClick={onEdit} className="text-slate-300 hover:text-white font-semibold">Edit</button>
-          <button onClick={onDuplicate} className="text-slate-300 hover:text-white font-semibold">Duplicate</button>
-          <button onClick={onDelete} className="text-rose-400 hover:text-rose-300 font-semibold">Delete</button>
+          <button onClick={onEdit} className="text-textMuted hover:text-textPrimary font-semibold cursor-pointer">Edit</button>
+          <button onClick={onDuplicate} className="text-textMuted hover:text-textPrimary font-semibold cursor-pointer">Duplicate</button>
+          <button onClick={onDelete} className="text-rose-500 hover:text-rose-600 dark:text-rose-400 dark:hover:text-rose-300 font-semibold cursor-pointer">Delete</button>
         </div>
       </div>
     </div>

@@ -246,7 +246,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
-        <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-[#2A2938] bg-[#12111A] p-6 shadow-2xl transition-all">
+        <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border bg-mainPanel p-6 shadow-2xl transition-all text-textPrimary">
           {/* Glowing Ambient Top Background Accent */}
           <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
           <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
@@ -254,7 +254,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#1F1E2A] text-slate-400 hover:bg-[#2B2A3B] hover:text-white transition cursor-pointer"
+            className="absolute top-4 right-4 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-cardAlt text-textMuted hover:bg-card hover:text-textPrimary transition cursor-pointer"
           >
             ✕
           </button>
@@ -268,10 +268,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                 className="h-full w-full object-contain"
               />
             </div>
-            <h2 className="text-xl font-black tracking-tight text-white">
+            <h2 className="text-xl font-black tracking-tight text-textPrimary">
               {activeTab === "otp" ? "Email Verification" : "NegoMind Ai Portal"}
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-textMuted mt-1">
               {activeTab === "signin" && "Sign in to access your negotiation agent simulations"}
               {activeTab === "signup" && "Create an account to train and test custom AI agents"}
               {activeTab === "otp" && "Enter the 6-digit OTP verification code sent to your email"}
@@ -280,7 +280,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
 
           {/* Error Alert Box */}
           {authError && (
-            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-400 animate-in fade-in">
+            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-600 dark:text-red-400 animate-in fade-in">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
@@ -292,17 +292,17 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
 
           {/* Tab Selector (Sign In vs Sign Up) */}
           {activeTab !== "otp" && (
-            <div className="grid grid-cols-2 gap-1 rounded-2xl bg-[#1B1A26] p-1 border border-[#272635] mb-5">
+            <div className="grid grid-cols-2 gap-1 rounded-2xl bg-cardAlt p-1 border border-border mb-5">
               <button
                 type="button"
                 onClick={() => {
                   setActiveTab("signin");
                   setAuthError(null);
                 }}
-                className={`rounded-xl py-2 text-xs font-bold transition-all ${
+                className={`rounded-xl py-2 text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "signin"
-                    ? "bg-[#282738] text-white shadow-md"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-card text-textPrimary shadow-md"
+                    : "text-textMuted hover:text-textPrimary"
                 }`}
               >
                 Sign In
@@ -313,10 +313,10 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                   setActiveTab("signup");
                   setAuthError(null);
                 }}
-                className={`rounded-xl py-2 text-xs font-bold transition-all ${
+                className={`rounded-xl py-2 text-xs font-bold transition-all cursor-pointer ${
                   activeTab === "signup"
-                    ? "bg-[#282738] text-white shadow-md"
-                    : "text-slate-400 hover:text-slate-200"
+                    ? "bg-card text-textPrimary shadow-md"
+                    : "text-textMuted hover:text-textPrimary"
                 }`}
               >
                 Create Account
@@ -333,7 +333,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                   type="button"
                   onClick={handleGoogleAuth}
                   disabled={loading}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-[#2C2B3A] bg-[#171622] px-3 py-2.5 text-xs font-bold text-slate-200 hover:border-blue-500/50 hover:bg-[#1E1D2B] transition disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-xs font-bold text-textSecondary hover:border-blue-500/50 hover:bg-cardAlt hover:text-textPrimary transition disabled:opacity-50 cursor-pointer"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -350,21 +350,21 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                 type="button"
                 onClick={handleDemoQuickSignIn}
                 disabled={loading}
-                className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400 transition cursor-pointer disabled:opacity-50"
+                className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400 transition cursor-pointer disabled:opacity-50"
               >
                 <span>🚀 Quick Demo Login (Instant Access)</span>
               </button>
 
               <div className="relative my-4 flex items-center justify-center">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#262535]" /></div>
-                <span className="relative bg-[#12111A] px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+                <span className="relative bg-mainPanel px-2 text-[10px] font-bold uppercase tracking-wider text-textMuted">
                   or sign in with email
                 </span>
               </div>
 
               <form onSubmit={handleSignInSubmit} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-textSecondary mb-1">
                     Email Address
                   </label>
                   <input
@@ -373,13 +373,13 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                     placeholder="name@company.com"
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#2D2C3D] bg-[#181724] px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-cardAlt px-3.5 py-2.5 text-sm text-textPrimary placeholder:text-textMuted focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-semibold text-slate-300">
+                    <label className="block text-xs font-semibold text-textSecondary">
                       Password
                     </label>
                   </div>
@@ -390,12 +390,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                       placeholder="••••••••"
                       value={signInPassword}
                       onChange={(e) => setSignInPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#2D2C3D] bg-[#181724] px-3.5 py-2.5 pr-10 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                      className="w-full rounded-xl border border-border bg-cardAlt px-3.5 py-2.5 pr-10 text-sm text-textPrimary placeholder:text-textMuted focus:border-emerald-500 focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textPrimary cursor-pointer"
                     >
                       {showPassword ? "🙈" : "👁️"}
                     </button>
@@ -405,7 +405,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-50"
+                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? "Signing In..." : "Sign In to Dashboard"}
                 </button>
@@ -421,7 +421,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                   type="button"
                   onClick={handleGoogleAuth}
                   disabled={loading}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-[#2C2B3A] bg-[#171622] px-3 py-2.5 text-xs font-bold text-slate-200 hover:border-blue-500/50 hover:bg-[#1E1D2B] transition disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-2.5 text-xs font-bold text-textSecondary hover:border-blue-500/50 hover:bg-cardAlt hover:text-textPrimary transition disabled:opacity-50 cursor-pointer"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -434,15 +434,15 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
               </div>
 
               <div className="relative my-3.5 flex items-center justify-center">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#262535]" /></div>
-                <span className="relative bg-[#12111A] px-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+                <span className="relative bg-mainPanel px-2 text-[10px] font-bold uppercase tracking-wider text-textMuted">
                   or register with email
                 </span>
               </div>
 
               <form onSubmit={handleSignUpSubmit} className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-textSecondary mb-1">
                     Full Name
                   </label>
                   <input
@@ -451,12 +451,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                     placeholder="Alex Morgan"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
-                    className="w-full rounded-xl border border-[#2D2C3D] bg-[#181724] px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-cardAlt px-3.5 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-textSecondary mb-1">
                     Email Address
                   </label>
                   <input
@@ -465,12 +465,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                     placeholder="name@company.com"
                     value={signUpEmail}
                     onChange={(e) => setSignUpEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#2D2C3D] bg-[#181724] px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-cardAlt px-3.5 py-2 text-sm text-textPrimary placeholder:text-textMuted focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-textSecondary mb-1">
                     Password (min 6 characters)
                   </label>
                   <div className="relative">
@@ -481,12 +481,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                       placeholder="••••••••"
                       value={signUpPassword}
                       onChange={(e) => setSignUpPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#2D2C3D] bg-[#181724] px-3.5 py-2 pr-10 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                      className="w-full rounded-xl border border-border bg-cardAlt px-3.5 py-2 pr-10 text-sm text-textPrimary placeholder:text-textMuted focus:border-emerald-500 focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-textMuted hover:text-textPrimary cursor-pointer"
                     >
                       {showPassword ? "🙈" : "👁️"}
                     </button>
@@ -496,7 +496,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-50 mt-1"
+                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-50 mt-1 cursor-pointer"
                 >
                   {loading ? "Sending OTP Code..." : "Create Account & Send Verification Code →"}
                 </button>
@@ -514,14 +514,14 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                     : "border-emerald-500/30 bg-emerald-500/10"
                 }`}
               >
-                <p className="text-xs text-emerald-300 font-semibold">
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold">
                   {emailSent
                     ? "✉️ Real OTP Email sent via SMTP to "
                     : "Verification code generated for "}
-                  <strong className="text-white">{otpEmail}</strong>
+                  <strong className="text-textPrimary">{otpEmail}</strong>
                 </p>
                 {emailSent && (
-                  <p className="text-[11px] text-emerald-400/80 mt-0.5">
+                  <p className="text-[11px] text-emerald-600 dark:text-emerald-400/80 mt-0.5">
                     Please check your email inbox and spam folder.
                   </p>
                 )}
@@ -531,19 +531,19 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
               {demoOtpCode && (
                 <div className="flex items-center justify-between rounded-xl border border-indigo-500/40 bg-indigo-500/15 p-3 text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-indigo-400 animate-ping" />
+                    <span className="h-2 w-2 rounded-full bg-indigo-500 dark:bg-indigo-400 animate-ping" />
                     <div>
-                      <p className="font-bold text-indigo-200">
+                      <p className="font-bold text-indigo-700 dark:text-indigo-200">
                         {emailSent ? "Active Verification OTP:" : "Demo Verification OTP:"}
                       </p>
-                      <p className="font-mono text-base font-black text-white">{demoOtpCode}</p>
+                      <p className="font-mono text-base font-black text-textPrimary">{demoOtpCode}</p>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleAutoFillDemoOtp}
-                    className="rounded-lg bg-indigo-500/30 px-3 py-1.5 text-xs font-bold text-indigo-200 hover:bg-indigo-500/50 hover:text-white transition"
+                    className="rounded-lg bg-indigo-500/30 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-200 hover:bg-indigo-500/50 hover:text-indigo-900 dark:hover:text-white transition cursor-pointer"
                   >
                     Auto-Fill OTP
                   </button>
@@ -563,7 +563,7 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                       onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                       onPaste={handleOtpPaste}
-                      className="h-12 w-11 sm:w-12 rounded-xl border border-[#353447] bg-[#181724] text-center font-mono text-xl font-black text-emerald-400 focus:border-emerald-500 focus:bg-[#201F30] focus:outline-none shadow-sm"
+                      className="h-12 w-11 sm:w-12 rounded-xl border border-border bg-cardAlt text-center font-mono text-xl font-black text-emerald-600 dark:text-emerald-400 focus:border-emerald-500 focus:bg-card focus:outline-none shadow-sm"
                     />
                   ))}
                 </div>
@@ -571,18 +571,18 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                 <button
                   type="submit"
                   disabled={loading || otpDigits.join("").length < 6}
-                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-40"
+                  className="w-full rounded-xl bg-emerald-500 py-2.5 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 active:scale-[0.99] disabled:opacity-40 cursor-pointer"
                 >
                   {loading ? "Verifying..." : "Verify Code & Complete Sign In"}
                 </button>
               </form>
 
               {/* Resend OTP */}
-              <div className="flex items-center justify-between pt-2 border-t border-[#262535] text-xs text-slate-400">
+              <div className="flex items-center justify-between pt-2 border-t border-border text-xs text-textMuted">
                 <button
                   type="button"
                   onClick={() => setActiveTab("signin")}
-                  className="hover:text-slate-200 text-[11px]"
+                  className="hover:text-textPrimary text-[11px] cursor-pointer"
                 >
                   ← Back to Sign In
                 </button>
@@ -591,12 +591,12 @@ export default function AuthModal({ isOpen, onClose, initialTab = "signin" }) {
                   <button
                     type="button"
                     onClick={handleResendOtpCode}
-                    className="font-bold text-emerald-400 hover:underline text-[11px]"
+                    className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline text-[11px] cursor-pointer"
                   >
                     Resend OTP Code
                   </button>
                 ) : (
-                  <span className="text-[11px] font-mono text-slate-500">
+                  <span className="text-[11px] font-mono text-textMuted">
                     Resend code in 00:{resendTimer < 10 ? `0${resendTimer}` : resendTimer}
                   </span>
                 )}

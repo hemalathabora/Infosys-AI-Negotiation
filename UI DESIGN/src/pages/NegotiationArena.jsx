@@ -175,16 +175,16 @@ export default function NegotiationArena({
     return (
       <main
         data-guide="negotiation-arena"
-        className="min-h-full flex-1 bg-[#17161B] px-4 py-8 sm:px-8 text-textPrimary animate-fadeIn flex items-center justify-center"
+        className="min-h-full flex-1 bg-mainPanel px-4 py-8 sm:px-8 text-textPrimary animate-fadeIn flex items-center justify-center"
       >
-        <div className="mx-auto max-w-md rounded-2xl border border-[#2D2C36] bg-[#201F25] p-10 text-center space-y-4 shadow-xl">
+        <div className="mx-auto max-w-md rounded-2xl border border-border bg-card p-10 text-center space-y-4 shadow-xl">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-950">
             <svg className="h-6 w-6 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" opacity="0.2" />
               <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-white font-sans">
+          <h1 className="text-xl font-bold text-textPrimary font-sans">
             Initializing Simulation Engine...
           </h1>
           <p className="text-xs text-textSecondary font-body">
@@ -199,17 +199,17 @@ export default function NegotiationArena({
     return (
       <main
         data-guide="negotiation-arena"
-        className="min-h-full flex-1 bg-[#17161B] px-4 py-8 sm:px-8 text-textPrimary animate-fadeIn"
+        className="min-h-full flex-1 bg-mainPanel px-4 py-8 sm:px-8 text-textPrimary animate-fadeIn"
       >
-        <div className="mx-auto max-w-4xl rounded-2xl border border-[#2D2C36] bg-[#201F25] p-10 text-center space-y-4 shadow-xl">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#3A3944] bg-[#25242C] text-white">
+        <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-10 text-center space-y-4 shadow-xl">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-cardAlt text-textPrimary">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white font-sans">
+          <h1 className="text-2xl font-bold text-textPrimary font-sans">
             No Active Negotiation Session
           </h1>
           <p className="text-xs sm:text-sm text-textSecondary max-w-md mx-auto font-body">
@@ -218,7 +218,7 @@ export default function NegotiationArena({
           <button
             type="button"
             onClick={() => onNavigate("Configure Agents")}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-white text-slate-950 px-6 py-3 text-xs sm:text-sm font-extrabold border border-slate-200 shadow-md transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 px-6 py-3 text-xs sm:text-sm font-extrabold border border-border shadow-md transition-all active:scale-95 cursor-pointer hover:opacity-90"
           >
             Configure Agents & Scenario →
           </button>
@@ -375,26 +375,26 @@ export default function NegotiationArena({
   return (
     <main
       data-guide="negotiation-arena"
-      className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn"
+      className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn"
     >
       <div className="mx-auto max-w-[1500px] space-y-6">
 
         {/* =====================================================
             1. ARENA HEADER BAR
         ====================================================== */}
-        <header className="border-b border-[#292831] pb-5 space-y-4">
+        <header className="border-b border-border pb-5 space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <p className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-400">
+                <p className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-400">
                   {isPracticeMode ? "HUMAN PRACTICE ARENA" : "LIVE SIMULATION ARENA"}
                 </p>
-                <span className="rounded-lg border border-[#3A3944] bg-[#222129] px-2.5 py-0.5 text-[10px] font-mono font-bold text-slate-300">
+                <span className="rounded-lg border border-border bg-cardAlt px-2.5 py-0.5 text-[10px] font-mono font-bold text-textSecondary">
                   {state.execution_mode || "Normal Mode"}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-textPrimary font-sans">
                 {scenario.scenario_name || scenario.name}
               </h1>
               <p className="mt-0.5 text-xs sm:text-sm text-textSecondary font-body">
@@ -405,20 +405,20 @@ export default function NegotiationArena({
             </div>
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <span className="font-mono text-xs font-bold text-white bg-[#222129] px-3.5 py-2 rounded-xl border border-[#302F39]">
+              <span className="font-mono text-xs font-bold text-textPrimary bg-cardAlt px-3.5 py-2 rounded-xl border border-border">
                 Round {state.current_round} of {maxRounds}
               </span>
 
               <div className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-mono font-bold ${
                 isDone
                   ? state.status === "agreement" || state.status === "accepted"
-                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400"
                     : state.status === "rejected"
-                    ? "border-rose-500/40 bg-rose-500/10 text-rose-400"
+                    ? "border-rose-500/40 bg-rose-500/10 text-rose-500 dark:text-rose-400"
                     : state.status === "deadlock" || state.status === "breakdown"
-                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                    : "border-[#302F39] bg-[#222129] text-slate-400"
-                  : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm"
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-500 dark:text-amber-300"
+                    : "border-border bg-cardAlt text-textMuted"
+                  : "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 shadow-sm"
               }`}>
                 <span className={`h-2 w-2 rounded-full ${
                   !isDone
@@ -441,17 +441,17 @@ export default function NegotiationArena({
             2. DEADLOCK / BREAKDOWN WARNING BANNER
         ====================================================== */}
         {(state.status === "deadlock" || state.status === "breakdown") && (
-          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-200 space-y-3 font-sans shadow-md">
+          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-900 dark:text-amber-200 space-y-3 font-sans shadow-md">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 font-bold">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-500 dark:text-amber-400 font-bold">
                   ⚠
                 </span>
                 <div>
-                  <h3 className="font-extrabold text-amber-300 text-base">
+                  <h3 className="font-extrabold text-amber-600 dark:text-amber-300 text-base">
                     {state.status === "breakdown" ? "Negotiation Breakdown Detected" : "Negotiation Stalled / Deadlock Detected"}
                   </h3>
-                  <p className="text-xs text-amber-200/90 font-body">
+                  <p className="text-xs text-amber-800/90 dark:text-amber-200/90 font-body">
                     {state.deadlock_info?.reason || "No meaningful movement detected within participants' limits."}
                   </p>
                 </div>
@@ -460,7 +460,7 @@ export default function NegotiationArena({
                 <button
                   type="button"
                   onClick={() => onNavigate("Analytics")}
-                  className="rounded-xl border border-amber-500/30 bg-amber-500/20 px-3.5 py-1.5 text-xs font-bold text-amber-100 hover:bg-amber-500/30 transition cursor-pointer"
+                  className="rounded-xl border border-amber-500/30 bg-amber-500/20 px-3.5 py-1.5 text-xs font-bold text-amber-900 dark:text-amber-100 hover:bg-amber-500/30 transition cursor-pointer"
                 >
                   View Analysis
                 </button>
@@ -496,73 +496,73 @@ export default function NegotiationArena({
           <div className="lg:col-span-4 space-y-6">
 
             {/* Live Metrics Summary */}
-            <div className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-5 space-y-4 shadow-md font-mono">
-              <div className="flex items-center justify-between border-b border-[#2D2C36] pb-3">
-                <h3 className="text-sm font-bold text-white font-sans uppercase tracking-wider text-slate-300">
+            <div className="rounded-2xl border border-border bg-card p-5 space-y-4 shadow-md font-mono">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <h3 className="text-sm font-bold text-textPrimary font-sans uppercase tracking-wider">
                   Live Round Metrics
                 </h3>
-                <span className="text-[11px] font-bold text-emerald-400">
+                <span className="text-[11px] font-bold text-emerald-500 dark:text-emerald-400">
                   {concessionsCount} Concession{concessionsCount !== 1 ? "s" : ""}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Opening Gap</p>
-                  <p className="text-base font-extrabold text-white">{openingGap !== null ? formatCurrency(openingGap) : "—"}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Opening Gap</p>
+                  <p className="text-base font-extrabold text-textPrimary">{openingGap !== null ? formatCurrency(openingGap) : "—"}</p>
                 </div>
 
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Current Gap</p>
-                  <p className="text-base font-extrabold text-emerald-400">{currentGap !== null ? formatCurrency(currentGap) : "—"}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Current Gap</p>
+                  <p className="text-base font-extrabold text-emerald-500 dark:text-emerald-400">{currentGap !== null ? formatCurrency(currentGap) : "—"}</p>
                 </div>
 
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Convergence</p>
-                  <p className="text-base font-extrabold text-sky-400">{convergencePct !== null ? `${convergencePct}%` : "—"}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Convergence</p>
+                  <p className="text-base font-extrabold text-sky-500 dark:text-sky-400">{convergencePct !== null ? `${convergencePct}%` : "—"}</p>
                 </div>
 
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Deadlock Risk</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Deadlock Risk</p>
                   <p className={`text-base font-extrabold ${
                     state.deadlock_info?.is_deadlock || state.status === "deadlock" || state.status === "breakdown"
-                      ? "text-amber-400"
+                      ? "text-amber-500 dark:text-amber-400"
                       : state.current_round >= 6 && convergencePct !== null && convergencePct < 40
-                      ? "text-amber-300"
-                      : "text-emerald-400"
+                      ? "text-amber-500 dark:text-amber-300"
+                      : "text-emerald-500 dark:text-emerald-400"
                   }`}>
                     {state.deadlock_info?.is_deadlock || state.status === "deadlock" || state.status === "breakdown" ? "High" : state.current_round >= 6 && convergencePct !== null && convergencePct < 40 ? "Medium" : "Low"}
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Total Offers</p>
-                  <p className="text-base font-extrabold text-slate-200">{offersCount}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Total Offers</p>
+                  <p className="text-base font-extrabold text-textPrimary">{offersCount}</p>
                 </div>
 
-                <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-3 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">Counteroffers</p>
-                  <p className="text-base font-extrabold text-indigo-300">{counteroffersCount}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3 space-y-0.5">
+                  <p className="text-[10px] text-textMuted font-bold uppercase">Counteroffers</p>
+                  <p className="text-base font-extrabold text-indigo-500 dark:text-indigo-300">{counteroffersCount}</p>
                 </div>
               </div>
             </div>
 
             {/* Compact Trade-off Analysis Panel (TASK 1.12) */}
-            <div className="rounded-2xl border border-purple-500/30 bg-[#201D28] p-5 space-y-3 font-mono">
-              <div className="flex items-center justify-between border-b border-[#302D3B] pb-2.5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+            <div className="rounded-2xl border border-purple-500/30 bg-purple-500/5 dark:bg-[#201D28] p-5 space-y-3 font-mono">
+              <div className="flex items-center justify-between border-b border-border pb-2.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-300 flex items-center gap-1.5">
                   <span>⚡</span> Trade-off Engine Telemetry
                 </h3>
-                <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300">
+                <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-600 dark:text-purple-300">
                   {history.filter((h) => h.tradeoff_data?.tradeoff_detected || h.parameters?.tradeoff_data?.tradeoff_detected).length} Detected
                 </span>
               </div>
 
               {/* Net Utility & Stance Metrics */}
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 uppercase">Human Utility</p>
-                  <p className="text-sm font-extrabold text-emerald-400">
+                <div className="rounded-xl border border-border bg-card p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-textMuted uppercase">Human Utility</p>
+                  <p className="text-sm font-extrabold text-emerald-500 dark:text-emerald-400">
                     {state.live_metrics?.user_utility !== undefined
                       ? `${Math.round(state.live_metrics.user_utility * 100)}%`
                       : state.live_metrics?.current_offer_utility !== undefined
@@ -570,23 +570,23 @@ export default function NegotiationArena({
                       : "78%"}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 uppercase">AI Utility</p>
-                  <p className="text-sm font-extrabold text-sky-400">
+                <div className="rounded-xl border border-border bg-card p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-textMuted uppercase">AI Utility</p>
+                  <p className="text-sm font-extrabold text-sky-500 dark:text-sky-400">
                     {state.live_metrics?.ai_utility !== undefined
                       ? `${Math.round(state.live_metrics.ai_utility * 100)}%`
                       : "72%"}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 uppercase">ZOPA Status</p>
-                  <p className="text-sm font-extrabold text-emerald-300 uppercase">
+                <div className="rounded-xl border border-border bg-card p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-textMuted uppercase">ZOPA Status</p>
+                  <p className="text-sm font-extrabold text-emerald-600 dark:text-emerald-300 uppercase">
                     {state.live_metrics?.zopa_status || (state.status === "deadlock" ? "Disputed" : "Active")}
                   </p>
                 </div>
-                <div className="rounded-xl border border-[#322F3E] bg-[#181620] p-2.5 space-y-0.5">
-                  <p className="text-[10px] text-slate-400 uppercase">Concession Cap</p>
-                  <p className="text-sm font-extrabold text-indigo-300">
+                <div className="rounded-xl border border-border bg-card p-2.5 space-y-0.5">
+                  <p className="text-[10px] text-textMuted uppercase">Concession Cap</p>
+                  <p className="text-sm font-extrabold text-indigo-500 dark:text-indigo-300">
                     {state.live_metrics?.concession_capacity !== undefined
                       ? `${Math.round(state.live_metrics.concession_capacity * 100)}%`
                       : "65%"}
@@ -636,18 +636,18 @@ export default function NegotiationArena({
 
             {/* Practice Mode Action & Coaching Tools (TASK 2.12, 2.13, 2.14) */}
             {isPracticeMode && (
-              <div className="rounded-2xl border border-emerald-500/30 bg-[#1A221E] p-5 space-y-3 font-mono">
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 dark:bg-[#1A221E] p-5 space-y-3 font-mono">
                 <div className="flex items-center justify-between border-b border-emerald-500/20 pb-2.5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400 flex items-center gap-1.5">
                     <span>🎓</span> Practice Coaching Tools
                   </h3>
                   <button
                     type="button"
                     onClick={() => setCoachEnabled(!coachEnabled)}
-                    className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border transition ${
+                    className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border transition cursor-pointer ${
                       coachEnabled
-                        ? "border-emerald-400 bg-emerald-500/20 text-emerald-300"
-                        : "border-[#3A3944] bg-[#201F25] text-slate-400"
+                        ? "border-emerald-500 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
+                        : "border-border bg-cardAlt text-textMuted"
                     }`}
                   >
                     Coach: {coachEnabled ? "ON" : "OFF"}
@@ -659,7 +659,7 @@ export default function NegotiationArena({
                     type="button"
                     onClick={handleGetHint}
                     disabled={isFetchingHint || isDone}
-                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-sky-500/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 py-2.5 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl border border-sky-500/40 bg-sky-500/15 hover:bg-sky-500/25 text-sky-600 dark:text-sky-300 py-2.5 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
                   >
                     {isFetchingHint ? (
                       <span className="flex items-center gap-2">
@@ -675,22 +675,22 @@ export default function NegotiationArena({
                   </button>
 
                   {activeHint && (
-                    <div className="rounded-xl border border-sky-500/30 bg-[#151D24] p-3 space-y-1.5 text-xs">
+                    <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 dark:bg-[#151D24] p-3 space-y-1.5 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-sky-400 text-[11px] uppercase">Advisor Guidance:</span>
+                        <span className="font-bold text-sky-500 dark:text-sky-400 text-[11px] uppercase">Advisor Guidance:</span>
                         <button
                           type="button"
                           onClick={() => setActiveHint(null)}
-                          className="text-slate-400 hover:text-white text-[11px] cursor-pointer"
+                          className="text-textMuted hover:text-textPrimary text-[11px] cursor-pointer"
                         >
                           ✕
                         </button>
                       </div>
-                      <p className="text-slate-200 font-body leading-relaxed">
+                      <p className="text-textPrimary font-body leading-relaxed">
                         {activeHint.hint}
                       </p>
                       {activeHint.suggested_move && (
-                        <p className="text-[10px] text-sky-300/90 font-mono">
+                        <p className="text-[10px] text-sky-600 dark:text-sky-300/90 font-mono">
                           Suggested move: {activeHint.suggested_move}
                         </p>
                       )}
@@ -702,7 +702,7 @@ export default function NegotiationArena({
                       type="button"
                       onClick={handleEndPracticeSession}
                       disabled={isEndingSession}
-                      className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 py-2 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
+                      className="w-full rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-300 py-2 text-xs font-bold transition disabled:opacity-40 cursor-pointer"
                     >
                       {isEndingSession ? "Ending Session..." : "End Practice & Score"}
                     </button>
@@ -713,7 +713,7 @@ export default function NegotiationArena({
 
             {/* Agent Stance Cards */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-white font-sans uppercase tracking-wider text-slate-300 px-1">
+              <h3 className="text-sm font-bold text-textPrimary font-sans uppercase tracking-wider px-1">
                 Participant Stance Indicators
               </h3>
 
@@ -726,20 +726,20 @@ export default function NegotiationArena({
                   <div
                     key={agent.id}
                     className={`rounded-2xl border p-5 space-y-3 transition-all ${
-                      isTurn ? "border-emerald-400 bg-[#24232C] shadow-lg" : "border-[#2D2C36] bg-[#201F25]"
+                      isTurn ? "border-emerald-500 bg-cardAlt shadow-lg" : "border-border bg-card"
                     }`}
                   >
-                    <div className="flex items-center justify-between border-b border-[#2B2A33] pb-3">
+                    <div className="flex items-center justify-between border-b border-border pb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-white font-sans text-sm">{agent.name}</h4>
+                          <h4 className="font-bold text-textPrimary font-sans text-sm">{agent.name}</h4>
                           {isTurn && (
-                            <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-mono font-bold text-emerald-300">
+                            <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-mono font-bold text-emerald-600 dark:text-emerald-300">
                               ACTIVE
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 font-body uppercase tracking-wider">{agent.role}</p>
+                        <p className="text-[11px] text-textMuted font-body uppercase tracking-wider">{agent.role}</p>
                       </div>
 
                       <span className={`rounded-xl border px-3 py-1 font-mono text-xs font-bold ${stance.classes}`}>
@@ -749,18 +749,18 @@ export default function NegotiationArena({
 
                     <div className="grid grid-cols-3 gap-2 font-mono text-xs">
                       <div className="space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase">Policy</span>
-                        <p className="font-bold text-white truncate">{agent.personality || agent.persona || "Collaborative"}</p>
+                        <span className="text-[10px] text-textMuted uppercase">Policy</span>
+                        <p className="font-bold text-textPrimary truncate">{agent.personality || agent.persona || "Collaborative"}</p>
                       </div>
 
                       <div className="space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase">Target</span>
-                        <p className="font-bold text-sky-400">{formatCurrency(getAuthoritativeTarget(agent))}</p>
+                        <span className="text-[10px] text-textMuted uppercase">Target</span>
+                        <p className="font-bold text-sky-500 dark:text-sky-400">{formatCurrency(getAuthoritativeTarget(agent))}</p>
                       </div>
 
                       <div className="space-y-0.5">
-                        <span className="text-[10px] text-slate-400 uppercase">Conceded</span>
-                        <p className="font-bold text-emerald-400">{formatCurrency(totalConcession)}</p>
+                        <span className="text-[10px] text-textMuted uppercase">Conceded</span>
+                        <p className="font-bold text-emerald-500 dark:text-emerald-400">{formatCurrency(totalConcession)}</p>
                       </div>
                     </div>
                   </div>
@@ -771,22 +771,22 @@ export default function NegotiationArena({
 
           {/* RIGHT PANEL: Negotiation Transcript */}
           <div className="lg:col-span-8 space-y-4 flex flex-col">
-            <div className="flex items-center justify-between border-b border-[#2D2C36] pb-3">
-              <h2 className="text-base font-bold text-white font-sans flex items-center gap-2">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-emerald-400">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h2 className="text-base font-bold text-textPrimary font-sans flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-emerald-500 dark:text-emerald-400">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
                 Negotiation Transcript Feed
               </h2>
-              <span className="font-mono text-xs text-slate-400">{history.length} Total Turns</span>
+              <span className="font-mono text-xs text-textMuted">{history.length} Total Turns</span>
             </div>
 
             {history.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#302F39] bg-[#1A191E] p-10 text-center space-y-4 flex-1 min-h-[500px] flex flex-col items-center justify-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#25242C] text-slate-400 font-mono text-sm">
+              <div className="rounded-2xl border border-dashed border-border bg-cardAlt p-10 text-center space-y-4 flex-1 min-h-[500px] flex flex-col items-center justify-center">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-card border border-border text-textMuted font-mono text-sm">
                   💬
                 </div>
-                <h3 className="text-base font-bold text-white">Negotiation Ready</h3>
+                <h3 className="text-base font-bold text-textPrimary">Negotiation Ready</h3>
                 <p className="text-xs text-textSecondary max-w-sm mx-auto">
                   {isPracticeMode
                     ? "Enter your initial offer below or click a control button to step the simulation."
@@ -810,7 +810,7 @@ export default function NegotiationArena({
                     type="button"
                     onClick={negotiation.runToCompletion}
                     disabled={isRunning}
-                    className="inline-flex items-center gap-2 rounded-xl border border-[#3A3944] bg-[#25242C] hover:bg-[#2F2E38] text-white px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                    className="inline-flex items-center gap-2 rounded-xl border border-border bg-card hover:bg-cardAlt text-textPrimary px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <polygon points="13 19 22 12 13 5 13 19" />
@@ -836,50 +836,50 @@ export default function NegotiationArena({
                       key={`turn-${idx}`}
                       className={`rounded-2xl border p-5 transition-all shadow-md space-y-3 ${
                         isHuman
-                          ? "border-emerald-500/40 bg-[#1E2622]"
-                          : "border-[#2D2C36] bg-[#201F25]"
+                          ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-[#1E2622]"
+                          : "border-border bg-card"
                       }`}
                     >
                       {/* Card Top Info */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2B2A33] pb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                         <div className="flex items-center gap-3">
                           <div className={`flex h-9 w-9 items-center justify-center rounded-xl font-mono text-xs font-bold ${
-                            isHuman ? "bg-emerald-400 text-slate-950" : "bg-[#25242C] text-white border border-[#3A3944]"
+                            isHuman ? "bg-emerald-500 text-slate-950 font-black" : "bg-cardAlt text-textPrimary border border-border"
                           }`}>
                             {isHuman ? "YOU" : agent.name.charAt(0)}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-white font-sans text-sm">{isHuman ? "Human Negotiator" : agent.name}</h4>
+                              <h4 className="font-bold text-textPrimary font-sans text-sm">{isHuman ? "Human Negotiator" : agent.name}</h4>
                               {isHuman && (
-                                <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-mono font-bold text-emerald-300">
+                                <span className="rounded-md bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-mono font-bold text-emerald-600 dark:text-emerald-300">
                                   HUMAN
                                 </span>
                               )}
                             </div>
-                            <p className="text-[11px] text-slate-400 font-body uppercase tracking-wider">{agent.role}</p>
+                            <p className="text-[11px] text-textMuted font-body uppercase tracking-wider">{agent.role}</p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2">
                           <ActionBadge decision={turn.decision} />
-                          <span className="font-mono text-xs text-slate-400 font-bold">R{turn.round}</span>
+                          <span className="font-mono text-xs text-textMuted font-bold">R{turn.round}</span>
                         </div>
                       </div>
 
                       {/* Card Content: Offer Value & Reasoning */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
                         <div className="space-y-1">
-                          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Offer Value</p>
-                          <p className="text-2xl font-extrabold text-emerald-400 font-mono tracking-tight">
+                          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-textMuted">Offer Value</p>
+                          <p className="text-2xl font-extrabold text-emerald-500 dark:text-emerald-400 font-mono tracking-tight">
                             {formatCurrency(turnVal)}
                           </p>
                         </div>
 
                         <div className="md:col-span-2 space-y-2">
                           <div>
-                            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Reasoning Summary</p>
-                            <p className="text-xs text-slate-200 font-body leading-relaxed">
+                            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-textMuted">Reasoning Summary</p>
+                            <p className="text-xs text-textPrimary font-body leading-relaxed">
                               "{turn.reasoning || turn.reason || "Offer submitted based on strategy."}"
                             </p>
                           </div>
@@ -903,10 +903,10 @@ export default function NegotiationArena({
                                 {entries.map(([vk, vv]) => (
                                   <span
                                     key={vk}
-                                    className="rounded-lg border border-[#3A3944] bg-[#17161D] px-2 py-0.5 text-[10px] font-mono"
+                                    className="rounded-lg border border-border bg-cardAlt px-2 py-0.5 text-[10px] font-mono"
                                   >
-                                    <span className="text-slate-400 capitalize">{vk.replace("_", " ")}: </span>
-                                    <span className="font-bold text-sky-300">
+                                    <span className="text-textMuted capitalize">{vk.replace("_", " ")}: </span>
+                                    <span className="font-bold text-sky-600 dark:text-sky-300">
                                       {typeof vv === "number" &&
                                       (vk.includes("salary") || vk.includes("budget") || vk.includes("bonus"))
                                         ? formatCurrency(vv)
@@ -927,11 +927,11 @@ export default function NegotiationArena({
                         return (
                           <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 space-y-1.5 font-mono text-xs">
                             <div className="flex items-center justify-between">
-                              <span className="flex items-center gap-1.5 font-bold text-purple-300 text-[11px] uppercase tracking-wide">
+                              <span className="flex items-center gap-1.5 font-bold text-purple-600 dark:text-purple-300 text-[11px] uppercase tracking-wide">
                                 <span>⚡</span> Trade-off Detected
                               </span>
                               {td.pareto_improving && (
-                                <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300">
+                                <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300">
                                   PARETO IMPROVING
                                 </span>
                               )}
@@ -942,8 +942,8 @@ export default function NegotiationArena({
                                   key={cidx}
                                   className={`px-2 py-0.5 rounded border ${
                                     ch.direction === "improved"
-                                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
-                                      : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                                      : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"
                                   }`}
                                 >
                                   {ch.direction === "improved" ? "↓" : "↑"} {ch.variable.replace("_", " ")}: {ch.direction} (
@@ -952,7 +952,7 @@ export default function NegotiationArena({
                               ))}
                             </div>
                             {td.description && (
-                              <p className="text-[11px] text-slate-300 font-body italic pt-0.5">
+                              <p className="text-[11px] text-textSecondary font-body italic pt-0.5">
                                 "{td.description}"
                               </p>
                             )}
@@ -962,8 +962,8 @@ export default function NegotiationArena({
 
                       {/* Coaching Feedback Banner (TASK 2.12) */}
                       {coachEnabled && (turn.strategy_feedback || turn.parameters?.strategy_feedback) && (
-                        <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 space-y-1 font-body text-xs text-sky-200">
-                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-sky-400">
+                        <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 space-y-1 font-body text-xs text-sky-800 dark:text-sky-200">
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
                             🎓 AI Negotiation Coach Feedback
                           </span>
                           <p>{turn.strategy_feedback || turn.parameters.strategy_feedback}</p>
@@ -971,16 +971,16 @@ export default function NegotiationArena({
                       )}
 
                       {/* Card Footer: Concession & Stance */}
-                      <div className="flex items-center justify-between pt-2 border-t border-[#2B2A33] text-xs font-mono">
-                        <div className="flex items-center gap-2 text-slate-400">
+                      <div className="flex items-center justify-between pt-2 border-t border-border text-xs font-mono">
+                        <div className="flex items-center gap-2 text-textMuted">
                           <span>Concession:</span>
-                          <span className="font-bold text-emerald-400">
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400">
                             {turnConcAmt > 0 ? `+${formatCurrency(turnConcAmt)}` : "$0"}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1.5">
-                          <span className="text-slate-400 text-[11px]">Stance:</span>
+                          <span className="text-textMuted text-[11px]">Stance:</span>
                           <span className={`rounded-lg border px-2.5 py-0.5 font-bold ${stance.classes}`}>
                             {stance.label}
                           </span>
@@ -994,24 +994,24 @@ export default function NegotiationArena({
 
             {/* PRACTICE MODE DYNAMIC MULTI-VARIABLE INPUT INTERFACE (TASK 2.4 & 2.5) */}
             {isHumanTurn && (
-              <div className="rounded-2xl border border-emerald-500/40 bg-[#1A231E] p-5 space-y-4 shadow-xl font-sans mt-4">
+              <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/5 dark:bg-[#1A231E] p-5 space-y-4 shadow-xl font-sans mt-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-emerald-500/20 pb-3">
                   <div>
-                    <span className="font-mono text-xs font-extrabold text-emerald-400 uppercase tracking-wider">
+                    <span className="font-mono text-xs font-extrabold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                       Your Turn (Practice Mode)
                     </span>
-                    <h3 className="text-lg font-extrabold text-white">Interactive Offer Composer</h3>
+                    <h3 className="text-lg font-extrabold text-textPrimary">Interactive Offer Composer</h3>
                   </div>
 
                   {/* Input Mode Selector: Structured vs Natural Language */}
-                  <div className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-[#131A16] p-1 font-mono text-xs">
+                  <div className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-cardAlt p-1 font-mono text-xs">
                     <button
                       type="button"
                       onClick={() => setInputMode("structured")}
                       className={`rounded-lg px-3 py-1 font-bold transition cursor-pointer ${
                         inputMode === "structured"
                           ? "bg-emerald-500 text-slate-950 shadow-sm"
-                          : "text-slate-400 hover:text-white"
+                          : "text-textMuted hover:text-textPrimary"
                       }`}
                     >
                       Variables Form
@@ -1022,7 +1022,7 @@ export default function NegotiationArena({
                       className={`rounded-lg px-3 py-1 font-bold transition cursor-pointer ${
                         inputMode === "natural"
                           ? "bg-emerald-500 text-slate-950 shadow-sm"
-                          : "text-slate-400 hover:text-white"
+                          : "text-textMuted hover:text-textPrimary"
                       }`}
                     >
                       Natural Language AI
@@ -1031,13 +1031,13 @@ export default function NegotiationArena({
                 </div>
 
                 {inputError && (
-                  <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-300 font-medium">
+                  <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-300 font-medium">
                     ⚠ {inputError}
                   </div>
                 )}
 
                 {nlSuccessNotice && (
-                  <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-300 font-medium">
+                  <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300 font-medium">
                     ✓ {nlSuccessNotice}
                   </div>
                 )}
@@ -1046,7 +1046,7 @@ export default function NegotiationArena({
                 {inputMode === "natural" && (
                   <div className="space-y-3">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-mono font-bold uppercase text-slate-300">
+                      <label className="text-xs font-mono font-bold uppercase text-textSecondary">
                         Type your proposal in plain English:
                       </label>
                       <textarea
@@ -1058,18 +1058,18 @@ export default function NegotiationArena({
                           setNaturalText(e.target.value);
                         }}
                         disabled={isRunning || isDone || isParsingNl}
-                        className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2.5 text-sm font-body text-white focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
+                        className="w-full rounded-xl border border-border bg-cardAlt px-4 py-2.5 text-sm font-body text-textPrimary placeholder:text-textMuted focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] text-slate-400 font-body">
+                      <p className="text-[11px] text-textMuted font-body">
                         The AI parser extracts structured parameters and populates the variable fields for review.
                       </p>
                       <button
                         type="button"
                         onClick={handleParseNaturalLanguage}
                         disabled={isParsingNl || !naturalText.trim()}
-                        className="inline-flex items-center gap-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-slate-950 px-4 py-2 text-xs font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
+                        className="inline-flex items-center gap-2 rounded-xl bg-purple-500 hover:bg-purple-400 text-white dark:text-slate-950 px-4 py-2 text-xs font-extrabold shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer"
                       >
                         {isParsingNl ? (
                           <span className="flex items-center gap-1.5">
@@ -1096,8 +1096,8 @@ export default function NegotiationArena({
                     {Object.entries(scenarioVars).map(([vname, vdef]) => {
                       const val = variableInputs[vname] !== undefined ? variableInputs[vname] : "";
                       return (
-                        <div key={vname} className="space-y-1 rounded-xl border border-[#2D2C36] bg-[#141318] p-3">
-                          <label className="text-[11px] font-mono font-bold uppercase text-slate-300 block">
+                        <div key={vname} className="space-y-1 rounded-xl border border-border bg-cardAlt p-3">
+                          <label className="text-[11px] font-mono font-bold uppercase text-textSecondary block">
                             {vdef.display_name || vname.replace("_", " ")}
                             {vdef.unit ? ` (${vdef.unit})` : ""}
                             {vdef.hard && <span className="text-rose-400 ml-1">*</span>}
@@ -1116,10 +1116,10 @@ export default function NegotiationArena({
                               }));
                             }}
                             disabled={isRunning || isDone}
-                            className="w-full rounded-lg border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-sm font-mono font-bold text-white focus:border-emerald-400 focus:outline-none disabled:opacity-50"
+                            className="w-full rounded-lg border border-border bg-card px-3 py-1.5 text-sm font-mono font-bold text-textPrimary focus:border-emerald-400 focus:outline-none disabled:opacity-50"
                             required={vdef.hard}
                           />
-                          <p className="text-[10px] text-slate-500 font-mono">
+                          <p className="text-[10px] text-textMuted font-mono">
                             Range: {vdef.min_value} - {vdef.max_value}
                           </p>
                         </div>
@@ -1128,7 +1128,7 @@ export default function NegotiationArena({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-mono font-bold uppercase text-slate-300">
+                    <label className="text-xs font-mono font-bold uppercase text-textSecondary">
                       Strategic Message / Rationale (Optional)
                     </label>
                     <textarea
@@ -1137,13 +1137,13 @@ export default function NegotiationArena({
                       value={humanMessageInput}
                       onChange={(e) => setHumanMessageInput(e.target.value)}
                       disabled={isRunning || isDone}
-                      className="w-full rounded-xl border border-[#302F39] bg-[#141318] px-4 py-2 text-sm font-body text-white focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
+                      className="w-full rounded-xl border border-border bg-cardAlt px-4 py-2 text-sm font-body text-textPrimary placeholder:text-textMuted focus:border-emerald-400 focus:outline-none resize-none disabled:opacity-50"
                     />
                   </div>
 
                   {isRunning && (
-                    <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-mono text-emerald-300">
-                      <svg className="h-4 w-4 animate-spin text-emerald-400" viewBox="0 0 24 24" fill="none">
+                    <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-mono text-emerald-700 dark:text-emerald-300">
+                      <svg className="h-4 w-4 animate-spin text-emerald-500 dark:text-emerald-400" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
                         <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" />
                       </svg>
@@ -1156,7 +1156,7 @@ export default function NegotiationArena({
                       type="button"
                       onClick={() => handleHumanSubmit("reject")}
                       disabled={isRunning || isDone}
-                      className="rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
+                      className="rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 px-4 py-2.5 text-xs font-bold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Reject Offer
                     </button>
@@ -1165,7 +1165,7 @@ export default function NegotiationArena({
                       type="button"
                       onClick={() => handleHumanSubmit("accept")}
                       disabled={isRunning || isDone}
-                      className="rounded-xl border border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 px-4 py-2.5 text-xs font-extrabold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
+                      className="rounded-xl border border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 px-4 py-2.5 text-xs font-extrabold transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Accept Offer
                     </button>
@@ -1173,7 +1173,7 @@ export default function NegotiationArena({
                     <button
                       type="submit"
                       disabled={isRunning || isDone}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 px-6 py-2.5 text-xs font-extrabold border border-emerald-300 shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-6 py-2.5 text-xs font-extrabold border border-emerald-400 shadow-md transition-all active:scale-95 disabled:opacity-40 cursor-pointer text-center"
                     >
                       Submit Counteroffer →
                     </button>
@@ -1218,21 +1218,21 @@ export default function NegotiationArena({
             <button
               type="button"
               onClick={() => onNavigate("Negotiation History")}
-              className="rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 px-5 py-2.5 text-xs font-bold text-indigo-300 transition cursor-pointer"
+              className="rounded-xl border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 px-5 py-2.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 transition cursor-pointer"
             >
               Inspect In History →
             </button>
             <button
               type="button"
               onClick={() => onNavigate("Analytics")}
-              className="rounded-xl border border-[#302F39] bg-[#222129] px-5 py-2.5 text-xs font-semibold text-white hover:bg-[#2A2933] transition cursor-pointer"
+              className="rounded-xl border border-border bg-cardAlt px-5 py-2.5 text-xs font-semibold text-textPrimary hover:bg-card transition cursor-pointer"
             >
               View System Analytics
             </button>
             <button
               type="button"
               onClick={() => onNavigate("Reports")}
-              className="rounded-xl bg-slate-100 hover:bg-white text-slate-950 px-5 py-2.5 text-xs font-bold border border-slate-200 shadow-md transition cursor-pointer"
+              className="rounded-xl bg-primary hover:bg-primaryBright text-slate-950 px-5 py-2.5 text-xs font-bold border border-primaryBright shadow-md transition cursor-pointer"
             >
               Open Full Audit Report →
             </button>

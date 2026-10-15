@@ -4,26 +4,100 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   DESIGN TOKENS - LIGHT & DARK THEMES
+============================================================ */
+
+:root {
+  --theme-mode: light;
+  --bg: #F8FAFC;
+  --header: #FFFFFF;
+  --sidebar: #FFFFFF;
+  --main-panel: #F8FAFC;
+  --card: #FFFFFF;
+  --card-alt: #F1F5F9;
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --border-glow: #CBD5E1;
+  --primary: #0F172A;
+  --primary-bright: #4F46E5;
+  --brand-white: #0F172A;
+  --azure: #3B82F6;
+  --azure-bright: #2563EB;
+  --success: #15803D;
+  --success-bright: #16A34A;
+  --warning: #B45309;
+  --warning-bright: #D97706;
+  --danger: #B91C1C;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --scrollbar-track: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
+  --glass-panel: rgba(255, 255, 255, 0.9);
+  --glass-panel-border: rgba(226, 232, 240, 0.8);
+  --glass-header: rgba(255, 255, 255, 0.94);
+  --glass-header-border: rgba(226, 232, 240, 0.85);
+  --skeleton-base: #E2E8F0;
+  --skeleton-highlight: #F1F5F9;
+}
+
+.dark {
+  --theme-mode: dark;
+  --bg: #0C0C0F;
+  --header: #0C0C0F;
+  --sidebar: #0C0C0F;
+  --main-panel: #17161B;
+  --card: #201F25;
+  --card-alt: #25242C;
+  --border: #2A2931;
+  --border-subtle: #302F39;
+  --border-glow: #3D3B48;
+  --primary: #F8FAFC;
+  --primary-bright: #FFFFFF;
+  --brand-white: #F1F5F9;
+  --azure: #3B82F6;
+  --azure-bright: #60A5FA;
+  --success: #10B981;
+  --success-bright: #34D399;
+  --warning: #F59E0B;
+  --warning-bright: #FBBF24;
+  --danger: #EF4444;
+  --text-primary: #F8FAFC;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --scrollbar-track: #0C0C0F;
+  --scrollbar-thumb: #2D2C36;
+  --scrollbar-thumb-hover: #454354;
+  --glass-panel: rgba(32, 31, 37, 0.9);
+  --glass-panel-border: rgba(255, 255, 255, 0.08);
+  --glass-header: rgba(12, 12, 15, 0.95);
+  --glass-header-border: rgba(42, 41, 49, 0.8);
+  --skeleton-base: #0F172A;
+  --skeleton-highlight: #1E293B;
+}
+
 /* 1. Global Reset & Overrides - Sleek custom scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0C0C0F;
+  background: var(--scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: #2D2C36;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #454354;
+  background: var(--scrollbar-thumb-hover);
 }
 
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
-  scrollbar-color: #2D2C36 #0C0C0F;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 html,
@@ -44,8 +118,9 @@ body {
 ============================================================ */
 
 body {
-  background-color: #0C0C0F;
-  color: #F8FAFC;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 
   font-family:
     "Inter",
@@ -75,7 +150,8 @@ h1, h2, h3, h4, h5, h6 {
   min-width: 0;
   min-height: 100vh;
   overflow-x: hidden;
-  background-color: #0C0C0F;
+  background-color: var(--bg);
+  color: var(--text-primary);
 }
 
 
@@ -84,15 +160,15 @@ h1, h2, h3, h4, h5, h6 {
 ============================================================ */
 
 .glass-panel {
-  background: rgba(32, 31, 37, 0.9);
+  background: var(--glass-panel);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-panel-border);
 }
 
 .glass-header {
-  background: rgba(12, 12, 15, 0.95);
+  background: var(--glass-header);
   backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(42, 41, 49, 0.8);
+  border-bottom: 1px solid var(--glass-header-border);
 }
 
 
@@ -164,9 +240,9 @@ button {
   background:
     linear-gradient(
       90deg,
-      #0F172A 25%,
-      #1E293B 37%,
-      #0F172A 63%
+      var(--skeleton-base) 25%,
+      var(--skeleton-highlight) 37%,
+      var(--skeleton-base) 63%
     );
 
   background-size: 400px 100%;

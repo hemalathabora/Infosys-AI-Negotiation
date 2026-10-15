@@ -26,7 +26,7 @@ function RobotIcon({ className = "h-6 w-6" }) {
         width="38"
         height="31"
         rx="9"
-        fill="#242330"
+        className="fill-cardAlt"
         stroke="currentColor"
         strokeWidth="2.5"
       />
@@ -143,32 +143,32 @@ export default function GuideChatPanel({
   };
 
   return (
-    <div className="fixed bottom-24 right-5 z-50 flex h-[min(680px,calc(100vh-120px))] w-[min(460px,calc(100vw-24px))] flex-col overflow-hidden rounded-2xl border border-[#302F39] bg-[#17161B] text-slate-200 shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
+    <div className="fixed bottom-24 right-5 z-50 flex h-[min(680px,calc(100vh-120px))] w-[min(460px,calc(100vw-24px))] flex-col overflow-hidden rounded-2xl border border-border bg-mainPanel text-textPrimary shadow-[0_24px_80px_rgba(0,0,0,0.3)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.6)]">
       {/* Header */}
-      <header className="border-b border-[#292831] bg-[#1E1D24] px-4 py-4">
+      <header className="border-b border-border bg-card px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-indigo-500/40 bg-indigo-500/10 text-indigo-300">
+            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-indigo-500/40 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
               <span className="absolute inset-0 rounded-xl bg-indigo-500/10 blur-md" />
               <RobotIcon className="relative h-7 w-7" />
 
-              <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-[#1E1D24] bg-emerald-400">
+              <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-card bg-emerald-400">
                 <span className="h-1 w-1 rounded-full bg-emerald-950" />
               </span>
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="truncate text-sm font-bold text-slate-100">
+                <h2 className="truncate text-sm font-bold text-textPrimary">
                   NegoMind AI Assistant
                 </h2>
 
-                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-emerald-400">
+                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                   Online
                 </span>
               </div>
 
-              <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.14em] text-slate-500">
+              <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-[0.14em] text-textMuted">
                 General & session AI expert
               </p>
             </div>
@@ -178,19 +178,19 @@ export default function GuideChatPanel({
             type="button"
             onClick={onClose}
             aria-label="Close assistant"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#302F39] bg-[#25242D] text-slate-400 transition hover:border-indigo-400/60 hover:bg-indigo-500/10 hover:text-indigo-300"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-cardAlt text-textMuted transition hover:border-indigo-400/60 hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-300 cursor-pointer"
           >
             <CloseIcon />
           </button>
         </div>
 
-        <div className="mt-4 flex items-center justify-between border-t border-[#292831] pt-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-slate-500">
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-textMuted">
             Conversation workspace
           </span>
 
-          <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-400">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+          <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
             System ready
           </span>
         </div>
@@ -198,12 +198,12 @@ export default function GuideChatPanel({
 
       {/* Header controls */}
       {(onNewChat || onClearMessages) && (
-        <div className="flex items-center justify-end gap-2 border-b border-[#292831] bg-[#1A191E] px-4 py-2.5">
+        <div className="flex items-center justify-end gap-2 border-b border-border bg-cardAlt px-4 py-2.5">
           {onNewChat && (
             <button
               type="button"
               onClick={onNewChat}
-              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-indigo-300 transition hover:border-indigo-400/60 hover:bg-indigo-500/20"
+              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-300 transition hover:border-indigo-400/60 hover:bg-indigo-500/20 cursor-pointer"
             >
               + New Chat
             </button>
@@ -213,7 +213,7 @@ export default function GuideChatPanel({
             <button
               type="button"
               onClick={onClearMessages}
-              className="rounded-lg border border-[#302F39] bg-[#25242D] px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-400 transition hover:border-slate-500 hover:text-slate-200"
+              className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-textMuted transition hover:border-borderHover hover:text-textPrimary cursor-pointer"
             >
               Clear
             </button>
@@ -222,7 +222,7 @@ export default function GuideChatPanel({
       )}
 
       {/* Message stream */}
-      <div className="flex-1 space-y-4 overflow-y-auto bg-[#17161B] p-4 scrollbar-thin scrollbar-thumb-[#3A3945] scrollbar-track-[#201F25]">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-mainPanel p-4">
         {messages.map((message) => (
           <GuideMessage
             key={message.id}
@@ -238,12 +238,12 @@ export default function GuideChatPanel({
         {isLoading && (
           <div className="flex items-center gap-3 rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-3 py-2.5">
             <div className="flex items-center gap-1">
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.3s]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.15s]" />
-              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-500 dark:bg-indigo-400 [animation-delay:-0.3s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-500 dark:bg-indigo-400 [animation-delay:-0.15s]" />
+              <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-500 dark:bg-indigo-400" />
             </div>
 
-            <span className="font-mono text-[10px] uppercase tracking-[0.13em] text-indigo-300">
+            <span className="font-mono text-[10px] uppercase tracking-[0.13em] text-indigo-600 dark:text-indigo-300">
               NegoMind is thinking
             </span>
           </div>
@@ -251,9 +251,9 @@ export default function GuideChatPanel({
 
         {/* Error display */}
         {error && (
-          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-200">
+          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-200">
             <div className="flex items-start gap-2">
-              <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-rose-400" />
+              <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-rose-500" />
 
               <div>
                 <p className="leading-5">{error}</p>
@@ -262,7 +262,7 @@ export default function GuideChatPanel({
                   <button
                     type="button"
                     onClick={onRetry}
-                    className="mt-3 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-rose-200 transition hover:bg-rose-500/20"
+                    className="mt-3 rounded-lg border border-rose-400/40 bg-rose-500/10 px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-200 transition hover:bg-rose-500/20 cursor-pointer"
                   >
                     Retry Last Question
                   </button>
@@ -273,13 +273,13 @@ export default function GuideChatPanel({
         )}
 
         {/* Starter prompts */}
-        <div className="border-t border-[#292831] pt-4">
+        <div className="border-t border-border pt-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-textMuted">
               Starter & session prompts
             </p>
 
-            <span className="font-mono text-[9px] uppercase tracking-wider text-indigo-400">
+            <span className="font-mono text-[9px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               Suggested
             </span>
           </div>
@@ -291,7 +291,7 @@ export default function GuideChatPanel({
         </div>
 
         {suggestions?.length > 0 && (
-          <div className="border-t border-[#292831] pt-3">
+          <div className="border-t border-border pt-3">
             <ContextSuggestions suggestions={suggestions} />
           </div>
         )}
@@ -305,7 +305,7 @@ export default function GuideChatPanel({
           event.preventDefault();
           onSubmit();
         }}
-        className="border-t border-[#292831] bg-[#1E1D24] p-4"
+        className="border-t border-border bg-card p-4"
       >
         <div className="flex items-end gap-2">
           <textarea
@@ -315,13 +315,13 @@ export default function GuideChatPanel({
             disabled={isLoading}
             placeholder="Ask about negotiation, strategy, coding, or math..."
             rows={2}
-            className="w-full resize-none rounded-xl border border-[#302F39] bg-[#17161B] p-3 text-xs leading-5 text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full resize-none rounded-xl border border-border bg-cardAlt p-3 text-xs leading-5 text-textPrimary outline-none transition placeholder:text-textMuted focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           />
 
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="flex h-10 items-center justify-center gap-2 rounded-xl border border-indigo-400/60 bg-indigo-500/15 px-4 text-[10px] font-bold uppercase tracking-wider text-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.12)] transition hover:border-indigo-300 hover:bg-indigo-500/25 hover:text-indigo-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-10 items-center justify-center gap-2 rounded-xl border border-indigo-500/60 bg-indigo-500/15 px-4 text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.12)] transition hover:border-indigo-500 hover:bg-indigo-500/25 hover:text-indigo-900 dark:hover:text-indigo-100 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
           >
             Send
             <SendIcon />
@@ -329,11 +329,11 @@ export default function GuideChatPanel({
         </div>
 
         <div className="mt-3 flex items-center justify-between">
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-slate-600">
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-textMuted">
             Enter to send
           </span>
 
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-slate-600">
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-textMuted">
             Shift + Enter for newline
           </span>
         </div>

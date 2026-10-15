@@ -5,6 +5,7 @@ import TopNavigation from "./components/TopNavigation";
 import Sidebar from "./components/Sidebar";
 import OAuthCallbackHandler from "./components/OAuthCallbackHandler";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 import Dashboard from "./pages/Dashboard";
 import AgentConfiguration from "./pages/AgentConfiguration";
@@ -40,18 +41,20 @@ export default function App() {
   }
 
   return (
-    <AuthProvider>
-      <MainAppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <MainAppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
 function MainAppContent() {
   const { user, isAuthenticated } = useAuth();
+  const { theme, resolvedTheme, isDark, setTheme } = useTheme();
   const userId = user ? String(user.email || user.id) : null;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [theme, setTheme] = useState("dark");
   const [activePage, setActivePage] = useState(() => (user ? "Dashboard" : "Landing"));
   const [activeScenario, setActiveScenario] = useState(null);
   const [loaderKey, setLoaderKey] = useState(1);
@@ -81,8 +84,6 @@ function MainAppContent() {
     setLoaderKey((prev) => prev + 1);
     setShowLoader(true);
   };
-
-  const isDark = theme === "dark";
 
   const recordedSessionsRef = useRef(new Set());
 
@@ -270,19 +271,7 @@ function MainAppContent() {
   ============================================================ */
 
   return (
-    <div
-      className={`
-      min-h-screen
-      w-full
-      bg-[#0C0C0F]
-      transition-colors
-      duration-200
-      ${isDark
-          ? "text-[#F8FAFC]"
-          : "text-[#0F172A]"
-        }
-    `}
-    >
+    <div className="min-h-screen w-full bg-bg text-textPrimary transition-colors duration-200">
       {showLoader && (
         <CinematicLoader
           key={loaderKey}
@@ -321,7 +310,7 @@ function MainAppContent() {
       )}
 
       {/* Page */}
-      <main className="w-full bg-[#0C0C0F]">
+      <main className="w-full bg-bg min-h-full transition-colors duration-200">
         {renderPage()}
       </main>
 

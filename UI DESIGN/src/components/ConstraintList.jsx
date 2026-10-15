@@ -45,10 +45,10 @@ export default function ConstraintList({ constraints, onChange }) {
           return (
             <li
               key={`${label}-${index}`}
-              className="flex items-center gap-3 rounded-xl border border-[#2D2C36] bg-[#1A191E] px-3.5 py-2.5 transition-colors focus-within:border-slate-400"
+              className="flex items-center gap-3 rounded-xl border border-border bg-cardAlt px-3.5 py-2.5 transition-colors focus-within:border-primary"
             >
               <span
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#3A3944] bg-[#25242C] text-white font-mono font-bold text-xs"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-textPrimary font-mono font-bold text-xs"
                 aria-hidden="true"
               >
                 ${index + 1}
@@ -62,7 +62,7 @@ export default function ConstraintList({ constraints, onChange }) {
                   min="0"
                   value={currentValue}
                   onChange={(event) => onChange?.(index, event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-[#3A3944] bg-[#222129] px-3 py-1.5 font-mono text-sm font-bold text-white outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white"
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-sm font-bold text-textPrimary outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
             </li>

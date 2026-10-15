@@ -52,13 +52,13 @@ function getSatisfaction(agent, finalValue) {
 
 function statusClasses(status) {
   if (status === "agreement" || status === "accepted") {
-    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400";
   }
-  if (status === "rejected") return "border-rose-500/40 bg-rose-500/10 text-rose-400";
+  if (status === "rejected") return "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-400";
   if (status === "deadlock" || status === "breakdown") {
-    return "border-amber-500/40 bg-amber-500/10 text-amber-300";
+    return "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300";
   }
-  return "border-[#3A3944] bg-[#222129] text-slate-300";
+  return "border-border bg-cardAlt text-textSecondary";
 }
 
 export default function OutcomeScreen({ scenario, state, timeline = {}, onDownloadReport }) {
@@ -81,11 +81,11 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
   };
 
   return (
-    <section className="space-y-6 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md" aria-labelledby="outcome-screen-title">
-      <div className="flex flex-col gap-4 border-b border-[#2B2A33] pb-5 sm:flex-row sm:items-start sm:justify-between">
+    <section className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-md" aria-labelledby="outcome-screen-title">
+      <div className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400">NEGOTIATION OUTCOME</p>
-          <h2 id="outcome-screen-title" className="mt-1 text-2xl font-extrabold text-white font-sans">Final Session Result</h2>
+          <p className="text-[11px] font-mono font-bold uppercase tracking-wider text-textMuted">NEGOTIATION OUTCOME</p>
+          <h2 id="outcome-screen-title" className="mt-1 text-2xl font-extrabold text-textPrimary font-sans">Final Session Result</h2>
           <p className="mt-1 text-xs text-textSecondary font-body">{safeText(scenario?.scenario_name || scenario?.name, "Negotiation session")}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
           <button
             type="button"
             onClick={handleDownload}
-            className="inline-flex h-fit items-center gap-2 rounded-xl border border-[#3A3944] bg-[#25242C] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#2F2E38]"
+            className="inline-flex h-fit items-center gap-2 rounded-xl border border-border bg-cardAlt px-3.5 py-2 text-xs font-bold text-textPrimary transition hover:bg-card cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <path d="M12 3v12" />
@@ -111,18 +111,18 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
       {/* Outcome statistics grid */}
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 font-mono">
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Final Offer / Terms</p>
-          <p className="mt-1 text-xl font-extrabold text-emerald-400">{formatCurrency(finalValue)}</p>
-          {finalTerms && <p className="mt-2 break-words text-[11px] text-slate-300">{finalTerms}</p>}
+        <div className="rounded-xl border border-border bg-cardAlt p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">Final Offer / Terms</p>
+          <p className="mt-1 text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(finalValue)}</p>
+          {finalTerms && <p className="mt-2 break-words text-[11px] text-textSecondary">{finalTerms}</p>}
         </div>
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rounds Elapsed</p>
-          <p className="mt-1 text-xl font-extrabold text-white">{Number.isFinite(Number(state.current_round)) ? Number(state.current_round) : "—"}</p>
+        <div className="rounded-xl border border-border bg-cardAlt p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">Rounds Elapsed</p>
+          <p className="mt-1 text-xl font-extrabold text-textPrimary">{Number.isFinite(Number(state.current_round)) ? Number(state.current_round) : "—"}</p>
         </div>
-        <div className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Recorded Turns</p>
-          <p className="mt-1 text-xl font-extrabold text-white">{history.length}</p>
+        <div className="rounded-xl border border-border bg-cardAlt p-4">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">Recorded Turns</p>
+          <p className="mt-1 text-xl font-extrabold text-textPrimary">{history.length}</p>
         </div>
       </div>
 
@@ -131,59 +131,59 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
         <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-500/20 pb-3">
             <div>
-              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 PRACTICE MODE EVALUATION SCORECARD
               </p>
-              <h3 className="text-lg font-extrabold text-white font-sans">
+              <h3 className="text-lg font-extrabold text-textPrimary font-sans">
                 Negotiator Performance Score
               </h3>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-3xl font-black font-mono text-emerald-400">
+              <span className="text-3xl font-black font-mono text-emerald-600 dark:text-emerald-400">
                 {state.scorecard?.overall_score ?? Math.min(100, Math.max(60, Math.round(92 - (history.length * 2))))}
               </span>
-              <span className="text-xs font-mono font-bold text-slate-400">/ 100</span>
+              <span className="text-xs font-mono font-bold text-textMuted">/ 100</span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 font-mono text-xs">
-            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase">Objectives (30%)</p>
-              <p className="text-base font-extrabold text-sky-400">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+              <p className="text-[10px] text-textMuted uppercase">Objectives (30%)</p>
+              <p className="text-base font-extrabold text-sky-600 dark:text-sky-400">
                 {state.scorecard?.objective_achievement ?? "85"}%
               </p>
             </div>
-            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase">Utility (25%)</p>
-              <p className="text-base font-extrabold text-emerald-400">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+              <p className="text-[10px] text-textMuted uppercase">Utility (25%)</p>
+              <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400">
                 {state.scorecard?.utility_score ?? "80"}%
               </p>
             </div>
-            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase">Trade-offs (20%)</p>
-              <p className="text-base font-extrabold text-purple-400">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+              <p className="text-[10px] text-textMuted uppercase">Trade-offs (20%)</p>
+              <p className="text-base font-extrabold text-purple-600 dark:text-purple-400">
                 {state.scorecard?.tradeoff_quality ?? "75"}%
               </p>
             </div>
-            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase">Discipline (15%)</p>
-              <p className="text-base font-extrabold text-amber-400">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+              <p className="text-[10px] text-textMuted uppercase">Discipline (15%)</p>
+              <p className="text-base font-extrabold text-amber-600 dark:text-amber-400">
                 {state.scorecard?.constraint_discipline ?? "100"}%
               </p>
             </div>
-            <div className="rounded-lg border border-[#2D2C36] bg-[#1A191E] p-3 space-y-1">
-              <p className="text-[10px] text-slate-400 uppercase">Efficiency (10%)</p>
-              <p className="text-base font-extrabold text-slate-200">
+            <div className="rounded-lg border border-border bg-card p-3 space-y-1">
+              <p className="text-[10px] text-textMuted uppercase">Efficiency (10%)</p>
+              <p className="text-base font-extrabold text-textPrimary">
                 {state.scorecard?.efficiency ?? "88"}%
               </p>
             </div>
           </div>
 
-          <div className="rounded-lg border border-emerald-500/20 bg-[#17201A] p-3.5 space-y-1 text-xs font-body">
-            <span className="font-mono font-bold uppercase text-emerald-400 text-[10px]">
+          <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-3.5 space-y-1 text-xs font-body">
+            <span className="font-mono font-bold uppercase text-emerald-600 dark:text-emerald-400 text-[10px]">
               Coaching Evaluation & Tactical Feedback
             </span>
-            <p className="text-slate-200 leading-relaxed">
+            <p className="text-textSecondary leading-relaxed">
               {state.scorecard?.coaching_summary ||
                 "Strong performance in multi-variable bargaining. Effective trade-offs were executed between secondary terms to preserve value on primary commercial targets."}
             </p>
@@ -192,44 +192,44 @@ export default function OutcomeScreen({ scenario, state, timeline = {}, onDownlo
       )}
 
       <div className="space-y-3">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300">Agent Objectives & Satisfaction</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-textPrimary">Agent Objectives & Satisfaction</h3>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {agents.length === 0 ? (
-            <p className="text-xs text-slate-400">No agent profile data is available.</p>
+            <p className="text-xs text-textMuted">No agent profile data is available.</p>
           ) : agents.map((agent, index) => {
             const agentId = agent?.id || `agent-${index}`;
             const finalAgentValue = getAgentFinalValue(history, agentId);
             const entries = Array.isArray(timeline[agentId]) ? timeline[agentId] : [];
             return (
-              <div key={agentId} className="rounded-xl border border-[#2D2C36] bg-[#1A191E] p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#2B2A33] pb-3">
+              <div key={agentId} className="rounded-xl border border-border bg-cardAlt p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3">
                   <div>
-                    <h4 className="text-sm font-bold text-white">{safeText(agent?.name || agent?.role, agentId)}</h4>
-                    <p className="mt-1 text-[11px] uppercase tracking-wider text-slate-400">{safeText(agent?.personality || agent?.persona, "Personality unavailable")}</p>
+                    <h4 className="text-sm font-bold text-textPrimary">{safeText(agent?.name || agent?.role, agentId)}</h4>
+                    <p className="mt-1 text-[11px] uppercase tracking-wider text-textMuted">{safeText(agent?.personality || agent?.persona, "Personality unavailable")}</p>
                   </div>
                   <div className="text-right font-mono">
-                    <p className="text-[10px] uppercase text-slate-400">Objective Satisfaction</p>
-                    <p className="text-lg font-extrabold text-sky-400">{getSatisfaction(agent, finalAgentValue)}</p>
+                    <p className="text-[10px] uppercase text-textMuted">Objective Satisfaction</p>
+                    <p className="text-lg font-extrabold text-sky-600 dark:text-sky-400">{getSatisfaction(agent, finalAgentValue)}</p>
                   </div>
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-3 text-xs font-mono">
                   <div>
-                    <p className="text-[10px] uppercase text-slate-400">Goal</p>
-                    <p className="mt-1 break-words text-slate-200">{safeText(agent?.goal || agent?.goals)}</p>
+                    <p className="text-[10px] uppercase text-textMuted">Goal</p>
+                    <p className="mt-1 break-words text-textSecondary">{safeText(agent?.goal || agent?.goals)}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase text-slate-400">Final Position</p>
-                    <p className="mt-1 text-emerald-400">{formatCurrency(finalAgentValue)}</p>
+                    <p className="text-[10px] uppercase text-textMuted">Final Position</p>
+                    <p className="mt-1 text-emerald-600 dark:text-emerald-400">{formatCurrency(finalAgentValue)}</p>
                   </div>
                 </div>
-                <div className="mt-4 border-t border-[#2B2A33] pt-3">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">Concession Timeline</p>
+                <div className="mt-4 border-t border-border pt-3">
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-textMuted">Concession Timeline</p>
                   {entries.length === 0 ? (
-                    <p className="mt-2 text-xs text-slate-500">No recorded concessions.</p>
+                    <p className="mt-2 text-xs text-textMuted">No recorded concessions.</p>
                   ) : (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {entries.map((entry, entryIndex) => (
-                        <span key={`${agentId}-${entryIndex}`} className="rounded-lg border border-[#3A3944] bg-[#222129] px-2.5 py-1 text-[11px] font-mono text-slate-200">
+                        <span key={`${agentId}-${entryIndex}`} className="rounded-lg border border-border bg-card px-2.5 py-1 text-[11px] font-mono text-textSecondary">
                           R{safeText(entry?.round, entryIndex + 1)}: {formatCurrency(entry?.value)}
                           {Number.isFinite(Number(entry?.delta)) && Number(entry.delta) !== 0 ? ` (${Number(entry.delta) > 0 ? "+" : ""}${formatCurrency(entry.delta)})` : ""}
                         </span>

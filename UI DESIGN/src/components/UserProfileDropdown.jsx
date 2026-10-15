@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
-export default function UserProfileDropdown({ isDark }) {
+export default function UserProfileDropdown({ isDark: propIsDark }) {
   const { user, signOut } = useAuth();
+  const { isDark: contextIsDark } = useTheme();
+  const isDark = propIsDark !== undefined ? propIsDark : contextIsDark;
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -43,22 +46,18 @@ export default function UserProfileDropdown({ isDark }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center rounded-md gap-2.5 border px-3 py-1.5 transition-all duration-200 cursor-pointer ${
-          isDark
-            ? "border-[#4B4A45] bg-[#222326] text-[#E8E3D8] hover:border-[#E8E3D8]"
-            : "border-slate-300 bg-slate-100 text-slate-800 hover:bg-slate-200"
-        }`}
+        className="flex items-center rounded-xl gap-2.5 border border-border bg-card px-3 py-1.5 transition-all duration-200 hover:border-borderGlow hover:bg-cardAlt text-textPrimary cursor-pointer shadow-sm"
       >
         <img
           src={avatarUrl}
           alt={user.full_name}
           onError={() => setImgError(true)}
-          className="h-6 w-6 object-cover rounded-full border border-[#8E8B83] bg-slate-800"
+          className="h-6 w-6 object-cover rounded-full border border-border bg-cardAlt"
         />
 
         <div className="text-left hidden sm:block">
-          <p className="text-xs font-bold leading-none text-[#E8E3D8]">{user.full_name}</p>
-          <p className="text-[10px] text-[#AAA79E] font-mono font-medium leading-tight mt-0.5">
+          <p className="text-xs font-bold leading-none text-textPrimary">{user.full_name}</p>
+          <p className="text-[10px] text-textMuted font-mono font-medium leading-tight mt-0.5">
             {providerBadge}
           </p>
         </div>
@@ -70,7 +69,7 @@ export default function UserProfileDropdown({ isDark }) {
           fill="none"
           stroke="currentColor"
           strokeWidth="2.5"
-          className={`transition-transform duration-200 text-[#AAA79E] ${isOpen ? "rotate-180" : ""}`}
+          className={`transition-transform duration-200 text-textMuted ${isOpen ? "rotate-180" : ""}`}
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -79,27 +78,23 @@ export default function UserProfileDropdown({ isDark }) {
       {/* Popover Dropdown Card */}
       {isOpen && (
         <div
-          className={`absolute right-0 top-12 z-50 w-72 border p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 ${
-            isDark
-              ? "border-[#4B4A45] bg-[#191A1C] text-[#E8E3D8]"
-              : "border-slate-200 bg-white text-slate-900"
-          }`}
+          className="absolute right-0 top-12 z-50 w-72 border border-border bg-card/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 text-textPrimary rounded-2xl"
         >
           {/* User Details Header */}
-          <div className="flex items-center gap-3 pb-3 border-b border-[#252435]">
+          <div className="flex items-center gap-3 pb-3 border-b border-border">
             <img
               src={avatarUrl}
               alt={user.full_name}
               onError={() => setImgError(true)}
-              className="h-11 w-11 rounded-full object-cover border-2 border-emerald-500/60 shadow-md bg-slate-800"
+              className="h-11 w-11 rounded-full object-cover border-2 border-emerald-500/60 shadow-md bg-cardAlt"
             />
 
             <div className="min-w-0 flex-1">
-              <h4 className="text-sm font-bold truncate">{user.full_name}</h4>
-              <p className="text-xs text-slate-400 truncate font-mono">{user.email}</p>
+              <h4 className="text-sm font-bold truncate text-textPrimary">{user.full_name}</h4>
+              <p className="text-xs text-textMuted truncate font-mono">{user.email}</p>
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider">
                   Verified Account
                 </span>
               </div>
@@ -108,13 +103,13 @@ export default function UserProfileDropdown({ isDark }) {
 
           {/* Account Meta Badges */}
           <div className="my-3 grid grid-cols-2 gap-2 text-center">
-            <div className="rounded-xl bg-[#1D1C2A] p-2 border border-[#2B2A3B]">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Method</p>
-              <p className="text-xs font-bold text-white capitalize">{user.auth_provider}</p>
+            <div className="rounded-xl bg-cardAlt p-2 border border-border">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">Method</p>
+              <p className="text-xs font-bold text-textPrimary capitalize">{user.auth_provider}</p>
             </div>
-            <div className="rounded-xl bg-[#1D1C2A] p-2 border border-[#2B2A3B]">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</p>
-              <p className="text-xs font-bold text-emerald-400">Active User</p>
+            <div className="rounded-xl bg-cardAlt p-2 border border-border">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-textMuted">Status</p>
+              <p className="text-xs font-bold text-emerald-500 dark:text-emerald-400">Active User</p>
             </div>
           </div>
 
@@ -126,7 +121,7 @@ export default function UserProfileDropdown({ isDark }) {
                 setIsOpen(false);
                 signOut();
               }}
-              className="w-full flex items-center justify-between rounded-xl p-2.5 text-xs font-bold text-red-400 hover:bg-red-500/15 hover:text-red-300 transition group cursor-pointer"
+              className="w-full flex items-center justify-between rounded-xl p-2.5 text-xs font-bold text-red-500 dark:text-red-400 hover:bg-red-500/10 transition group cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

@@ -119,8 +119,6 @@ function FloatingInput({
 
   return (
     <div className="group relative">
-      
-
       <input
         id={id}
         type={type}
@@ -129,16 +127,14 @@ function FloatingInput({
         required={required}
         minLength={minLength}
         placeholder={label}
-        className="peer h-[50px] w-full border border-[#302E42] bg-[#161522]/80 p-5 text-sm text-white outline-none backdrop-blur-md transition-all duration-300"
+        className="peer h-[50px] w-full rounded-xl border border-border bg-cardAlt p-5 text-sm text-textPrimary placeholder:text-textMuted outline-none backdrop-blur-md transition-all duration-300 focus:border-emerald-500"
       />
-
-      
 
       {onTogglePassword && (
         <button
           type="button"
           onClick={onTogglePassword}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-200"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted transition hover:text-textPrimary cursor-pointer"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           <Icon name={showPassword ? "eyeOff" : "eye"} size={17} />
@@ -369,7 +365,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
   };
 
   return (
-    <main className="relative min-h-screen w-full overflow-y-auto lg:overflow-hidden bg-[#0C0B12] text-white">
+    <main className="relative min-h-screen w-full overflow-y-auto lg:overflow-hidden bg-bg text-textPrimary">
       {/* Ambient background lighting */}
       <div className="pointer-events-none absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[140px]" />
       <div className="pointer-events-none absolute -bottom-40 right-0 h-[560px] w-[560px] rounded-full bg-indigo-500/10 blur-[140px]" />
@@ -377,22 +373,19 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
       <div className="relative grid h-full min-h-0 lg:grid-cols-2">
         {/* Authentication panel */}
         <section
-          className={`relative z-20 min-h-0 overflow-y-auto bg-[#0C0B12] px-4 py-6 transition-transform duration-700 ease-in-out sm:px-10 lg:col-start-1 lg:row-start-1 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-6 xl:px-20 ${isSignup ? "lg:translate-x-full" : "lg:translate-x-0"
+          className={`relative z-20 min-h-0 overflow-y-auto bg-bg px-4 py-6 transition-transform duration-700 ease-in-out sm:px-10 lg:col-start-1 lg:row-start-1 lg:h-full lg:overflow-y-auto lg:px-12 lg:py-6 xl:px-20 ${isSignup ? "lg:translate-x-full" : "lg:translate-x-0"
             }`}
         >
           <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col justify-center">
-            {/* Brand Logo & Tagline */}
-            
-
             {/* Heading and tab switcher */}
             <div className="mb-6">
-              <div className="w-full flex justify-between mb-5 rounded-2xl border border-[#2F2E3E] bg-[#161522]/80 p-1 shadow-xl backdrop-blur-md gap-1">
+              <div className="w-full flex justify-between mb-5 rounded-2xl border border-border bg-cardAlt p-1 shadow-xl backdrop-blur-md gap-1">
                 <button
                   type="button"
                   onClick={() => switchMode("signin")}
                   className={`flex-1 rounded-xl py-2.5 text-sm sm:text-base font-black transition-all cursor-pointer ${!isSignup
-                    ? "bg-[#29283A] text-emerald-400 shadow-lg"
-                    : "text-slate-500 hover:text-slate-200"
+                    ? "bg-card text-emerald-600 dark:text-emerald-400 shadow-lg"
+                    : "text-textMuted hover:text-textPrimary"
                     }`}
                 >
                   Sign In
@@ -402,15 +395,15 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                   type="button"
                   onClick={() => switchMode("signup")}
                   className={`flex-1 rounded-xl py-2.5 text-sm sm:text-base font-black transition-all cursor-pointer ${isSignup
-                    ? "bg-[#29283A] text-emerald-400 shadow-lg"
-                    : "text-slate-500 hover:text-slate-200"
+                    ? "bg-card text-emerald-600 dark:text-emerald-400 shadow-lg"
+                    : "text-textMuted hover:text-textPrimary"
                     }`}
                 >
                   Sign Up
                 </button>
               </div>
 
-              <h1 className="text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+              <h1 className="text-4xl font-black tracking-[-0.04em] text-textPrimary sm:text-5xl">
                 {isOtp
                   ? "Verify your identity"
                   : isSignup
@@ -418,7 +411,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     : "Welcome back."}
               </h1>
 
-              <p className="mt-2 max-w-md text-sm leading-6 text-slate-400">
+              <p className="mt-2 max-w-md text-sm leading-6 text-textMuted">
                 {isOtp
                   ? `Enter the verification code sent to ${otpEmail}.`
                   : isSignup
@@ -429,7 +422,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
 
             {/* Error state */}
             {authError && (
-              <div className="mb-3 flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-xs leading-5 text-red-300">
+              <div className="mb-3 flex items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-xs leading-5 text-red-600 dark:text-red-300">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-red-400/50 text-[11px] font-black">
                   !
                 </span>
@@ -442,20 +435,19 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
               <div className="space-y-6">
                 <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4">
                   <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300">
                       <Icon name="mail" size={19} />
                     </span>
                     <div>
-                      <p className="text-xs font-bold text-emerald-200">
+                      <p className="text-xs font-bold text-emerald-700 dark:text-emerald-200">
                         Verification code dispatched
                       </p>
-                      <p className="mt-0.5 text-[11px] text-emerald-300/70">
+                      <p className="mt-0.5 text-[11px] text-emerald-600 dark:text-emerald-300/70">
                         Check your inbox and spam folder.
                       </p>
                     </div>
                   </div>
                 </div>
-
 
                 <form onSubmit={handleOtpSubmit} className="space-y-6">
                   <div className="flex justify-between gap-2">
@@ -472,7 +464,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                         onChange={(event) => handleOtpChange(index, event.target.value)}
                         onKeyDown={(event) => handleOtpKeyDown(index, event)}
                         onPaste={handleOtpPaste}
-                        className="h-14 w-full rounded-2xl border border-[#302E42] bg-[#161522]/80 text-center font-mono text-xl font-black text-emerald-400 outline-none backdrop-blur-md transition focus:border-emerald-500 focus:bg-[#1A1928] focus:ring-4 focus:ring-emerald-500/10"
+                        className="h-14 w-full rounded-2xl border border-border bg-cardAlt text-center font-mono text-xl font-black text-emerald-600 dark:text-emerald-400 outline-none backdrop-blur-md transition focus:border-emerald-500 focus:bg-card focus:ring-4 focus:ring-emerald-500/10"
                       />
                     ))}
                   </div>
@@ -480,18 +472,18 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                   <button
                     type="submit"
                     disabled={loading || otpDigits.join("").length !== 6}
-                    className="group flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="group flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                   >
                     {loading ? "Verifying..." : "Verify Code"}
                     {!loading && <Icon name="arrow" size={18} strokeWidth={2.2} />}
                   </button>
                 </form>
 
-                <div className="flex items-center justify-between border-t border-[#29283A] pt-5 text-xs">
+                <div className="flex items-center justify-between border-t border-border pt-5 text-xs">
                   <button
                     type="button"
                     onClick={() => switchMode("signin")}
-                    className="text-slate-500 transition hover:text-white"
+                    className="text-textMuted transition hover:text-textPrimary cursor-pointer"
                   >
                     ← Back to sign in
                   </button>
@@ -500,12 +492,12 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     <button
                       type="button"
                       onClick={handleResendOtp}
-                      className="font-bold text-emerald-400 hover:underline"
+                      className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
                     >
                       Resend code
                     </button>
                   ) : (
-                    <span className="font-mono text-slate-600">
+                    <span className="font-mono text-textMuted">
                       Resend in 00:{String(resendTimer).padStart(2, "0")}
                     </span>
                   )}
@@ -519,19 +511,37 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     type="button"
                     onClick={handleGoogleAuth}
                     disabled={loading}
-                    className="flex h-12 items-center justify-center gap-2 border border-[#302E42] bg-[#161522]/80 text-sm font-bold text-slate-200 backdrop-blur-md transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-[#1D1C2B] disabled:opacity-50"
+                    className="flex h-12 items-center justify-center gap-2 rounded-xl border border-border bg-cardAlt text-sm font-bold text-textSecondary backdrop-blur-md transition hover:-translate-y-0.5 hover:border-blue-500/50 hover:bg-card hover:text-textPrimary disabled:opacity-50 cursor-pointer"
                   >
                     <GoogleIcon />
                     {loading ? "Connecting..." : "Continue with Google"}
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setLoading(true);
+                      await signInWithOAuth("google", {
+                        email: "shaikrazaq920@gmail.com",
+                        full_name: "Shaik Razaq",
+                        avatar_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=Shaik",
+                      });
+                      setLoading(false);
+                      onNavigate?.("Dashboard");
+                    }}
+                    disabled={loading}
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400 transition cursor-pointer disabled:opacity-50"
+                  >
+                    <span>🚀 Quick Demo Login (Instant Access)</span>
+                  </button>
                 </div>
 
                 <div className="my-7 flex items-center gap-4">
-                  <div className="h-px flex-1 bg-[#29283A]" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-textMuted">
                     Or continue with
                   </span>
-                  <div className="h-px flex-1 bg-[#29283A]" />
+                  <div className="h-px flex-1 bg-border" />
                 </div>
 
                 {isSignup ? (
@@ -568,14 +578,14 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                       onTogglePassword={() => setShowPassword((value) => !value)}
                     />
 
-                    <p className="px-1 text-[11px] text-slate-600">
+                    <p className="px-1 text-[11px] text-textMuted">
                       Use at least 6 characters for your password.
                     </p>
 
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group flex h-12 w-full items-center justify-center gap-3 bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="group flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                     >
                       {loading ? "Sending verification code..." : "Create Account"}
                       {!loading && <Icon name="arrow" size={18} strokeWidth={2.2} />}
@@ -606,12 +616,12 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     />
 
                     <div className="flex items-center justify-between px-1 pt-1">
-                      <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-500">
+                      <label className="flex cursor-pointer items-center gap-2 text-xs text-textMuted">
                         <input
                           type="checkbox"
                           checked={rememberMe}
                           onChange={(event) => setRememberMe(event.target.checked)}
-                          className="h-4 w-4 rounded border-[#3B394D] bg-[#161522] text-emerald-500 accent-emerald-500 focus:ring-emerald-500"
+                          className="h-4 w-4 rounded border-border bg-cardAlt text-emerald-500 accent-emerald-500 focus:ring-emerald-500"
                         />
                         Remember me
                       </label>
@@ -619,7 +629,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                       <button
                         type="button"
                         onClick={() => setAuthError("Password reset is not available yet.")}
-                        className="text-xs font-bold text-emerald-400 transition hover:text-emerald-300 hover:underline"
+                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 transition hover:underline cursor-pointer"
                       >
                         Forgot password?
                       </button>
@@ -628,7 +638,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="group flex h-12 w-full items-center justify-center gap-3  bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-50"
+                      className="group flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-emerald-500 text-sm font-black text-slate-950 shadow-[0_0_25px_rgba(16,185,129,0.18)] transition duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_0_28px_rgba(16,185,129,0.35)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                     >
                       {loading ? "Signing in..." : "Sign In to Engine"}
                       {!loading && <Icon name="arrow" size={18} strokeWidth={2.2} />}
@@ -636,12 +646,12 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                   </form>
                 )}
 
-                <p className="mt-7 text-center text-xs text-slate-500">
+                <p className="mt-7 text-center text-xs text-textMuted">
                   {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
                   <button
                     type="button"
                     onClick={() => switchMode(isSignup ? "signin" : "signup")}
-                    className="font-bold text-emerald-400 transition hover:text-emerald-300 hover:underline"
+                    className="font-bold text-emerald-600 dark:text-emerald-400 transition hover:underline cursor-pointer"
                   >
                     {isSignup ? "Sign in" : "Create one"}
                   </button>
@@ -653,7 +663,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
 
         {/* Visual hero panel */}
         <section
-          className={`relative z-10 hidden min-h-0 overflow-hidden border-l border-[#262536] transition-transform duration-700 ease-in-out lg:col-start-2 lg:row-start-1 lg:block lg:h-full ${isSignup ? "lg:-translate-x-full" : "lg:translate-x-0"
+          className={`relative z-10 hidden min-h-0 overflow-hidden border-l border-border transition-transform duration-700 ease-in-out lg:col-start-2 lg:row-start-1 lg:block lg:h-full ${isSignup ? "lg:-translate-x-full" : "lg:translate-x-0"
             }`}
         >
           <img
@@ -663,12 +673,11 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
           />
 
           {/* Dark integration overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0C0B12]/95 via-[#0C0B12]/55 to-[#0C0B12]/20" />
+          <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/55 to-black/30" />
 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_35%,rgba(16,185,129,0.22),transparent_28%),radial-gradient(circle_at_25%_75%,rgba(99,102,241,0.18),transparent_30%)]" />
 
           <div className="relative z-10 flex h-full flex-col justify-between p-10 xl:p-16">
-
             <div className="max-w-xl">
               <div></div>
 

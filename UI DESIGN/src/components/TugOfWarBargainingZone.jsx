@@ -240,28 +240,28 @@ export default function TugOfWarBargainingZone({
   const isBuyerRole = currentAgentId === "buyer" || currentAgentId === "candidate" || currentAgentId === "employer";
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-xl font-sans ${className}`}>
+    <div className={`relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xl font-sans ${className}`}>
       
-      {/* Subtle Dark Glassmorphic Ambient FX */}
+      {/* Subtle Ambient FX */}
       <div className="pointer-events-none absolute -left-20 -top-20 h-64 w-64 rounded-full bg-rose-500/5 blur-3xl" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-sky-500/5 blur-3xl" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-72 w-72 rounded-full bg-emerald-500/5 blur-3xl" />
 
       {/* HEADER SECTION */}
-      <div className="relative z-10 mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[#2D2C36] pb-4">
+      <div className="relative z-10 mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+            <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
               <Activity className="h-3.5 w-3.5" />
             </span>
-            <span className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
               Negotiation Physics Engine
             </span>
-            <span className="rounded-lg border border-[#302F39] bg-[#1A191E] px-2.5 py-0.5 font-mono text-[10px] font-bold text-slate-300">
+            <span className="rounded-lg border border-border bg-cardAlt px-2.5 py-0.5 font-mono text-[10px] font-bold text-textSecondary">
               Live Bargaining Track
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white font-sans flex items-center gap-2">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-textPrimary font-sans flex items-center gap-2">
             Tug-of-War Bargaining Zone
           </h2>
           <p className="text-xs text-textSecondary font-body mt-0.5">
@@ -275,7 +275,7 @@ export default function TugOfWarBargainingZone({
             <button
               type="button"
               onClick={handleResetTest}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-xs font-mono font-bold text-amber-300 hover:bg-amber-500/25 transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-xs font-mono font-bold text-amber-600 dark:text-amber-300 hover:bg-amber-500/25 transition cursor-pointer"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset Interactive Probe
@@ -287,8 +287,8 @@ export default function TugOfWarBargainingZone({
             onClick={() => setIsEditingBounds(!isEditingBounds)}
             className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-mono font-bold transition cursor-pointer ${
               isEditingBounds
-                ? "border-sky-400 bg-sky-500/20 text-sky-200"
-                : "border-[#302F39] bg-[#1A191E] text-slate-300 hover:bg-[#25242E]"
+                ? "border-sky-400 bg-sky-500/20 text-sky-700 dark:text-sky-200"
+                : "border-border bg-cardAlt text-textSecondary hover:bg-card"
             }`}
           >
             <Sliders className="h-3.5 w-3.5" />
@@ -299,20 +299,20 @@ export default function TugOfWarBargainingZone({
 
       {/* EDITABLE BOUNDS DRAWER */}
       {isEditingBounds && (
-        <div className="relative z-10 mb-6 rounded-xl border border-sky-500/30 bg-[#1A191E] p-4 space-y-3 font-mono animate-fadeIn">
-          <div className="flex items-center justify-between border-b border-[#2D2C36] pb-2">
-            <h4 className="text-xs font-bold text-sky-300 uppercase tracking-wider flex items-center gap-2">
-              <Sliders className="h-4 w-4 text-sky-400" />
+        <div className="relative z-10 mb-6 rounded-xl border border-sky-500/30 bg-cardAlt p-4 space-y-3 font-mono animate-fadeIn">
+          <div className="flex items-center justify-between border-b border-border pb-2">
+            <h4 className="text-xs font-bold text-sky-600 dark:text-sky-300 uppercase tracking-wider flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-sky-500 dark:text-sky-400" />
               Custom Negotiation Limit Anchors
             </h4>
-            <span className="text-[11px] text-slate-400">Modify anchors to test dynamic ZOPA expansion or deadlock</span>
+            <span className="text-[11px] text-textMuted">Modify anchors to test dynamic ZOPA expansion or deadlock</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-rose-400 flex items-center justify-between">
+              <label className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center justify-between">
                 <span>Vendor Floor Limit (Red Anchor):</span>
-                <span className="text-white font-extrabold">{formatCurrency(vendorFloor)}</span>
+                <span className="text-textPrimary font-extrabold">{formatCurrency(vendorFloor)}</span>
               </label>
               <input
                 type="range"
@@ -321,14 +321,14 @@ export default function TugOfWarBargainingZone({
                 step="500"
                 value={vendorFloor}
                 onChange={(e) => setVendorFloor(Number(e.target.value))}
-                className="w-full h-2 bg-rose-950 rounded-lg appearance-none cursor-pointer accent-rose-500"
+                className="w-full h-2 bg-rose-200 dark:bg-rose-950 rounded-lg appearance-none cursor-pointer accent-rose-500"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-sky-400 flex items-center justify-between">
+              <label className="text-[11px] font-bold text-sky-600 dark:text-sky-400 flex items-center justify-between">
                 <span>Buyer Ceiling Limit (Blue Anchor):</span>
-                <span className="text-white font-extrabold">{formatCurrency(buyerCeiling)}</span>
+                <span className="text-textPrimary font-extrabold">{formatCurrency(buyerCeiling)}</span>
               </label>
               <input
                 type="range"
@@ -337,7 +337,7 @@ export default function TugOfWarBargainingZone({
                 step="500"
                 value={buyerCeiling}
                 onChange={(e) => setBuyerCeiling(Number(e.target.value))}
-                className="w-full h-2 bg-sky-950 rounded-lg appearance-none cursor-pointer accent-sky-500"
+                className="w-full h-2 bg-sky-200 dark:bg-sky-950 rounded-lg appearance-none cursor-pointer accent-sky-500"
               />
             </div>
           </div>
@@ -347,17 +347,17 @@ export default function TugOfWarBargainingZone({
       {/* TOP ANCHOR METRICS BADGES */}
       <div className="relative z-10 mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
         {/* Left Anchor Badge (Red) */}
-        <div className="rounded-xl border border-rose-500/30 bg-[#1A191E] p-3.5 flex items-center justify-between shadow-sm">
+        <div className="rounded-xl border border-rose-500/30 bg-cardAlt p-3.5 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold border border-rose-500/30">
               <Shield className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-rose-400 tracking-wider">Vendor Floor Limit</p>
-              <p className="text-base font-extrabold text-white">{formatCurrency(vendorFloor)}</p>
+              <p className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 tracking-wider">Vendor Floor Limit</p>
+              <p className="text-base font-extrabold text-textPrimary">{formatCurrency(vendorFloor)}</p>
             </div>
           </div>
-          <span className="rounded-lg bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-500/30">
+          <span className="rounded-lg bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-300 border border-rose-500/30">
             Min Floor
           </span>
         </div>
@@ -365,47 +365,47 @@ export default function TugOfWarBargainingZone({
         {/* Middle ZOPA Status Badge */}
         <div className={`rounded-xl border p-3.5 flex items-center justify-between shadow-sm transition-all ${
           isInsideZopa
-            ? "border-emerald-500/30 bg-[#1A191E]"
-            : "border-amber-500/30 bg-[#1A191E]"
+            ? "border-emerald-500/30 bg-cardAlt"
+            : "border-amber-500/30 bg-cardAlt"
         }`}>
           <div className="flex items-center gap-2.5">
             <div className={`flex h-8 w-8 items-center justify-center rounded-xl font-bold border ${
               isInsideZopa 
-                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                : "bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30"
             }`}>
               {isInsideZopa ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
             </div>
             <div>
-              <p className={`text-[10px] uppercase font-bold tracking-wider ${isInsideZopa ? "text-emerald-400" : "text-amber-400"}`}>
+              <p className={`text-[10px] uppercase font-bold tracking-wider ${isInsideZopa ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
                 {isInsideZopa ? "ZOPA Active" : "Out of Bounds"}
               </p>
-              <p className="text-base font-extrabold text-white">
+              <p className="text-base font-extrabold text-textPrimary">
                 {hasZopa ? `${formatCurrency(Math.abs(buyerCeiling - vendorFloor))} Window` : "No ZOPA"}
               </p>
             </div>
           </div>
           <span className={`rounded-lg px-2 py-0.5 text-[10px] font-bold border ${
             isInsideZopa 
-              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
-              : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+              ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" 
+              : "bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
           }`}>
             {isInsideZopa ? "FEASIBLE" : "OUTSIDE ZOPA"}
           </span>
         </div>
 
         {/* Right Anchor Badge (Blue) */}
-        <div className="rounded-xl border border-sky-500/30 bg-[#1A191E] p-3.5 flex items-center justify-between shadow-sm">
+        <div className="rounded-xl border border-sky-500/30 bg-cardAlt p-3.5 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/20 text-sky-400 font-bold border border-sky-500/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/20 text-sky-600 dark:text-sky-400 font-bold border border-sky-500/30">
               <Target className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-sky-400 tracking-wider">Buyer Ceiling Limit</p>
-              <p className="text-base font-extrabold text-white">{formatCurrency(buyerCeiling)}</p>
+              <p className="text-[10px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-wider">Buyer Ceiling Limit</p>
+              <p className="text-base font-extrabold text-textPrimary">{formatCurrency(buyerCeiling)}</p>
             </div>
           </div>
-          <span className="rounded-lg bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-500/30">
+          <span className="rounded-lg bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-300 border border-sky-500/30">
             Max Budget
           </span>
         </div>
@@ -417,18 +417,18 @@ export default function TugOfWarBargainingZone({
       <div className="relative z-10 my-6 py-4">
         
         {/* TUG OF WAR TENSION ROPES VISUAL EFFECT */}
-        <div className="relative mb-3 flex items-center justify-between px-1 text-[11px] font-mono font-bold text-slate-400">
-          <div className="flex items-center gap-2 text-rose-400">
+        <div className="relative mb-3 flex items-center justify-between px-1 text-[11px] font-mono font-bold text-textMuted">
+          <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
             <span className="h-2 w-2 rounded-full bg-rose-500 animate-ping" />
             <span>◄ VENDOR PULL (${vendorFloor.toLocaleString()})</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-slate-300 font-extrabold bg-[#1A191E] px-3.5 py-1 rounded-xl border border-[#302F39]">
-            <ArrowRightLeft className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-1.5 text-textPrimary font-extrabold bg-cardAlt px-3.5 py-1 rounded-xl border border-border">
+            <ArrowRightLeft className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
             <span>BARGAINING ZONE CONTINUUM</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sky-400">
+          <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400">
             <span>BUYER PULL (${buyerCeiling.toLocaleString()}) ►</span>
             <span className="h-2 w-2 rounded-full bg-sky-500 animate-ping" />
           </div>
@@ -438,7 +438,7 @@ export default function TugOfWarBargainingZone({
         <div
           ref={trackRef}
           onClick={handleTrackClick}
-          className="relative h-14 w-full rounded-2xl border border-[#2D2C36] bg-[#14131A] shadow-inner cursor-crosshair overflow-visible select-none"
+          className="relative h-14 w-full rounded-2xl border border-border bg-slate-100 dark:bg-[#14131A] shadow-inner cursor-crosshair overflow-visible select-none"
         >
           {/* Canvas for Particle Trail behind marker */}
           <canvas
@@ -449,7 +449,7 @@ export default function TugOfWarBargainingZone({
           {/* Background Grid Ticks */}
           <div className="pointer-events-none absolute inset-0 flex justify-between px-4 opacity-15">
             {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="h-full w-px bg-slate-300" />
+              <div key={i} className="h-full w-px bg-slate-400 dark:bg-slate-300" />
             ))}
           </div>
 
@@ -460,14 +460,14 @@ export default function TugOfWarBargainingZone({
                 left: `${zopaLeftPct}%`,
                 width: `${zopaWidthPct}%`,
               }}
-              className="absolute top-0 bottom-0 z-0 bg-gradient-to-r from-emerald-500/15 via-emerald-400/25 to-emerald-500/15 border-x-2 border-emerald-400/80 shadow-[0_0_20px_rgba(16,185,129,0.25)] overflow-hidden transition-all duration-300"
+              className="absolute top-0 bottom-0 z-0 bg-gradient-to-r from-emerald-500/15 via-emerald-400/25 to-emerald-500/15 border-x-2 border-emerald-500/80 dark:border-emerald-400/80 shadow-[0_0_20px_rgba(16,185,129,0.25)] overflow-hidden transition-all duration-300"
             >
               {/* Shimmer animation diagonal lines inside ZOPA */}
               <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(16,185,129,0.12)_25%,transparent_25%,transparent_50%,rgba(16,185,129,0.12)_50%,rgba(16,185,129,0.12)_75%,transparent_75%,transparent)] bg-[length:16px_16px] animate-[pulse_3s_infinite]" />
 
               {/* ZOPA Label Badge centered in zone */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <span className="rounded-lg bg-[#17161B]/90 px-3 py-1 font-mono text-[10px] font-extrabold tracking-widest text-emerald-400 border border-emerald-500/40 shadow-md uppercase">
+                <span className="rounded-lg bg-card/90 px-3 py-1 font-mono text-[10px] font-extrabold tracking-widest text-emerald-600 dark:text-emerald-400 border border-emerald-500/40 shadow-md uppercase">
                   ✨ ZOPA ({formatCurrency(vendorFloor)} – {formatCurrency(buyerCeiling)})
                 </span>
               </div>
@@ -480,8 +480,8 @@ export default function TugOfWarBargainingZone({
             className="absolute top-0 bottom-0 z-20 w-1 bg-rose-500 shadow-[0_0_12px_#F43F5E] transition-all duration-300 pointer-events-none"
           >
             {/* Top Anchor Flag */}
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-[#17161B] px-2 py-0.5 font-mono text-[9px] font-bold text-rose-400 shadow-md whitespace-nowrap flex items-center gap-1 border border-rose-500/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-card px-2 py-0.5 font-mono text-[9px] font-bold text-rose-600 dark:text-rose-400 shadow-md whitespace-nowrap flex items-center gap-1 border border-rose-500/40">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
               Floor: {formatCurrency(vendorFloor)}
             </div>
             {/* Anchor Pin Node */}
@@ -494,8 +494,8 @@ export default function TugOfWarBargainingZone({
             className="absolute top-0 bottom-0 z-20 w-1 bg-sky-500 shadow-[0_0_12px_#38BDF8] transition-all duration-300 pointer-events-none"
           >
             {/* Top Anchor Flag */}
-            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-[#17161B] px-2 py-0.5 font-mono text-[9px] font-bold text-sky-400 shadow-md whitespace-nowrap flex items-center gap-1 border border-sky-500/40">
-              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
+            <div className="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-card px-2 py-0.5 font-mono text-[9px] font-bold text-sky-600 dark:text-sky-400 shadow-md whitespace-nowrap flex items-center gap-1 border border-sky-500/40">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
               Ceiling: {formatCurrency(buyerCeiling)}
             </div>
             {/* Anchor Pin Node */}
@@ -521,10 +521,10 @@ export default function TugOfWarBargainingZone({
 
             {/* Glassmorphic Circle Node Matching System UI */}
             <div
-              className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-[#17161B] backdrop-blur-md shadow-2xl transition-all duration-300 ${
+              className={`relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-card backdrop-blur-md shadow-2xl transition-all duration-300 ${
                 isInsideZopa
-                  ? "border-emerald-400 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
-                  : "border-amber-400 text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
+                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                  : "border-amber-500 text-amber-600 dark:text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.4)]"
               }`}
             >
               {isBuyerRole ? (
@@ -536,32 +536,32 @@ export default function TugOfWarBargainingZone({
 
             {/* Marker Floating Tooltip Card Below */}
             <div
-              className={`absolute top-13 left-1/2 -translate-x-1/2 rounded-xl border border-[#302F39] bg-[#17161B]/95 backdrop-blur-md p-3 font-mono shadow-2xl transition-all duration-300 whitespace-nowrap z-40 ${
+              className={`absolute top-13 left-1/2 -translate-x-1/2 rounded-xl border border-border bg-card/95 backdrop-blur-md p-3 font-mono shadow-2xl transition-all duration-300 whitespace-nowrap z-40 ${
                 isInsideZopa
-                  ? "border-emerald-500/40 text-emerald-300 shadow-[0_10px_30px_rgba(16,185,129,0.25)]"
-                  : "border-amber-500/40 text-amber-300 shadow-[0_10px_30px_rgba(245,158,11,0.25)]"
+                  ? "border-emerald-500/40 text-emerald-700 dark:text-emerald-300 shadow-[0_10px_30px_rgba(16,185,129,0.25)]"
+                  : "border-amber-500/40 text-amber-700 dark:text-amber-300 shadow-[0_10px_30px_rgba(245,158,11,0.25)]"
               }`}
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className={`h-2 w-2 rounded-full ${isInsideZopa ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                <span className={`h-2 w-2 rounded-full ${isInsideZopa ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-textMuted">
                   {interactiveMode ? "Interactive Probe" : `Round ${currentTurnData?.round || currentRound} Offer`}
                 </span>
                 <span className={`rounded-md px-1.5 py-0.2 text-[9px] font-bold border ${
                   isInsideZopa 
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" 
-                    : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30" 
+                    : "bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30"
                 }`}>
                   {isInsideZopa ? "IN-ZOPA" : "OUTSIDE ZOPA"}
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
-                <p className="text-base font-extrabold text-white font-mono">
+                <p className="text-base font-extrabold text-textPrimary font-mono">
                   {formatCurrency(activeOfferPrice)}
                 </p>
-                <div className="text-[10px] text-slate-400 border-l border-[#302F39] pl-2 font-sans">
-                  <span>Proposer: <strong className="text-white">{agentName}</strong></span>
+                <div className="text-[10px] text-textMuted border-l border-border pl-2 font-sans">
+                  <span>Proposer: <strong className="text-textPrimary">{agentName}</strong></span>
                 </div>
               </div>
             </div>
@@ -571,10 +571,10 @@ export default function TugOfWarBargainingZone({
         </div>
 
         {/* SCALE TICKS AND NUMERIC CONTINUUM LABELS */}
-        <div className="mt-3 flex justify-between px-1 font-mono text-[10px] font-semibold text-slate-400">
+        <div className="mt-3 flex justify-between px-1 font-mono text-[10px] font-semibold text-textMuted">
           <span>{formatCurrency(minScale)}</span>
           <span>{formatCurrency(minScale + scaleRange * 0.25)}</span>
-          <span className="text-slate-200 font-extrabold">{formatCurrency(minScale + scaleRange * 0.5)}</span>
+          <span className="text-textPrimary font-extrabold">{formatCurrency(minScale + scaleRange * 0.5)}</span>
           <span>{formatCurrency(minScale + scaleRange * 0.75)}</span>
           <span>{formatCurrency(maxScale)}</span>
         </div>
@@ -582,13 +582,13 @@ export default function TugOfWarBargainingZone({
 
       {/* TURN HISTORY STEPPER CONTROLS */}
       {history.length > 0 && (
-        <div className="relative z-10 mt-5 border-t border-[#2D2C36] pt-4">
+        <div className="relative z-10 mt-5 border-t border-border pt-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="font-mono text-xs font-bold text-textMuted uppercase tracking-wider">
                 Turn History Playback:
               </span>
-              <span className="font-mono text-xs text-emerald-400 font-bold">
+              <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                 {selectedTurnIdx !== null ? `Turn ${selectedTurnIdx + 1} of ${history.length}` : "Latest Live Turn"}
               </span>
             </div>
@@ -608,9 +608,9 @@ export default function TugOfWarBargainingZone({
                     className={`rounded-xl border px-2.5 py-1 text-[11px] font-bold transition cursor-pointer flex items-center gap-1 ${
                       isSelected
                         ? turnInside
-                          ? "border-emerald-500 bg-emerald-500/20 text-emerald-300 shadow-md"
-                          : "border-amber-500 bg-amber-500/20 text-amber-300 shadow-md"
-                        : "border-[#302F39] bg-[#1A191E] text-slate-400 hover:bg-[#25242E]"
+                          ? "border-emerald-500 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 shadow-md"
+                          : "border-amber-500 bg-amber-500/20 text-amber-700 dark:text-amber-300 shadow-md"
+                        : "border-border bg-cardAlt text-textMuted hover:bg-card"
                     }`}
                   >
                     <span>R{turn.round}</span>
@@ -624,8 +624,8 @@ export default function TugOfWarBargainingZone({
                 onClick={() => setSelectedTurnIdx(null)}
                 className={`rounded-xl border px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
                   selectedTurnIdx === null
-                    ? "border-emerald-500 bg-emerald-500/20 text-emerald-300"
-                    : "border-[#302F39] bg-[#1A191E] text-slate-400 hover:bg-[#25242E]"
+                    ? "border-emerald-500 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300"
+                    : "border-border bg-cardAlt text-textMuted hover:bg-card"
                 }`}
               >
                 Live Turn

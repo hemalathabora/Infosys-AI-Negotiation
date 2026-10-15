@@ -377,7 +377,7 @@ export default function NegotiationHistory({ onNavigate }) {
 
 
   return (
-    <main data-guide="negotiation-history-page" className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary">
+    <main data-guide="negotiation-history-page" className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary">
       <div className="mx-auto max-w-[1500px] space-y-6">
 
         {/* Toast Feedback */}
@@ -401,7 +401,7 @@ export default function NegotiationHistory({ onNavigate }) {
         )}
 
         {/* Header Bar */}
-        <header className="border-b border-[#292831] pb-6">
+        <header className="border-b border-border pb-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="flex items-center gap-3">
@@ -411,7 +411,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   className="h-9 w-9 rounded-xl object-contain bg-white p-0.5 shadow-md border border-white/10 shrink-0"
                 />
                 <div>
-                  <p className="text-base font-black text-white tracking-tight">
+                  <p className="text-base font-black text-textPrimary tracking-tight">
                     NegoMind <span className="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Ai</span>
                   </p>
                   <p className="text-[10px] font-bold text-indigo-400/90 tracking-wider uppercase">
@@ -419,7 +419,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   </p>
                 </div>
               </div>
-              <h1 className="mt-4 text-2xl font-extrabold text-white">Negotiation History</h1>
+              <h1 className="mt-4 text-2xl font-extrabold text-textPrimary">Negotiation History</h1>
               <p className="mt-1 text-xs text-textSecondary">
                 Inspect complete session records, view chronological transcripts, and export authenticated reports.
               </p>
@@ -431,7 +431,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 type="button"
                 onClick={loadHistory}
                 disabled={isLoading}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#2D2C36] bg-[#201F25] px-4 py-2.5 text-xs font-bold text-slate-200 hover:bg-[#2B2A33] transition cursor-pointer"
+                className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-textPrimary hover:bg-cardAlt transition cursor-pointer"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={isLoading ? "animate-spin" : ""}>
                   <path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
@@ -440,8 +440,8 @@ export default function NegotiationHistory({ onNavigate }) {
               </button>
 
               {/* Export All History Dropdown Buttons */}
-              <div className="inline-flex rounded-xl border border-[#2D2C36] bg-[#201F25] p-1">
-                <span className="self-center px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <div className="inline-flex rounded-xl border border-border bg-card p-1">
+                <span className="self-center px-2.5 text-[10px] font-bold uppercase tracking-wider text-textMuted">
                   Export All:
                 </span>
                 <button
@@ -465,7 +465,7 @@ export default function NegotiationHistory({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate("Configure Agents")}
-                className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-white transition cursor-pointer"
+                className="rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition cursor-pointer"
               >
                 + New Negotiation
               </button>
@@ -480,8 +480,8 @@ export default function NegotiationHistory({ onNavigate }) {
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
                 ℹ
               </span>
-              <p className="text-slate-300">
-                <strong className="text-white">Active Browser History:</strong> Showing negotiations recorded in this browser session.{" "}
+              <p className="text-textSecondary">
+                <strong className="text-textPrimary">Active Browser History:</strong> Showing negotiations recorded in this browser session.{" "}
                 <button
                   type="button"
                   onClick={() => onNavigate("AuthPage")}
@@ -495,7 +495,7 @@ export default function NegotiationHistory({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate("AuthPage")}
-              className="shrink-0 rounded-xl bg-white px-3.5 py-1.5 font-bold text-slate-950 hover:bg-slate-100 transition cursor-pointer"
+              className="shrink-0 rounded-xl bg-card border border-border px-3.5 py-1.5 font-bold text-textPrimary hover:bg-cardAlt transition cursor-pointer"
             >
               Sign In
             </button>
@@ -503,10 +503,10 @@ export default function NegotiationHistory({ onNavigate }) {
         )}
 
         {/* Search & Filter Toolbar */}
-        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-4">
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 rounded-2xl border border-border bg-card p-4">
           {/* Search Box */}
           <div className="relative sm:col-span-2 lg:col-span-2">
-            <span className="absolute inset-y-0 left-3 flex items-center text-slate-400">
+            <span className="absolute inset-y-0 left-3 flex items-center text-textMuted">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -519,7 +519,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 setCurrentPage(1);
               }}
               placeholder="Search by scenario name..."
-              className="w-full rounded-xl border border-[#3A3944] bg-[#17161B] py-2.5 pl-9 pr-3 text-xs text-white placeholder-slate-400 focus:border-indigo-400 focus:outline-none"
+              className="w-full rounded-xl border border-border bg-mainPanel py-2.5 pl-9 pr-3 text-xs text-textPrimary placeholder-textMuted focus:border-indigo-400 focus:outline-none"
             />
           </div>
 
@@ -531,7 +531,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 setModeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full rounded-xl border border-[#3A3944] bg-[#17161B] py-2.5 px-3 text-xs text-white focus:border-indigo-400 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-border bg-mainPanel py-2.5 px-3 text-xs text-textPrimary focus:border-indigo-400 focus:outline-none cursor-pointer"
             >
               <option value="all">All Modes</option>
               <option value="simulation">Simulation Mode</option>
@@ -547,7 +547,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 setOutcomeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full rounded-xl border border-[#3A3944] bg-[#17161B] py-2.5 px-3 text-xs text-white focus:border-indigo-400 focus:outline-none cursor-pointer"
+              className="w-full rounded-xl border border-border bg-mainPanel py-2.5 px-3 text-xs text-textPrimary focus:border-indigo-400 focus:outline-none cursor-pointer"
             >
               <option value="all">All Outcomes</option>
               <option value="agreement">Agreement Reached</option>
@@ -564,7 +564,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 setDateRangeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="flex-1 rounded-xl border border-[#3A3944] bg-[#17161B] py-2.5 px-2 text-xs text-white focus:border-indigo-400 focus:outline-none cursor-pointer"
+              className="flex-1 rounded-xl border border-border bg-mainPanel py-2.5 px-2 text-xs text-textPrimary focus:border-indigo-400 focus:outline-none cursor-pointer"
             >
               <option value="all">Any Date</option>
               <option value="today">Today</option>
@@ -578,7 +578,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 setSortBy(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-28 rounded-xl border border-[#3A3944] bg-[#17161B] py-2.5 px-2 text-xs text-white focus:border-indigo-400 focus:outline-none cursor-pointer"
+              className="w-28 rounded-xl border border-border bg-mainPanel py-2.5 px-2 text-xs text-textPrimary focus:border-indigo-400 focus:outline-none cursor-pointer"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -591,13 +591,13 @@ export default function NegotiationHistory({ onNavigate }) {
           /* Loading State */
           <div className="space-y-3">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse rounded-2xl border border-[#2D2C36] bg-[#201F25] p-5">
+              <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-5">
                 <div className="flex justify-between gap-4">
                   <div className="space-y-2.5 w-1/2">
-                    <div className="h-4 bg-slate-700/50 rounded w-3/4" />
-                    <div className="h-3 bg-slate-700/30 rounded w-1/2" />
+                    <div className="h-4 bg-slate-300 dark:bg-slate-700/50 rounded w-3/4" />
+                    <div className="h-3 bg-slate-200 dark:bg-slate-700/30 rounded w-1/2" />
                   </div>
-                  <div className="h-8 bg-slate-700/40 rounded w-32" />
+                  <div className="h-8 bg-slate-200 dark:bg-slate-700/40 rounded w-32" />
                 </div>
               </div>
             ))}
@@ -616,8 +616,8 @@ export default function NegotiationHistory({ onNavigate }) {
           </div>
         ) : historyItems.length === 0 ? (
           /* Empty State */
-          <div className="rounded-2xl border border-[#2D2C36] bg-[#201F25] p-12 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-700 bg-slate-800 text-slate-400">
+          <div className="rounded-2xl border border-border bg-card p-12 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-cardAlt text-textMuted">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14 2 14 8 20 8" />
@@ -625,7 +625,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 <line x1="16" y1="17" x2="8" y2="17" />
               </svg>
             </div>
-            <h3 className="mt-4 text-lg font-bold text-white">No Negotiation Records Found</h3>
+            <h3 className="mt-4 text-lg font-bold text-textPrimary">No Negotiation Records Found</h3>
             <p className="mt-1 text-xs text-textSecondary max-w-sm mx-auto">
               {search || modeFilter !== "all" || outcomeFilter !== "all" || dateRangeFilter !== "all"
                 ? "No sessions match the current search and filter settings. Try adjusting your search query."
@@ -641,7 +641,7 @@ export default function NegotiationHistory({ onNavigate }) {
                     setOutcomeFilter("all");
                     setDateRangeFilter("all");
                   }}
-                  className="rounded-xl border border-[#3A3944] bg-[#17161B] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#25242C] transition cursor-pointer"
+                  className="rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-xs font-bold text-textPrimary hover:bg-cardAlt transition cursor-pointer"
                 >
                   Reset Filters
                 </button>
@@ -649,7 +649,7 @@ export default function NegotiationHistory({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate("Configure Agents")}
-                className="rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-white transition cursor-pointer"
+                className="rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition cursor-pointer"
               >
                 Launch Negotiation
               </button>
@@ -658,9 +658,9 @@ export default function NegotiationHistory({ onNavigate }) {
         ) : (
           /* Table of History Records */
           <div className="space-y-4">
-            <div className="overflow-x-auto rounded-2xl border border-[#2D2C36] bg-[#201F25]">
+            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
               <table className="w-full min-w-[760px] text-left text-xs">
-                <thead className="border-b border-[#2D2C36] bg-[#17161B] font-mono text-[10px] uppercase text-slate-400">
+                <thead className="border-b border-border bg-mainPanel font-mono text-[10px] uppercase text-textMuted">
                   <tr>
                     <th className="px-4 py-3.5">Scenario</th>
                     <th className="px-4 py-3.5">Mode / Engine</th>
@@ -672,7 +672,7 @@ export default function NegotiationHistory({ onNavigate }) {
                     <th className="px-4 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2B2A33]">
+                <tbody className="divide-y divide-border">
                   {historyItems.map((item) => {
                     const dateFormatted = item.created_at
                       ? new Date(item.created_at).toLocaleString()
@@ -690,12 +690,12 @@ export default function NegotiationHistory({ onNavigate }) {
                     return (
                       <tr
                         key={item.negotiation_id}
-                        className="transition-colors hover:bg-white/[0.02]"
+                        className="transition-colors hover:bg-cardAlt"
                       >
                         {/* Scenario */}
                         <td className="px-4 py-4">
-                          <p className="font-bold text-white">{item.scenario_name}</p>
-                          <p className="font-mono text-[10px] text-slate-400 mt-0.5">
+                          <p className="font-bold text-textPrimary">{item.scenario_name}</p>
+                          <p className="font-mono text-[10px] text-textMuted mt-0.5">
                             ID: {item.negotiation_id.slice(0, 8)}...
                           </p>
                         </td>
@@ -710,17 +710,17 @@ export default function NegotiationHistory({ onNavigate }) {
                             >
                               {item.mode}
                             </span>
-                            <span className="text-[10px] font-mono text-slate-400">
+                            <span className="text-[10px] font-mono text-textMuted">
                               {item.reasoning_mode}
                             </span>
                           </div>
                         </td>
 
                         {/* Participants */}
-                        <td className="px-4 py-4 text-slate-300">
+                        <td className="px-4 py-4 text-textSecondary">
                           <p className="font-medium">{item.agents_summary}</p>
                           {item.participant_roles && item.participant_roles.length > 0 && (
-                            <p className="font-mono text-[10px] text-slate-500 mt-0.5">
+                            <p className="font-mono text-[10px] text-textMuted mt-0.5">
                               {item.participant_roles.join(" • ")}
                             </p>
                           )}
@@ -728,8 +728,8 @@ export default function NegotiationHistory({ onNavigate }) {
 
                         {/* Rounds */}
                         <td className="px-4 py-4 font-mono">
-                          <span className="font-bold text-white">{item.current_round}</span>
-                          <span className="text-slate-500"> / {item.max_rounds}</span>
+                          <span className="font-bold text-textPrimary">{item.current_round}</span>
+                          <span className="text-textMuted"> / {item.max_rounds}</span>
                         </td>
 
                         {/* Outcome */}
@@ -745,13 +745,13 @@ export default function NegotiationHistory({ onNavigate }) {
 
                         {/* Agreed Terms */}
                         <td className="px-4 py-4 font-mono">
-                          <span className={isAgreement ? "font-bold text-emerald-400" : "text-slate-400"}>
+                          <span className={isAgreement ? "font-bold text-emerald-500 dark:text-emerald-400" : "text-textMuted"}>
                             {agreedStr}
                           </span>
                         </td>
 
                         {/* Date & Time */}
-                        <td className="px-4 py-4 text-slate-400 font-mono text-[11px] whitespace-nowrap">
+                        <td className="px-4 py-4 text-textMuted font-mono text-[11px] whitespace-nowrap">
                           {dateFormatted}
                         </td>
 
@@ -761,7 +761,7 @@ export default function NegotiationHistory({ onNavigate }) {
                             <button
                               type="button"
                               onClick={() => handleOpenDetail(item.negotiation_id)}
-                              className="rounded-lg border border-[#3A3944] bg-[#17161B] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-600 hover:border-indigo-600 transition cursor-pointer"
+                              className="rounded-lg border border-border bg-mainPanel px-2.5 py-1.5 text-xs font-semibold text-textPrimary hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition cursor-pointer"
                               title="Inspect negotiation details"
                             >
                               View
@@ -772,7 +772,7 @@ export default function NegotiationHistory({ onNavigate }) {
                               type="button"
                               onClick={() => handleDownloadSession(item.negotiation_id, "pdf")}
                               disabled={exportingSessionId === `${item.negotiation_id}-pdf`}
-                              className="rounded-lg border border-[#3A3944] bg-[#17161B] px-2 py-1.5 text-xs font-mono font-bold text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg border border-border bg-mainPanel px-2 py-1.5 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition disabled:opacity-40 cursor-pointer"
                               title="Download PDF report"
                             >
                               PDF
@@ -781,7 +781,7 @@ export default function NegotiationHistory({ onNavigate }) {
                               type="button"
                               onClick={() => handleDownloadSession(item.negotiation_id, "csv")}
                               disabled={exportingSessionId === `${item.negotiation_id}-csv`}
-                              className="rounded-lg border border-[#3A3944] bg-[#17161B] px-2 py-1.5 text-xs font-mono font-bold text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/40 transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg border border-border bg-mainPanel px-2 py-1.5 text-xs font-mono font-bold text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/10 hover:border-indigo-500/40 transition disabled:opacity-40 cursor-pointer"
                               title="Download CSV table"
                             >
                               CSV
@@ -790,7 +790,7 @@ export default function NegotiationHistory({ onNavigate }) {
                               type="button"
                               onClick={() => handleDownloadSession(item.negotiation_id, "json")}
                               disabled={exportingSessionId === `${item.negotiation_id}-json`}
-                              className="rounded-lg border border-[#3A3944] bg-[#17161B] px-2 py-1.5 text-xs font-mono font-bold text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/40 transition disabled:opacity-40 cursor-pointer"
+                              className="rounded-lg border border-border bg-mainPanel px-2 py-1.5 text-xs font-mono font-bold text-cyan-500 dark:text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-500/40 transition disabled:opacity-40 cursor-pointer"
                               title="Download JSON data"
                             >
                               JSON
@@ -806,9 +806,9 @@ export default function NegotiationHistory({ onNavigate }) {
 
             {/* Pagination Controls */}
             <div className="flex flex-wrap items-center justify-between gap-3 px-2 pt-2">
-              <span className="text-xs text-slate-400">
-                Showing <strong className="text-white">{historyItems.length}</strong> of{" "}
-                <strong className="text-white">{totalCount}</strong> sessions (Page {currentPage} of{" "}
+              <span className="text-xs text-textMuted">
+                Showing <strong className="text-textPrimary">{historyItems.length}</strong> of{" "}
+                <strong className="text-textPrimary">{totalCount}</strong> sessions (Page {currentPage} of{" "}
                 {totalPages})
               </span>
 
@@ -817,7 +817,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage <= 1}
-                  className="rounded-xl border border-[#2D2C36] bg-[#201F25] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#2B2A33] transition disabled:opacity-40 cursor-pointer"
+                  className="rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-bold text-textPrimary hover:bg-cardAlt transition disabled:opacity-40 cursor-pointer"
                 >
                   ← Previous
                 </button>
@@ -832,8 +832,8 @@ export default function NegotiationHistory({ onNavigate }) {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`h-8 w-8 rounded-lg text-xs font-bold transition cursor-pointer ${
                         currentPage === pageNum
-                          ? "bg-slate-100 text-slate-950 font-black"
-                          : "border border-[#2D2C36] bg-[#201F25] text-slate-300 hover:bg-[#2B2A33]"
+                          ? "bg-emerald-500 text-slate-950 font-black"
+                          : "border border-border bg-card text-textSecondary hover:bg-cardAlt"
                       }`}
                     >
                       {pageNum}
@@ -844,7 +844,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   type="button"
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   disabled={currentPage >= totalPages}
-                  className="rounded-xl border border-[#2D2C36] bg-[#201F25] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#2B2A33] transition disabled:opacity-40 cursor-pointer"
+                  className="rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-bold text-textPrimary hover:bg-cardAlt transition disabled:opacity-40 cursor-pointer"
                 >
                   Next →
                 </button>
@@ -860,18 +860,18 @@ export default function NegotiationHistory({ onNavigate }) {
       ============================================================ */}
       {selectedSessionId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative flex max-h-[92vh] w-full max-w-5xl flex-col rounded-2xl border border-[#2D2C36] bg-[#1E1D24] shadow-2xl text-textPrimary overflow-hidden">
+          <div className="relative flex max-h-[92vh] w-full max-w-5xl flex-col rounded-2xl border border-border bg-card shadow-2xl text-textPrimary overflow-hidden">
 
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-[#2D2C36] bg-[#17161B] px-6 py-4">
+            <div className="flex items-center justify-between border-b border-border bg-mainPanel px-6 py-4">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">
                   READ-ONLY SESSION AUDIT
                 </span>
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-textPrimary">
                   {detailData ? detailData.scenario_name : "Loading session..."}
                 </h2>
-                <p className="font-mono text-[11px] text-slate-400">
+                <p className="font-mono text-[11px] text-textMuted">
                   Session ID: {selectedSessionId}
                 </p>
               </div>
@@ -883,21 +883,21 @@ export default function NegotiationHistory({ onNavigate }) {
                     <button
                       type="button"
                       onClick={() => handleDownloadSession(selectedSessionId, "pdf")}
-                      className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
+                      className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer"
                     >
                       Download PDF
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDownloadSession(selectedSessionId, "csv")}
-                      className="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
+                      className="rounded-lg border border-indigo-500/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-300 hover:bg-indigo-500/20 transition cursor-pointer"
                     >
                       CSV
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDownloadSession(selectedSessionId, "json")}
-                      className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 transition cursor-pointer"
+                      className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-3 py-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-300 hover:bg-cyan-500/20 transition cursor-pointer"
                     >
                       JSON
                     </button>
@@ -906,7 +906,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 <button
                   type="button"
                   onClick={handleCloseDetail}
-                  className="rounded-xl border border-[#3A3944] bg-[#201F25] p-2 text-slate-400 hover:text-white transition cursor-pointer"
+                  className="rounded-xl border border-border bg-cardAlt p-2 text-textMuted hover:text-textPrimary transition cursor-pointer"
                 >
                   ✕
                 </button>
@@ -918,7 +918,7 @@ export default function NegotiationHistory({ onNavigate }) {
               {isDetailLoading ? (
                 <div className="space-y-4 py-8 text-center">
                   <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-                  <p className="text-xs text-slate-400 font-mono">Retrieving immutable audit records...</p>
+                  <p className="text-xs text-textMuted font-mono">Retrieving immutable audit records...</p>
                 </div>
               ) : detailError ? (
                 <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-6 text-center">
@@ -928,38 +928,38 @@ export default function NegotiationHistory({ onNavigate }) {
                 <>
                   {/* Overview Cards */}
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <div className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-3.5">
-                      <p className="text-[10px] font-mono uppercase text-slate-400">Mode</p>
-                      <p className="mt-1 font-bold text-white capitalize">{detailData.mode || "Simulation"}</p>
+                    <div className="rounded-xl border border-border bg-mainPanel p-3.5">
+                      <p className="text-[10px] font-mono uppercase text-textMuted">Mode</p>
+                      <p className="mt-1 font-bold text-textPrimary capitalize">{detailData.mode || "Simulation"}</p>
                     </div>
-                    <div className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-3.5">
-                      <p className="text-[10px] font-mono uppercase text-slate-400">Reasoning Engine</p>
-                      <p className="mt-1 font-bold text-indigo-400">{detailData.execution_mode || "Normal Mode"}</p>
+                    <div className="rounded-xl border border-border bg-mainPanel p-3.5">
+                      <p className="text-[10px] font-mono uppercase text-textMuted">Reasoning Engine</p>
+                      <p className="mt-1 font-bold text-indigo-500 dark:text-indigo-400">{detailData.execution_mode || "Normal Mode"}</p>
                     </div>
-                    <div className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-3.5">
-                      <p className="text-[10px] font-mono uppercase text-slate-400">Rounds Completed</p>
-                      <p className="mt-1 font-mono font-bold text-white">
+                    <div className="rounded-xl border border-border bg-mainPanel p-3.5">
+                      <p className="text-[10px] font-mono uppercase text-textMuted">Rounds Completed</p>
+                      <p className="mt-1 font-mono font-bold text-textPrimary">
                         {detailData.current_round} / {detailData.max_rounds}
                       </p>
                     </div>
-                    <div className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-3.5">
-                      <p className="text-[10px] font-mono uppercase text-slate-400">Final Outcome</p>
-                      <p className="mt-1 font-bold text-emerald-400 uppercase">
+                    <div className="rounded-xl border border-border bg-mainPanel p-3.5">
+                      <p className="text-[10px] font-mono uppercase text-textMuted">Final Outcome</p>
+                      <p className="mt-1 font-bold text-emerald-600 dark:text-emerald-400 uppercase">
                         {detailData.status || "Completed"}
                       </p>
                     </div>
                   </div>
 
                   {/* Scenario Configuration & Final Terms */}
-                  <div className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-5 space-y-3">
-                    <h3 className="text-sm font-bold text-white">Scenario Configuration & Agreement Terms</h3>
-                    <p className="text-xs text-slate-300 leading-relaxed">
+                  <div className="rounded-xl border border-border bg-mainPanel p-5 space-y-3">
+                    <h3 className="text-sm font-bold text-textPrimary">Scenario Configuration & Agreement Terms</h3>
+                    <p className="text-xs text-textSecondary leading-relaxed">
                       {detailData.scenario_description || "Not available"}
                     </p>
-                    <div className="mt-3 pt-3 border-t border-[#2D2C36] flex flex-wrap items-center justify-between gap-3">
+                    <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <span className="text-[10px] font-mono uppercase text-slate-400">Final Agreed Settlement</span>
-                        <p className="text-base font-mono font-bold text-emerald-400">
+                        <span className="text-[10px] font-mono uppercase text-textMuted">Final Agreed Settlement</span>
+                        <p className="text-base font-mono font-bold text-emerald-600 dark:text-emerald-400">
                           {detailData.current_offer
                             ? `$${Math.round(detailData.current_offer.price || detailData.current_offer.value || 0).toLocaleString()}`
                             : detailData.status === "deadlock" || detailData.status === "rejected"
@@ -968,8 +968,8 @@ export default function NegotiationHistory({ onNavigate }) {
                         </p>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] font-mono uppercase text-slate-400">Recorded Date</span>
-                        <p className="text-xs text-slate-300 font-mono">
+                        <span className="text-[10px] font-mono uppercase text-textMuted">Recorded Date</span>
+                        <p className="text-xs text-textSecondary font-mono">
                           {detailData.created_at ? new Date(detailData.created_at).toLocaleString() : "Not available"}
                         </p>
                       </div>
@@ -978,21 +978,21 @@ export default function NegotiationHistory({ onNavigate }) {
 
                   {/* Participant Roles & Objectives */}
                   <div className="space-y-3">
-                    <h3 className="text-sm font-bold text-white">Participant Profiles & Roles</h3>
+                    <h3 className="text-sm font-bold text-textPrimary">Participant Profiles & Roles</h3>
                     <div className="grid gap-3 sm:grid-cols-2">
                       {detailData.participating_agents && detailData.participating_agents.length > 0 ? (
                         detailData.participating_agents.map((agent, i) => (
-                          <div key={agent.id || i} className="rounded-xl border border-[#2D2C36] bg-[#17161B] p-4 space-y-2">
+                          <div key={agent.id || i} className="rounded-xl border border-border bg-mainPanel p-4 space-y-2">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h4 className="font-bold text-white">{agent.name || agent.id || "Agent"}</h4>
-                                <p className="text-xs text-indigo-400 font-mono mt-0.5">
+                                <h4 className="font-bold text-textPrimary">{agent.name || agent.id || "Agent"}</h4>
+                                <p className="text-xs text-indigo-500 dark:text-indigo-400 font-mono mt-0.5">
                                   Role: {agent.role || "Not available"} &bull; {agent.persona || agent.personality || "Standard"}
                                 </p>
                               </div>
                             </div>
-                            <div className="text-xs text-slate-300">
-                              <span className="font-semibold text-slate-400">Objectives: </span>
+                            <div className="text-xs text-textSecondary">
+                              <span className="font-semibold text-textMuted">Objectives: </span>
                               {agent.goals
                                 ? Array.isArray(agent.goals)
                                   ? agent.goals.join("; ")
@@ -1002,7 +1002,7 @@ export default function NegotiationHistory({ onNavigate }) {
                           </div>
                         ))
                       ) : (
-                        <p className="text-xs text-slate-400">Not available</p>
+                        <p className="text-xs text-textMuted">Not available</p>
                       )}
                     </div>
                   </div>
@@ -1010,15 +1010,15 @@ export default function NegotiationHistory({ onNavigate }) {
                   {/* Complete Chronological Transcript */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-white">Turn-by-Turn Negotiation Transcript</h3>
-                      <span className="text-[10px] font-mono text-slate-400">
+                      <h3 className="text-sm font-bold text-textPrimary">Turn-by-Turn Negotiation Transcript</h3>
+                      <span className="text-[10px] font-mono text-textMuted">
                         Total turns: {detailData.history ? detailData.history.length : 0}
                       </span>
                     </div>
 
-                    <div className="overflow-x-auto rounded-xl border border-[#2D2C36] bg-[#17161B]">
+                    <div className="overflow-x-auto rounded-xl border border-border bg-mainPanel">
                       <table className="w-full text-left text-xs">
-                        <thead className="bg-[#141318] border-b border-[#2D2C36] font-mono text-[10px] uppercase text-slate-400">
+                        <thead className="bg-cardAlt border-b border-border font-mono text-[10px] uppercase text-textMuted">
                           <tr>
                             <th className="px-3.5 py-3">Turn</th>
                             <th className="px-3.5 py-3">Round</th>
@@ -1029,7 +1029,7 @@ export default function NegotiationHistory({ onNavigate }) {
                             <th className="px-3.5 py-3">Strategic Reasoning</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#24232C]">
+                        <tbody className="divide-y divide-border">
                           {detailData.history && detailData.history.length > 0 ? (
                             detailData.history.map((turn, index) => {
                               const pVal = turn.value || (turn.proposed_offer && (turn.proposed_offer.price || turn.proposed_offer.value));
@@ -1038,22 +1038,22 @@ export default function NegotiationHistory({ onNavigate }) {
                               const concessionAmount = concession ? concession.concession_amount || concession.concession : null;
 
                               return (
-                                <tr key={turn.id || index} className="align-top hover:bg-white/[0.02]">
-                                  <td className="px-3.5 py-3 font-mono text-slate-400">{index + 1}</td>
-                                  <td className="px-3.5 py-3 font-mono text-slate-400">R{turn.round || 1}</td>
-                                  <td className="px-3.5 py-3 font-bold text-white">{turn.agent_id}</td>
+                                <tr key={turn.id || index} className="align-top hover:bg-cardAlt">
+                                  <td className="px-3.5 py-3 font-mono text-textMuted">{index + 1}</td>
+                                  <td className="px-3.5 py-3 font-mono text-textMuted">R{turn.round || 1}</td>
+                                  <td className="px-3.5 py-3 font-bold text-textPrimary">{turn.agent_id}</td>
                                   <td className="px-3.5 py-3">
                                     <span className={`inline-flex rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold ${decisionBadgeClass(turn.decision)}`}>
                                       {turn.decision || "N/A"}
                                     </span>
                                   </td>
-                                  <td className="px-3.5 py-3 font-mono font-bold text-emerald-400">{priceStr}</td>
-                                  <td className="px-3.5 py-3 font-mono text-slate-300">
+                                  <td className="px-3.5 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{priceStr}</td>
+                                  <td className="px-3.5 py-3 font-mono text-textSecondary">
                                     {concessionAmount !== null && concessionAmount !== undefined
                                       ? `${concessionAmount > 0 ? "+" : ""}$${Math.round(concessionAmount).toLocaleString()}`
                                       : "Not available"}
                                   </td>
-                                  <td className="px-3.5 py-3 text-slate-300 leading-relaxed max-w-sm whitespace-normal">
+                                  <td className="px-3.5 py-3 text-textSecondary leading-relaxed max-w-sm whitespace-normal">
                                     {turn.reasoning || "Not available"}
                                   </td>
                                 </tr>
@@ -1061,7 +1061,7 @@ export default function NegotiationHistory({ onNavigate }) {
                             })
                           ) : (
                             <tr>
-                              <td colSpan={7} className="px-4 py-8 text-center text-slate-500 font-mono">
+                              <td colSpan={7} className="px-4 py-8 text-center text-textMuted font-mono">
                                 No transcript turns recorded for this session.
                               </td>
                             </tr>
@@ -1075,14 +1075,14 @@ export default function NegotiationHistory({ onNavigate }) {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between border-t border-[#2D2C36] bg-[#17161B] px-6 py-4">
-              <span className="text-[10px] font-mono text-slate-400">
+            <div className="flex items-center justify-between border-t border-border bg-mainPanel px-6 py-4">
+              <span className="text-[10px] font-mono text-textMuted">
                 Opening previous sessions is strictly read-only and preserves the original audit records.
               </span>
               <button
                 type="button"
                 onClick={handleCloseDetail}
-                className="rounded-xl border border-[#3A3944] bg-[#201F25] px-5 py-2 text-xs font-bold text-white hover:bg-[#2B2A33] transition cursor-pointer"
+                className="rounded-xl border border-border bg-card px-5 py-2 text-xs font-bold text-textPrimary hover:bg-cardAlt transition cursor-pointer"
               >
                 Close
               </button>

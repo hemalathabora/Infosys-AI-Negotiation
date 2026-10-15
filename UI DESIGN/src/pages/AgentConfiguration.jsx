@@ -55,10 +55,10 @@ function ZopaVisualizer({ agents }) {
   const fmt = (n) => n >= 1000 ? `$${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : `$${n.toLocaleString()}`;
 
   return (
-    <section aria-label="ZOPA Zone of Possible Agreement" className="rounded-2xl border border-[#302F39] bg-[#1E1D24] p-5 space-y-4 shadow-sm">
+    <section aria-label="ZOPA Zone of Possible Agreement" className="rounded-2xl border border-border bg-card p-5 space-y-4 shadow-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+          <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-500 dark:text-sky-400 flex items-center gap-1.5">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="12" cy="12" r="10" />
               <line x1="2" y1="12" x2="22" y2="12" />
@@ -66,12 +66,12 @@ function ZopaVisualizer({ agents }) {
             </svg>
             ZOPA Pre-flight Analysis
           </p>
-          <p className="text-[11px] text-slate-400 font-body mt-0.5">
+          <p className="text-[11px] text-textMuted font-body mt-0.5">
             Zone of Possible Agreement — checks if an overlap exists before negotiation starts.
           </p>
         </div>
         <span className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 font-mono text-xs font-bold ${
-          isPositive ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-red-500/30 bg-red-500/10 text-red-400"
+          isPositive ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "border-red-500/30 bg-red-500/10 text-red-500 dark:text-red-400"
         }`}>
           {isPositive ? (
             <>
@@ -88,40 +88,40 @@ function ZopaVisualizer({ agents }) {
       </div>
 
       {/* Visual bar */}
-      <div className="relative w-full h-8 rounded-full bg-[#2B2A33] overflow-hidden">
+      <div className="relative w-full h-8 rounded-full bg-cardAlt border border-border overflow-hidden">
         <div
           className={`absolute top-0 h-full rounded-full transition-all duration-500 ${
             isPositive ? "bg-emerald-500/30" : "bg-red-500/30"
           }`}
           style={{ left: `${leftPct}%`, width: `${Math.max(widthPct, 1)}%` }}
         />
-        <div className="absolute top-0 h-full w-0.5 bg-sky-400" style={{ left: `${floorPct}%` }} />
-        <div className="absolute top-0 h-full w-0.5 bg-purple-400" style={{ left: `${ceilPct}%` }} />
+        <div className="absolute top-0 h-full w-0.5 bg-sky-500 dark:bg-sky-400" style={{ left: `${floorPct}%` }} />
+        <div className="absolute top-0 h-full w-0.5 bg-purple-500 dark:bg-purple-400" style={{ left: `${ceilPct}%` }} />
       </div>
 
       {/* Legend */}
       <div className="flex items-center justify-between text-[11px] font-mono">
-        <div className="flex items-center gap-1.5 text-sky-300">
-          <span className="inline-block h-2 w-2 rounded-full bg-sky-400" />
+        <div className="flex items-center gap-1.5 text-sky-600 dark:text-sky-300">
+          <span className="inline-block h-2 w-2 rounded-full bg-sky-500 dark:bg-sky-400" />
           <span className="font-bold">{floorAgent?.name}</span>
-          <span className="text-slate-400">floor {fmt(floor)}</span>
+          <span className="text-textMuted">floor {fmt(floor)}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-purple-300">
-          <span className="text-slate-400">ceiling {fmt(ceiling)}</span>
+        <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-300">
+          <span className="text-textMuted">ceiling {fmt(ceiling)}</span>
           <span className="font-bold">{ceilingAgent?.name}</span>
-          <span className="inline-block h-2 w-2 rounded-full bg-purple-400" />
+          <span className="inline-block h-2 w-2 rounded-full bg-purple-500 dark:bg-purple-400" />
         </div>
       </div>
 
       {/* Warning if no agreement zone */}
       {!isPositive && (
         <div className="flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-red-400 mt-0.5 shrink-0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-red-500 dark:text-red-400 mt-0.5 shrink-0">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
             <line x1="12" y1="9" x2="12" y2="13" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
-          <p className="text-xs text-red-300 font-body">
+          <p className="text-xs text-red-600 dark:text-red-300 font-body">
             <span className="font-bold">No agreement zone detected.</span> The constraint values create a gap of{" "}
             <span className="font-bold">{fmt(Math.abs(gap))}</span> between the floor and ceiling. Adjust agent
             constraints above to create an overlap, or expect a likely deadlock or breakdown.
@@ -262,22 +262,22 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
   const configuredAgentCount = agentChecks.filter(Boolean).length;
 
   return (
-    <main data-guide="agent-configuration-shell" className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
+    <main data-guide="agent-configuration-shell" className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
       <div className="mx-auto max-w-[1500px] space-y-8">
 
         {/* =====================================================
             1. SYMMETRICAL PAGE HEADER & STEPPER CARDS
         ====================================================== */}
-        <section className="border-b border-[#292831] pb-6 space-y-6">
+        <section className="border-b border-border pb-6 space-y-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-400">
+                <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-400">
                   ORCHESTRATOR ENGINE CONFIGURATION
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-textPrimary font-sans">
                 Configure Negotiation Session
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-textSecondary font-body">
@@ -289,38 +289,38 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
           {/* Pre-selected Scenario Banner (from Scenarios page) */}
           {initialScenario && selectedScenario && (
             <div className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Scenario Pre-Selected</p>
-                <p className="text-sm font-bold text-white truncate">
+                <p className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Scenario Pre-Selected</p>
+                <p className="text-sm font-bold text-textPrimary truncate">
                   {selectedScenario.scenario_name || selectedScenario.name}
                 </p>
               </div>
-              <span className="text-xs text-slate-400 font-body shrink-0">Selected from Scenarios page</span>
+              <span className="text-xs text-textMuted font-body shrink-0">Selected from Scenarios page</span>
             </div>
           )}
 
           {/* Mode Switcher Banner */}
-          <div className="rounded-2xl border border-[#302F39] bg-[#201F25] p-5 shadow-sm space-y-4 font-sans">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                   Session Mode Selection
                 </p>
-                <h3 className="text-base font-bold text-white">Choose How You Negotiate</h3>
+                <h3 className="text-base font-bold text-textPrimary">Choose How You Negotiate</h3>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-xl border border-[#3A3944] bg-[#17161B] p-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 rounded-xl border border-border bg-mainPanel p-1">
                 <button
                   type="button"
                   onClick={() => setMode("simulation")}
                   className={`flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${mode === "simulation"
                       ? "bg-emerald-500 text-slate-950 shadow-md font-extrabold"
-                      : "text-slate-300 hover:text-white"
+                      : "text-textSecondary hover:text-textPrimary"
                     }`}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -336,7 +336,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                   onClick={() => setMode("practice")}
                   className={`flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${mode === "practice"
                       ? "bg-emerald-500 text-slate-950 shadow-md font-extrabold"
-                      : "text-slate-300 hover:text-white"
+                      : "text-textSecondary hover:text-textPrimary"
                     }`}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -349,8 +349,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
             </div>
 
             {mode === "practice" && agents.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-[#2D2C36] text-xs">
-                <span className="font-mono font-bold text-slate-400">Select Your Human Role:</span>
+              <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border text-xs">
+                <span className="font-mono font-bold text-textMuted">Select Your Human Role:</span>
                 <div className="flex flex-wrap items-center gap-2">
                   {agents.map((agent) => (
                     <button
@@ -358,8 +358,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                       type="button"
                       onClick={() => setHumanRole(agent.role)}
                       className={`rounded-xl border px-3 py-1.5 font-bold transition-all cursor-pointer ${activeHumanRole.toLowerCase() === agent.role.toLowerCase()
-                          ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm"
-                          : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                          ? "border-emerald-400 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 shadow-sm"
+                          : "border-border bg-cardAlt text-textSecondary hover:text-textPrimary"
                         }`}
                     >
                       Human: {agent.name} ({agent.role})
@@ -370,13 +370,13 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
             )}
 
             {mode === "practice" && (
-              <div className="space-y-3 pt-3 border-t border-[#2D2C36]">
+              <div className="space-y-3 pt-3 border-t border-border">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
+                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                       Practice Difficulty Level
                     </p>
-                    <p className="text-xs text-slate-400 font-body">
+                    <p className="text-xs text-textMuted font-body">
                       Calibrates opponent concession magnitude, anchoring, and package complexity.
                     </p>
                   </div>
@@ -392,8 +392,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                         type="button"
                         onClick={() => setDifficulty(lvl.id)}
                         className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${difficulty === lvl.id
-                            ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-sm"
-                            : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                            ? "border-emerald-400 bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 shadow-sm"
+                            : "border-border bg-cardAlt text-textSecondary hover:text-textPrimary"
                           }`}
                         title={lvl.desc}
                       >
@@ -405,10 +405,10 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
                   <div>
-                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-purple-400">
+                    <p className="text-xs font-mono font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
                       AI Opponent Persona
                     </p>
-                    <p className="text-xs text-slate-400 font-body">
+                    <p className="text-xs text-textMuted font-body">
                       Select AI negotiation temperament and strategic posture.
                     </p>
                   </div>
@@ -419,8 +419,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                         type="button"
                         onClick={() => setAiPersonality(p)}
                         className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${aiPersonality === p
-                            ? "border-purple-400 bg-purple-500/20 text-purple-300 shadow-sm"
-                            : "border-[#3A3944] bg-[#25242C] text-slate-300 hover:text-white"
+                            ? "border-purple-400 bg-purple-500/20 text-purple-600 dark:text-purple-300 shadow-sm"
+                            : "border-border bg-cardAlt text-textSecondary hover:text-textPrimary"
                           }`}
                       >
                         {p}
@@ -432,16 +432,16 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
             )}
 
             {/* Round Selection */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-[#2D2C36]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-border">
               <div>
-                <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 flex items-center gap-1.5">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
                   Negotiation Round Limit Selection
                 </p>
-                <p className="text-xs text-slate-400 font-body mt-0.5">
+                <p className="text-xs text-textMuted font-body mt-0.5">
                   Set maximum turn limit before deadlock triggers if no agreement is reached.
                 </p>
               </div>
@@ -453,8 +453,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                     type="button"
                     onClick={() => setMaxRounds(r)}
                     className={`rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${maxRounds === r
-                        ? "border-sky-400 bg-sky-500/20 text-sky-300 shadow-md scale-105"
-                        : "border-[#3A3944] bg-[#17161B] text-slate-300 hover:text-white hover:border-slate-500"
+                        ? "border-sky-400 bg-sky-500/20 text-sky-600 dark:text-sky-300 shadow-md scale-105"
+                        : "border-border bg-mainPanel text-textSecondary hover:text-textPrimary hover:border-borderHover"
                       }`}
                   >
                     {r} Rounds {r === 5 ? "(Default)" : ""}
@@ -466,41 +466,41 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
 
           {/* Symmetrical 3-Step Progress Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-            <div className="flex items-center gap-3 rounded-2xl border border-white bg-[#25242C] p-4 shadow-sm">
-              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-white text-slate-950 font-black text-xs">
+            <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-cardAlt p-4 shadow-sm">
+              <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500 text-slate-950 font-black text-xs">
                 1
               </span>
               <div>
-                <p className="font-bold text-white uppercase font-sans">1. Select Scenario</p>
-                <p className="text-[11px] text-slate-400 font-body">Choose business situation</p>
+                <p className="font-bold text-textPrimary uppercase font-sans">1. Select Scenario</p>
+                <p className="text-[11px] text-textMuted font-body">Choose business situation</p>
               </div>
             </div>
 
             <div className={`flex items-center gap-3 rounded-2xl border p-4 transition-all ${selectedScenario
-                ? "border-slate-400 bg-[#222129] text-white"
-                : "border-[#2A2931] bg-[#1E1D24] text-slate-400"
+                ? "border-emerald-500/40 bg-card text-textPrimary"
+                : "border-border bg-cardAlt text-textMuted"
               }`}>
-              <span className={`flex h-7 w-7 items-center justify-center rounded-xl font-black text-xs ${selectedScenario ? "bg-slate-200 text-slate-950" : "bg-[#2A2933] text-slate-400"
+              <span className={`flex h-7 w-7 items-center justify-center rounded-xl font-black text-xs ${selectedScenario ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-cardAlt text-textMuted"
                 }`}>
                 2
               </span>
               <div>
                 <p className="font-bold uppercase font-sans">2. Configure Session</p>
-                <p className="text-[11px] text-slate-400 font-body">Mode, rounds & difficulty</p>
+                <p className="text-[11px] text-textMuted font-body">Mode, rounds & difficulty</p>
               </div>
             </div>
 
             <div className={`flex items-center gap-3 rounded-2xl border p-4 transition-all ${configurationValid
-                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                : "border-[#2A2931] bg-[#1E1D24] text-slate-400"
+                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "border-border bg-cardAlt text-textMuted"
               }`}>
-              <span className={`flex h-7 w-7 items-center justify-center rounded-xl font-black text-xs ${configurationValid ? "bg-emerald-400 text-slate-950" : "bg-[#2A2933] text-slate-400"
+              <span className={`flex h-7 w-7 items-center justify-center rounded-xl font-black text-xs ${configurationValid ? "bg-emerald-500 text-slate-950" : "bg-cardAlt text-textMuted"
                 }`}>
                 3
               </span>
               <div>
                 <p className="font-bold uppercase font-sans">3. Deploy Engine</p>
-                <p className="text-[11px] text-slate-400 font-body">Launch simulation</p>
+                <p className="text-[11px] text-textMuted font-body">Launch simulation</p>
               </div>
             </div>
           </div>
@@ -512,8 +512,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
         <section data-guide="scenario-selector" aria-labelledby="scenario-heading" className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h2 id="scenario-heading" className="text-lg font-bold text-white font-sans flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-slate-300">
+              <h2 id="scenario-heading" className="text-lg font-bold text-textPrimary font-sans flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-textSecondary">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
@@ -540,19 +540,19 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                   className={`
                     group relative flex h-full flex-col justify-between rounded-2xl border p-6 text-left transition-all duration-200
                     ${isActive
-                      ? "border-2 border-white bg-[#25242C] shadow-lg"
-                      : "border-[#2D2C36] bg-[#201F25] hover:border-slate-400 hover:bg-[#25242C]"
+                      ? "border-2 border-emerald-500 dark:border-white bg-cardAlt shadow-lg"
+                      : "border-border bg-card hover:border-borderHover hover:bg-cardAlt"
                     }
                   `}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-textMuted">
                         SCENARIO 0{indexNum}
                       </span>
 
                       {isActive && (
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1 font-mono text-[10px] font-bold text-white uppercase tracking-wider border border-white/20">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1 font-mono text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider border border-emerald-500/20">
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
@@ -561,12 +561,12 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                       )}
                     </div>
 
-                    <h3 className="text-xl font-bold text-white font-sans">{scenario.name}</h3>
+                    <h3 className="text-xl font-bold text-textPrimary font-sans">{scenario.name}</h3>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-[#2B2A33] flex items-center justify-between text-xs text-slate-400 font-mono">
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs text-textMuted font-mono">
                     <span>2 Parties Involved</span>
-                    <span className="group-hover:translate-x-0.5 transition-transform text-white">Select →</span>
+                    <span className="group-hover:translate-x-0.5 transition-transform text-textPrimary">Select →</span>
                   </div>
                 </button>
               );
@@ -575,9 +575,9 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
 
           {/* Symmetrical Scenario Description Banner */}
           {selectedScenario && !isLoading && !error && (
-            <div className="rounded-2xl border border-[#302F39] bg-[#222129] p-6 shadow-sm">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#3A3944] bg-[#2A2933] text-white" aria-hidden="true">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-cardAlt text-textPrimary" aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
@@ -601,8 +601,8 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
           <section aria-labelledby="agents-heading" className="space-y-5">
             <div className="flex items-center gap-3">
               <div>
-                <h2 id="agents-heading" className="text-lg font-bold text-white font-sans flex items-center gap-2">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-400">
+                <h2 id="agents-heading" className="text-lg font-bold text-textPrimary font-sans flex items-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-emerald-500 dark:text-emerald-400">
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -614,9 +614,9 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                   Review and tune each negotiating agent's goals, constraints, and personality.
                 </p>
               </div>
-              <div className="ml-auto flex items-center gap-2 rounded-xl border border-[#302F39] bg-[#201F25] px-3 py-1.5">
+              <div className="ml-auto flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-xs font-bold text-emerald-400">
+                <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   {agents.length} AGENT{agents.length !== 1 ? "S" : ""} LOADED
                 </span>
               </div>

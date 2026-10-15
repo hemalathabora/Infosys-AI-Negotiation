@@ -291,21 +291,21 @@ export default function CustomScenarioBuilder({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6 backdrop-blur-md overflow-y-auto">
-      <div className={`w-full max-w-4xl rounded-2xl border p-5 sm:p-8 shadow-2xl transition-all my-auto max-h-[92vh] flex flex-col ${isDark ? "border-[#2A2935] bg-[#121118] text-white" : "border-slate-300 bg-white text-slate-900"}`}>
+      <div className="w-full max-w-4xl rounded-2xl border border-border bg-card text-textPrimary p-5 sm:p-8 shadow-2xl transition-all my-auto max-h-[92vh] flex flex-col">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b pb-4 border-white/10">
+        <div className="flex items-center justify-between border-b pb-4 border-border">
           <div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">
               Custom Scenario Builder
             </span>
-            <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-textPrimary">
               {editingScenario ? "Edit Custom Scenario" : "Create New Negotiation Scenario"}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-xl border border-white/10 p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
+            className="rounded-xl border border-border p-2 text-textMuted hover:bg-cardAlt hover:text-textPrimary transition cursor-pointer"
           >
             ✕
           </button>
@@ -332,18 +332,18 @@ export default function CustomScenarioBuilder({
                     onClick={() => validateStep(step) && setStep(stepNum)}
                     className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold cursor-pointer transition ${
                       isActive
-                        ? "bg-emerald-500 text-black shadow-[0_0_12px_rgba(16,185,129,0.5)]"
+                        ? "bg-emerald-500 text-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.5)]"
                         : isPast
-                        ? "bg-emerald-950 text-emerald-400 border border-emerald-500/50"
-                        : "bg-white/5 text-slate-500 border border-white/10"
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/50"
+                        : "bg-cardAlt text-textMuted border border-border"
                     }`}
                   >
                     {isPast ? "✓" : stepNum}
                   </div>
-                  <span className={`text-[11px] font-medium whitespace-nowrap ${isActive ? "text-emerald-400 font-bold" : isPast ? "text-slate-300" : "text-slate-500"}`}>
+                  <span className={`text-[11px] font-medium whitespace-nowrap ${isActive ? "text-emerald-500 dark:text-emerald-400 font-bold" : isPast ? "text-textSecondary" : "text-textMuted"}`}>
                     {label}
                   </span>
-                  {i < 6 && <div className={`h-[1px] w-6 sm:w-10 mx-1 ${isPast ? "bg-emerald-500/60" : "bg-white/10"}`} />}
+                  {i < 6 && <div className={`h-[1px] w-6 sm:w-10 mx-1 ${isPast ? "bg-emerald-500/60" : "bg-border"}`} />}
                 </div>
               );
             })}
@@ -352,9 +352,9 @@ export default function CustomScenarioBuilder({
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mb-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-300 font-medium flex items-center justify-between">
+          <div className="mb-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3 text-xs text-rose-500 dark:text-rose-300 font-medium flex items-center justify-between">
             <span>⚠️ {errorMsg}</span>
-            <button onClick={() => setErrorMsg(null)} className="text-rose-400 hover:text-white font-bold ml-2">✕</button>
+            <button onClick={() => setErrorMsg(null)} className="text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-white font-bold ml-2">✕</button>
           </div>
         )}
 
@@ -365,7 +365,7 @@ export default function CustomScenarioBuilder({
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                     Scenario Name *
                   </label>
                   <input
@@ -373,17 +373,17 @@ export default function CustomScenarioBuilder({
                     placeholder="e.g. Commercial Lease Renewal"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-sm text-textPrimary placeholder-textMuted focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                     Category *
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-[#1A1924] px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-sm text-textPrimary focus:border-emerald-500 focus:outline-none"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -393,7 +393,7 @@ export default function CustomScenarioBuilder({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                   Description *
                 </label>
                 <textarea
@@ -401,13 +401,13 @@ export default function CustomScenarioBuilder({
                   placeholder="Explain the background context, goals, and stakes of this negotiation..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-sm text-textPrimary placeholder-textMuted focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                     Maximum Negotiation Rounds *
                   </label>
                   <input
@@ -416,18 +416,18 @@ export default function CustomScenarioBuilder({
                     max={50}
                     value={maxRounds}
                     onChange={(e) => setMaxRounds(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                    className="w-full rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-sm text-textPrimary focus:border-emerald-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                     Number of Participants
                   </label>
                   <input
                     type="text"
                     readOnly
                     value={`${participants.length} Participants Configured`}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-400 cursor-not-allowed"
+                    className="w-full rounded-xl border border-border bg-cardAlt px-4 py-2.5 text-sm text-textMuted cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -438,13 +438,13 @@ export default function CustomScenarioBuilder({
           {step === 2 && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-textMuted">
                   Configure at least 2 negotiators with custom roles, personalities, and financial boundaries.
                 </p>
                 <button
                   type="button"
                   onClick={handleAddParticipant}
-                  className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20"
+                  className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 cursor-pointer"
                 >
                   + Add Participant
                 </button>
@@ -452,16 +452,16 @@ export default function CustomScenarioBuilder({
 
               <div className="space-y-4">
                 {participants.map((p, idx) => (
-                  <div key={idx} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                      <span className="font-mono text-xs font-bold text-emerald-400">
+                  <div key={idx} className="rounded-xl border border-border bg-cardAlt p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-border pb-2">
+                      <span className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400">
                         Participant #{idx + 1}
                       </span>
                       {participants.length > 2 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveParticipant(idx)}
-                          className="text-xs text-rose-400 hover:underline"
+                          className="text-xs text-rose-500 hover:underline cursor-pointer"
                         >
                           Remove
                         </button>
@@ -470,29 +470,29 @@ export default function CustomScenarioBuilder({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 mb-1">Name</label>
+                        <label className="block text-[11px] font-bold text-textMuted mb-1">Name</label>
                         <input
                           type="text"
                           value={p.name}
                           onChange={(e) => handleUpdateParticipant(idx, "name", e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                          className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 mb-1">Role Title</label>
+                        <label className="block text-[11px] font-bold text-textMuted mb-1">Role Title</label>
                         <input
                           type="text"
                           value={p.role}
                           onChange={(e) => handleUpdateParticipant(idx, "role", e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                          className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 mb-1">Personality Policy</label>
+                        <label className="block text-[11px] font-bold text-textMuted mb-1">Personality Policy</label>
                         <select
                           value={p.personality}
                           onChange={(e) => handleUpdateParticipant(idx, "personality", e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-[#1A1924] px-3 py-1.5 text-xs text-white"
+                          className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                         >
                           {PERSONALITIES.map((pers) => (
                             <option key={pers} value={pers}>{pers}</option>
@@ -502,19 +502,19 @@ export default function CustomScenarioBuilder({
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-slate-400 mb-1">Primary Objective *</label>
+                      <label className="block text-[11px] font-bold text-textMuted mb-1">Primary Objective *</label>
                       <input
                         type="text"
                         placeholder="e.g. Secure lowest possible unit price"
                         value={p.objective}
                         onChange={(e) => handleUpdateParticipant(idx, "objective", e.target.value)}
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                        className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                        <label className="block text-[11px] font-bold text-textMuted mb-1">
                           Minimum Floor Limit ($)
                         </label>
                         <input
@@ -522,11 +522,11 @@ export default function CustomScenarioBuilder({
                           placeholder="e.g. 42000"
                           value={p.min_value ?? ""}
                           onChange={(e) => handleUpdateParticipant(idx, "min_value", e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                          className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-400 mb-1">
+                        <label className="block text-[11px] font-bold text-textMuted mb-1">
                           Maximum Ceiling Limit ($)
                         </label>
                         <input
@@ -534,7 +534,7 @@ export default function CustomScenarioBuilder({
                           placeholder="e.g. 50000"
                           value={p.max_value ?? ""}
                           onChange={(e) => handleUpdateParticipant(idx, "max_value", e.target.value)}
-                          className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                          className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                         />
                       </div>
                     </div>
@@ -548,31 +548,31 @@ export default function CustomScenarioBuilder({
           {step === 3 && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-textMuted">
                   Define terms to be negotiated (Price, Budget, Warranty, Delivery Timeline, etc.).
                 </p>
                 <button
                   type="button"
                   onClick={handleAddVariable}
-                  className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500/20"
+                  className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 cursor-pointer"
                 >
                   + Add Variable
                 </button>
               </div>
 
               {variables.map((v, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row items-center gap-3 rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                <div key={idx} className="flex flex-col sm:flex-row items-center gap-3 rounded-xl border border-border bg-cardAlt p-3">
                   <input
                     type="text"
                     placeholder="Variable Name (e.g. Unit Price)"
                     value={v.name}
                     onChange={(e) => handleUpdateVariable(idx, "name", e.target.value)}
-                    className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                    className="flex-1 rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                   />
                   <select
                     value={v.type}
                     onChange={(e) => handleUpdateVariable(idx, "type", e.target.value)}
-                    className="rounded-lg border border-white/10 bg-[#1A1924] px-3 py-1.5 text-xs text-white"
+                    className="rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                   >
                     {VARIABLE_TYPES.map((t) => (
                       <option key={t} value={t}>{t}</option>
@@ -583,12 +583,12 @@ export default function CustomScenarioBuilder({
                     placeholder="Starting Value"
                     value={v.starting_value ?? ""}
                     onChange={(e) => handleUpdateVariable(idx, "starting_value", e.target.value)}
-                    className="w-28 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                    className="w-28 rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                   />
                   <button
                     type="button"
                     onClick={() => handleRemoveVariable(idx)}
-                    className="text-xs text-rose-400 hover:underline"
+                    className="text-xs text-rose-500 hover:underline cursor-pointer"
                   >
                     ✕
                   </button>
@@ -600,29 +600,29 @@ export default function CustomScenarioBuilder({
           {/* STEP 4: Objectives */}
           {step === 4 && (
             <div className="space-y-4">
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-textMuted">
                 Review and refine primary and secondary objectives for each negotiator.
               </p>
               {participants.map((p, idx) => (
-                <div key={idx} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
-                  <h4 className="text-sm font-bold text-emerald-400">{p.name} ({p.role})</h4>
+                <div key={idx} className="rounded-xl border border-border bg-cardAlt p-4 space-y-3">
+                  <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{p.name} ({p.role})</h4>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Primary Objective</label>
+                    <label className="block text-[11px] font-bold text-textMuted mb-1">Primary Objective</label>
                     <input
                       type="text"
                       value={p.objective}
                       onChange={(e) => handleUpdateParticipant(idx, "objective", e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                      className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-400 mb-1">Secondary Objective (Optional)</label>
+                    <label className="block text-[11px] font-bold text-textMuted mb-1">Secondary Objective (Optional)</label>
                     <input
                       type="text"
                       placeholder="e.g. Include 12-month free maintenance support"
                       value={p.secondary_objective || ""}
                       onChange={(e) => handleUpdateParticipant(idx, "secondary_objective", e.target.value)}
-                      className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white"
+                      className="w-full rounded-lg border border-border bg-mainPanel px-3 py-1.5 text-xs text-textPrimary"
                     />
                   </div>
                 </div>
@@ -634,26 +634,26 @@ export default function CustomScenarioBuilder({
           {step === 5 && (
             <div className="space-y-4">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-                <h4 className="text-sm font-bold text-emerald-300">🛡️ Backend Constraint Guardrails</h4>
-                <p className="text-xs text-emerald-200/80 mt-1">
+                <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-300">🛡️ Backend Constraint Guardrails</h4>
+                <p className="text-xs text-emerald-700 dark:text-emerald-200/80 mt-1">
                   Constraints defined below are strictly enforced by NegoMind AI engine. Out-of-bound proposals from LLM or human players are automatically validated, clamped, and flagged.
                 </p>
               </div>
 
               {participants.map((p, idx) => (
-                <div key={idx} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-2">
+                <div key={idx} className="rounded-xl border border-border bg-cardAlt p-4 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">{p.name} ({p.role})</span>
-                    <span className="text-[10px] font-mono text-emerald-400 uppercase">{p.personality}</span>
+                    <span className="text-xs font-bold text-textPrimary">{p.name} ({p.role})</span>
+                    <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 uppercase">{p.personality}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="rounded-lg bg-black/40 p-2 border border-white/5">
-                      <span className="text-slate-400 text-[10px]">Floor Limit:</span>
-                      <p className="font-mono font-bold text-white">{p.min_value ? `$${Number(p.min_value).toLocaleString()}` : "No Floor"}</p>
+                    <div className="rounded-lg bg-mainPanel p-2 border border-border">
+                      <span className="text-textMuted text-[10px]">Floor Limit:</span>
+                      <p className="font-mono font-bold text-textPrimary">{p.min_value ? `$${Number(p.min_value).toLocaleString()}` : "No Floor"}</p>
                     </div>
-                    <div className="rounded-lg bg-black/40 p-2 border border-white/5">
-                      <span className="text-slate-400 text-[10px]">Ceiling Budget:</span>
-                      <p className="font-mono font-bold text-white">{p.max_value ? `$${Number(p.max_value).toLocaleString()}` : "No Ceiling"}</p>
+                    <div className="rounded-lg bg-mainPanel p-2 border border-border">
+                      <span className="text-textMuted text-[10px]">Ceiling Budget:</span>
+                      <p className="font-mono font-bold text-textPrimary">{p.max_value ? `$${Number(p.max_value).toLocaleString()}` : "No Ceiling"}</p>
                     </div>
                   </div>
                 </div>
@@ -665,36 +665,36 @@ export default function CustomScenarioBuilder({
           {step === 6 && (
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-2">
                   Negotiation Mode *
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div
                     onClick={() => setMode("simulation")}
-                    className={`rounded-xl border p-4 cursor-pointer transition ${mode === "simulation" ? "border-emerald-500 bg-emerald-500/10 text-white" : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20"}`}
+                    className={`rounded-xl border p-4 cursor-pointer transition ${mode === "simulation" ? "border-emerald-500 bg-emerald-500/10 text-textPrimary" : "border-border bg-cardAlt text-textMuted hover:border-borderHover"}`}
                   >
-                    <div className="font-bold text-sm text-emerald-400">🤖 Simulation Mode</div>
-                    <p className="text-xs text-slate-300 mt-1">Autonomous AI vs AI negotiation between agents.</p>
+                    <div className="font-bold text-sm text-emerald-600 dark:text-emerald-400">🤖 Simulation Mode</div>
+                    <p className="text-xs text-textSecondary mt-1">Autonomous AI vs AI negotiation between agents.</p>
                   </div>
                   <div
                     onClick={() => setMode("practice")}
-                    className={`rounded-xl border p-4 cursor-pointer transition ${mode === "practice" ? "border-emerald-500 bg-emerald-500/10 text-white" : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20"}`}
+                    className={`rounded-xl border p-4 cursor-pointer transition ${mode === "practice" ? "border-emerald-500 bg-emerald-500/10 text-textPrimary" : "border-border bg-cardAlt text-textMuted hover:border-borderHover"}`}
                   >
-                    <div className="font-bold text-sm text-emerald-400">👤 Practice Mode</div>
-                    <p className="text-xs text-slate-300 mt-1">Interactive Human vs AI practice arena.</p>
+                    <div className="font-bold text-sm text-emerald-600 dark:text-emerald-400">👤 Practice Mode</div>
+                    <p className="text-xs text-textSecondary mt-1">Interactive Human vs AI practice arena.</p>
                   </div>
                 </div>
               </div>
 
               {mode === "practice" && (
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-textMuted mb-1">
                     Select Your Human Negotiator Role
                   </label>
                   <select
                     value={humanRole}
                     onChange={(e) => setHumanRole(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-[#1A1924] px-4 py-2.5 text-sm text-white"
+                    className="w-full rounded-xl border border-border bg-mainPanel px-4 py-2.5 text-sm text-textPrimary"
                   >
                     <option value="">Select Role...</option>
                     {participants.map((p) => (
@@ -710,37 +710,37 @@ export default function CustomScenarioBuilder({
           {step === 7 && (
             <div className="space-y-5">
               <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-                <h3 className="text-base font-black text-emerald-300">SCENARIO REVIEW SUMMARY</h3>
-                <p className="text-xs text-emerald-200/80">Review scenario parameters before launching in Arena.</p>
+                <h3 className="text-base font-black text-emerald-600 dark:text-emerald-300">SCENARIO REVIEW SUMMARY</h3>
+                <p className="text-xs text-emerald-700 dark:text-emerald-200/80">Review scenario parameters before launching in Arena.</p>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                  <span className="text-slate-400 text-[10px]">SCENARIO</span>
-                  <p className="font-bold text-white truncate">{name}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3">
+                  <span className="text-textMuted text-[10px]">SCENARIO</span>
+                  <p className="font-bold text-textPrimary truncate">{name}</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                  <span className="text-slate-400 text-[10px]">CATEGORY</span>
-                  <p className="font-bold text-emerald-400">{category}</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3">
+                  <span className="text-textMuted text-[10px]">CATEGORY</span>
+                  <p className="font-bold text-emerald-600 dark:text-emerald-400">{category}</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                  <span className="text-slate-400 text-[10px]">PARTICIPANTS</span>
-                  <p className="font-bold text-white">{participants.length} Players</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3">
+                  <span className="text-textMuted text-[10px]">PARTICIPANTS</span>
+                  <p className="font-bold text-textPrimary">{participants.length} Players</p>
                 </div>
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-                  <span className="text-slate-400 text-[10px]">MAX ROUNDS</span>
-                  <p className="font-bold text-white">{maxRounds} Rounds</p>
+                <div className="rounded-xl border border-border bg-cardAlt p-3">
+                  <span className="text-textMuted text-[10px]">MAX ROUNDS</span>
+                  <p className="font-bold text-textPrimary">{maxRounds} Rounds</p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Configured Negotiators</h4>
+              <div className="rounded-xl border border-border bg-cardAlt p-4 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted">Configured Negotiators</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {participants.map((p, idx) => (
-                    <div key={idx} className="rounded-lg bg-black/40 p-3 border border-white/5 text-xs">
-                      <div className="font-bold text-white">{p.name} ({p.role})</div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">Policy: <span className="text-emerald-400 font-bold">{p.personality}</span></div>
-                      <div className="text-[11px] text-slate-300 mt-1">Goal: {p.objective}</div>
+                    <div key={idx} className="rounded-lg bg-mainPanel p-3 border border-border text-xs">
+                      <div className="font-bold text-textPrimary">{p.name} ({p.role})</div>
+                      <div className="text-[11px] text-textMuted mt-0.5">Policy: <span className="text-emerald-600 dark:text-emerald-400 font-bold">{p.personality}</span></div>
+                      <div className="text-[11px] text-textSecondary mt-1">Goal: {p.objective}</div>
                     </div>
                   ))}
                 </div>
@@ -750,12 +750,12 @@ export default function CustomScenarioBuilder({
         </div>
 
         {/* Wizard Footer Controls */}
-        <div className="flex items-center justify-between border-t pt-4 border-white/10 mt-4">
+        <div className="flex items-center justify-between border-t pt-4 border-border mt-4">
           {step > 1 ? (
             <button
               type="button"
               onClick={handleBack}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 transition"
+              className="rounded-xl border border-border bg-cardAlt px-4 py-2 text-xs font-bold text-textSecondary hover:bg-border transition cursor-pointer"
             >
               ← Back
             </button>
@@ -768,7 +768,7 @@ export default function CustomScenarioBuilder({
               type="button"
               onClick={handleSaveDraft}
               disabled={isSubmitting}
-              className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-xs font-bold text-white hover:bg-white/20 transition disabled:opacity-50"
+              className="rounded-xl border border-border bg-cardAlt px-4 py-2 text-xs font-bold text-textPrimary hover:bg-border transition disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? "Saving..." : "Save Draft"}
             </button>
@@ -777,7 +777,7 @@ export default function CustomScenarioBuilder({
               <button
                 type="button"
                 onClick={handleNext}
-                className="rounded-xl bg-emerald-500 px-5 py-2 text-xs font-bold text-black shadow-lg hover:bg-emerald-400 transition"
+                className="rounded-xl bg-emerald-500 px-5 py-2 text-xs font-bold text-slate-950 shadow-lg hover:bg-emerald-400 transition cursor-pointer"
               >
                 Next →
               </button>
@@ -786,7 +786,7 @@ export default function CustomScenarioBuilder({
                 type="button"
                 onClick={handleStartNegotiationSubmit}
                 disabled={isSubmitting}
-                className="rounded-xl bg-emerald-400 px-5 py-2 text-xs font-black text-black shadow-[0_0_20px_rgba(52,211,153,0.5)] hover:bg-emerald-300 transition disabled:opacity-50"
+                className="rounded-xl bg-emerald-400 px-5 py-2 text-xs font-black text-slate-950 shadow-[0_0_20px_rgba(52,211,153,0.5)] hover:bg-emerald-300 transition disabled:opacity-50 cursor-pointer"
               >
                 🚀 Start Negotiation
               </button>

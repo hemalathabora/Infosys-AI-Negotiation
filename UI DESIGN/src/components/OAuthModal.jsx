@@ -40,14 +40,14 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
       <div
-        className={`w-full max-w-md rounded-3xl border p-6 shadow-2xl transition-all duration-200 ${
+        className={`w-full max-w-md rounded-3xl border border-border bg-mainPanel p-6 shadow-2xl transition-all duration-200 text-textPrimary ${
           isGoogle
-            ? "border-blue-500/30 bg-[#12141F] text-white"
-            : "border-purple-500/30 bg-[#0F0E17] text-white"
+            ? "border-blue-500/30"
+            : "border-purple-500/30"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#262535]">
+        <div className="flex items-center justify-between pb-4 border-b border-border">
           <div className="flex items-center gap-3">
             {isGoogle ? (
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-md">
@@ -71,7 +71,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                 </svg>
               </div>
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#24292E] border border-slate-700 shadow-md text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#24292E] border border-border shadow-md text-white">
                 <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
                   <path
                     fillRule="evenodd"
@@ -83,18 +83,18 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
             )}
 
             <div>
-              <h3 className="font-bold text-lg text-white">
+              <h3 className="font-bold text-lg text-textPrimary">
                 {isGoogle ? "Sign in with Google" : "Authorize NegoMind AI"}
               </h3>
-              <p className="text-xs text-slate-400">
-                Live OAuth 2.0 verification via <span className="text-slate-200 font-semibold">{isGoogle ? "Google Identity Services" : "GitHub OAuth"}</span>
+              <p className="text-xs text-textMuted">
+                Live OAuth 2.0 verification via <span className="text-textSecondary font-semibold">{isGoogle ? "Google Identity Services" : "GitHub OAuth"}</span>
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-[#252433] hover:text-white transition"
+            className="rounded-lg p-1.5 text-textMuted hover:bg-cardAlt hover:text-textPrimary transition cursor-pointer"
           >
             ✕
           </button>
@@ -102,7 +102,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
 
         {/* Error notification */}
         {errorMsg && (
-          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-400">
+          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-600 dark:text-red-400">
             <span className="font-bold">!</span>
             <span>{errorMsg}</span>
           </div>
@@ -112,11 +112,11 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
         <div className="mt-5 space-y-4">
           {activeMode === "popup" ? (
             <div className="space-y-4 text-center">
-              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-300">
-                <p className="font-bold text-sm text-emerald-200 mb-1">
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-xs text-emerald-700 dark:text-emerald-300">
+                <p className="font-bold text-sm text-emerald-800 dark:text-emerald-200 mb-1">
                   {isGoogle ? "Official Google Sign-In" : "Official GitHub Sign-In"}
                 </p>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-textSecondary leading-relaxed">
                   {isGoogle
                     ? "Click below to open Google's authentication popup and select your Google account."
                     : "Click below to authenticate with your official GitHub account."}
@@ -127,7 +127,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                 type="button"
                 onClick={handleLaunchPopup}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-emerald-500 py-3 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2.5 rounded-2xl bg-emerald-500 py-3 text-sm font-bold text-slate-950 hover:bg-emerald-400 transition shadow-lg shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -143,7 +143,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                 <button
                   type="button"
                   onClick={() => setActiveMode("manual")}
-                  className="text-xs text-slate-400 hover:text-slate-200 underline"
+                  className="text-xs text-textMuted hover:text-textPrimary underline cursor-pointer"
                 >
                   Advanced: Manual Token / Code Entry
                 </button>
@@ -151,14 +151,14 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
             </div>
           ) : (
             <form onSubmit={handleManualSubmit} className="space-y-4">
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-300">
                 {isGoogle
                   ? "Paste a valid Google ID Token or Access Token to verify directly against Google's tokeninfo API."
                   : "Paste a valid GitHub OAuth Authorization Code or Personal Access Token to verify directly with GitHub."}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-textSecondary mb-1">
                   {isGoogle ? "Google ID Token / Access Token" : "GitHub Code / Access Token"}
                 </label>
                 <textarea
@@ -167,7 +167,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                   placeholder={isGoogle ? "eyJhbGciOiJSUzI1NiIs..." : "ghp_... or auth_code..."}
                   value={realTokenOrCode}
                   onChange={(e) => setRealTokenOrCode(e.target.value)}
-                  className="w-full rounded-xl border border-[#333245] bg-[#1A1926] p-3 font-mono text-xs text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-cardAlt p-3 font-mono text-xs text-textPrimary focus:border-emerald-500 focus:outline-none"
                 />
               </div>
 
@@ -175,14 +175,14 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
                 <button
                   type="button"
                   onClick={() => setActiveMode("popup")}
-                  className="text-xs text-slate-400 hover:text-white"
+                  className="text-xs text-textMuted hover:text-textPrimary cursor-pointer"
                 >
                   ← Back to OAuth popup
                 </button>
 
                 <button
                   type="submit"
-                  className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition"
+                  className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition cursor-pointer"
                 >
                   Verify Token with Backend →
                 </button>
@@ -192,7 +192,7 @@ export default function OAuthModal({ isOpen, provider, onClose, onAuthorize }) {
         </div>
 
         {/* Footer */}
-        <p className="mt-5 text-[10px] text-center text-slate-500 border-t border-[#262535] pt-3">
+        <p className="mt-5 text-[10px] text-center text-textMuted border-t border-border pt-3">
           NegoMind OAuth Engine • Real-time Token Exchange & Verification
         </p>
       </div>

@@ -29,7 +29,7 @@ export default function AgentCard({
 
   return (
     <article
-      className="animate-fadeIn flex h-full flex-col justify-between gap-6 rounded-2xl border border-[#2D2C36] bg-[#201F25] p-6 shadow-md transition-all hover:border-[#3E3D49]"
+      className="animate-fadeIn flex h-full flex-col justify-between gap-6 rounded-2xl border border-border bg-card p-6 shadow-md transition-all hover:border-borderHover"
       aria-labelledby={`agent-${agent.id}-name`}
     >
       <div className="space-y-5">
@@ -43,7 +43,7 @@ export default function AgentCard({
           />
         </div>
 
-        <div className="h-px w-full bg-[#2B2A33]" />
+        <div className="h-px w-full bg-border" />
 
         {/* Goal */}
         <GoalSection goal={agent.goal} />
@@ -63,17 +63,17 @@ export default function AgentCard({
 
       {/* Bottom Status */}
       <div className="space-y-4 pt-2">
-        <div className="h-px w-full bg-[#2B2A33]" />
+        <div className="h-px w-full bg-border" />
         <div className="flex items-center gap-2 text-xs font-mono">
           {isConfigured ? (
-            <div className="flex w-full items-center justify-between rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2 text-emerald-400">
+            <div className="flex w-full items-center justify-between rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-2 text-emerald-600 dark:text-emerald-400">
               <span className="font-bold tracking-wider">CONFIGURED & READY</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
           ) : (
-            <div className="flex w-full items-center justify-between rounded-xl bg-amber-500/10 border border-amber-500/30 px-3.5 py-2 text-amber-400">
+            <div className="flex w-full items-center justify-between rounded-xl bg-amber-500/10 border border-amber-500/30 px-3.5 py-2 text-amber-600 dark:text-amber-400">
               <span className="font-bold tracking-wider">INCOMPLETE PARAMETERS</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <circle cx="12" cy="12" r="10" />

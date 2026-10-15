@@ -4,6 +4,7 @@ import UserProfileDropdown from "./UserProfileDropdown";
 import NegoMindLogo from "./NegoMindLogo";
 import DownloadAppButton from "./DownloadAppButton";
 import PwaInstallModal from "./PwaInstallModal";
+import ThemeToggle from "./ThemeToggle";
 import { usePwaInstall } from "../hooks/usePwaInstall";
 
 const navLinks = [
@@ -107,7 +108,7 @@ export default function TopNavigation({
   };
 
   return (
-    <header className="sticky top-0 z-50 flex flex-col border-b border-[#26242C] bg-[#0C0C0F]/90 text-[#F8FAFC] backdrop-blur-md">
+    <header className="sticky top-0 z-50 flex flex-col border-b border-border bg-header/90 text-textPrimary backdrop-blur-md transition-colors duration-200">
       {/* Top Navbar Main Header */}
       <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
         {/* Left Side - Brand / Logo */}
@@ -123,7 +124,7 @@ export default function TopNavigation({
                 key={link.label}
                 href={link.page ? "#" : link.href}
                 onClick={(e) => handleNavClick(e, link)}
-                className="relative py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-slate-100 after:transition-all hover:text-slate-100 hover:after:w-full"
+                className="relative py-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-textSecondary transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-textPrimary after:transition-all hover:text-textPrimary hover:after:w-full"
               >
                 {link.label}
               </a>
@@ -137,18 +138,21 @@ export default function TopNavigation({
         )}
 
         {/* Right Section / Controls */}
-        <div className="hidden items-center gap-4 lg:flex">
+        <div className="hidden items-center gap-3 lg:flex">
+          {/* Theme Selector */}
+          <ThemeToggle />
+
           {/* Gemini LLM Toggle Status Badge */}
           {isAuthenticated && <LlmStatusBadge />}
 
           {/* User Profile or Sign In */}
           {isAuthenticated ? (
-            <UserProfileDropdown isDark={true} />
+            <UserProfileDropdown />
           ) : (
             <button
               type="button"
               onClick={handleSignInClick}
-              className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 transition-colors hover:text-slate-100 cursor-pointer"
+              className="text-[11px] font-bold uppercase tracking-[0.14em] text-textSecondary transition-colors hover:text-textPrimary cursor-pointer px-2 py-1"
             >
               Sign in
             </button>
@@ -159,7 +163,7 @@ export default function TopNavigation({
             <button
               type="button"
               onClick={handleWorkspaceClick}
-              className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950 transition-all duration-300 hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.15)] active:translate-y-px cursor-pointer"
+              className="group inline-flex items-center justify-center gap-3 border border-border bg-primaryBright text-primary px-5 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] dark:text-slate-950 dark:bg-slate-100 transition-all duration-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)] active:translate-y-px cursor-pointer rounded-xl"
             >
               <span>Enter the workspace</span>
               <span className="inline-block text-base leading-none transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
@@ -171,6 +175,9 @@ export default function TopNavigation({
 
         {/* Mobile Navigation Toggle & Compact Download Button */}
         <div className="flex items-center gap-2.5 lg:hidden">
+          {/* Mobile Theme Toggle */}
+          <ThemeToggle compact />
+
           {!isAuthenticated && (
             <DownloadAppButton
               variant="headerCompact"
@@ -178,23 +185,23 @@ export default function TopNavigation({
               isInstalled={isInstalled}
             />
           )}
-          {isAuthenticated && <UserProfileDropdown isDark={true} />}
+          {isAuthenticated && <UserProfileDropdown />}
           <button
             type="button"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-[#302F39] bg-[#16151A]"
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 border border-border bg-card rounded-xl text-textPrimary"
           >
-            <span className="h-px w-4 bg-slate-200" />
-            <span className="h-px w-4 bg-slate-200" />
+            <span className="h-0.5 w-4 bg-current" />
+            <span className="h-0.5 w-4 bg-current" />
           </button>
         </div>
       </div>
 
       {/* Sub-Navbar Breadcrumb & Menu Bar (Below Main Navbar for Logged In Users) */}
       {isAuthenticated && (
-        <div className="border-t border-[#26242C] bg-[#121116] px-5 sm:px-8 lg:px-12 text-[#F8FAFC]">
+        <div className="border-t border-border bg-card/90 px-5 sm:px-8 lg:px-12 text-textPrimary transition-colors duration-200">
           <div className="mx-auto flex h-11 max-w-[1500px] items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Menu Toggle Button */}
@@ -202,9 +209,9 @@ export default function TopNavigation({
                 <button
                   type="button"
                   onClick={onMenuToggle}
-                  className={`group inline-flex items-center gap-2 border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer ${isMenuOpen
-                      ? "border-slate-200 bg-slate-100 text-slate-950"
-                      : "border-[#302F39] bg-[#1B1A22] text-slate-300 hover:border-[#424050] hover:bg-[#23212C] hover:text-slate-100"
+                  className={`group inline-flex items-center gap-2 border px-3 py-1 rounded-xl text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 cursor-pointer ${isMenuOpen
+                      ? "border-primaryBright bg-primaryBright/10 text-primaryBright"
+                      : "border-border bg-cardAlt text-textSecondary hover:border-borderGlow hover:text-textPrimary"
                     }`}
                   title="Toggle Dashboard Navigation Menu"
                 >
@@ -218,17 +225,17 @@ export default function TopNavigation({
               )}
 
               {/* Breadcrumb Navigation Path */}
-              <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
-                <span className="text-slate-400">NegoMind</span>
-                <span className="text-slate-600">/</span>
-                <span className="font-bold text-slate-100 uppercase tracking-wider">
+              <div className="flex items-center gap-2 font-mono text-[11px] text-textSecondary">
+                <span>NegoMind</span>
+                <span className="text-textMuted">/</span>
+                <span className="font-bold text-textPrimary uppercase tracking-wider">
                   {activePage || "Dashboard"}
                 </span>
               </div>
             </div>
 
-            <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-textMuted">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>System Control Hub</span>
             </div>
           </div>
@@ -237,9 +244,9 @@ export default function TopNavigation({
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#26242C] bg-[#121116] px-5 py-5 lg:hidden">
+        <div className="border-t border-border bg-card px-5 py-5 lg:hidden text-textPrimary shadow-xl animate-in fade-in duration-150">
           {!isAuthenticated && (
-            <nav className="flex flex-col gap-4 mb-5 border-b border-[#26242C] pb-4">
+            <nav className="flex flex-col gap-4 mb-5 border-b border-border pb-4">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
@@ -248,7 +255,7 @@ export default function TopNavigation({
                     setMobileMenuOpen(false);
                     handleNavClick(e, link);
                   }}
-                  className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400 hover:text-slate-100"
+                  className="text-[11px] font-bold uppercase tracking-[0.16em] text-textSecondary hover:text-textPrimary"
                 >
                   {link.label}
                 </a>
@@ -277,7 +284,7 @@ export default function TopNavigation({
                         setMobileMenuOpen(false);
                         onMenuToggle();
                       }}
-                      className="flex items-center gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-100"
+                      className="flex items-center gap-2 border border-border bg-cardAlt px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-textPrimary rounded-lg"
                     >
                       <span>Dashboard Menu</span>
                     </button>
@@ -306,7 +313,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleSignInClick();
                     }}
-                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400 hover:text-slate-100 cursor-pointer"
+                    className="text-[11px] font-bold uppercase tracking-[0.14em] text-textSecondary hover:text-textPrimary cursor-pointer"
                   >
                     Sign in
                   </button>
@@ -317,7 +324,7 @@ export default function TopNavigation({
                       setMobileMenuOpen(false);
                       handleWorkspaceClick();
                     }}
-                    className="group inline-flex items-center justify-center gap-3 border border-slate-200 bg-slate-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-950 cursor-pointer"
+                    className="group inline-flex items-center justify-center gap-3 border border-border bg-primaryBright text-primary dark:text-slate-950 dark:bg-slate-100 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] cursor-pointer rounded-xl"
                   >
                     <span>Enter workspace</span>
                     <span>↗</span>
@@ -416,7 +423,7 @@ function LlmStatusBadge() {
 
   if (status.loading) {
     return (
-      <div className="inline-flex items-center rounded-md gap-2 border border-[#302F39] bg-[#1B1A22] px-3 py-1.5 text-[10px] font-mono font-bold text-slate-400">
+      <div className="inline-flex items-center rounded-xl gap-2 border border-border bg-card px-3 py-1.5 text-[10px] font-mono font-bold text-textMuted">
         <span className="h-1.5 w-1.5 rounded-full bg-slate-400 animate-pulse" />
         Engine...
       </div>
@@ -430,25 +437,25 @@ function LlmStatusBadge() {
       type="button"
       onClick={handleToggle}
       title={isOn ? "Gemini LLM is Active. Click to turn OFF." : "Normal Mode is Active. Click to turn Gemini LLM ON."}
-      className={`group inline-flex items-center rounded-md gap-2.5 border px-3 py-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer ${isOn
-          ? "border-emerald-500/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40"
-          : "border-[#302F39] bg-[#1B1A22] text-slate-400 hover:border-[#424050] hover:text-slate-100"
+      className={`group inline-flex items-center rounded-xl gap-2.5 border px-3 py-1.5 text-[10px] font-mono font-bold transition-all cursor-pointer shadow-sm ${isOn
+          ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/25"
+          : "border-border bg-card text-textSecondary hover:border-borderGlow hover:text-textPrimary"
         }`}
     >
       <div className="flex items-center gap-2">
-        <span className={`h-2 w-2 rounded-full ${isOn ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
+        <span className={`h-2 w-2 rounded-full ${isOn ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
         <span className="font-sans font-bold uppercase tracking-[0.14em]">
           {isOn ? "Gemini LLM" : "Normal Mode"}
         </span>
       </div>
 
-      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${isOn ? "bg-emerald-500" : "bg-[#302F39]"
+      <div className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full p-0.5 transition-colors duration-200 ${isOn ? "bg-emerald-500" : "bg-borderGlow"
         }`}>
         <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-md transition-transform duration-200 ${isOn ? "translate-x-3" : "translate-x-0"
           }`} />
       </div>
 
-      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${isOn ? "text-emerald-400" : "text-slate-400"
+      <span className={`font-mono text-[9px] uppercase font-bold tracking-wider ${isOn ? "text-emerald-600 dark:text-emerald-400" : "text-textMuted"
         }`}>
         {isOn ? "ON" : "OFF"}
       </span>

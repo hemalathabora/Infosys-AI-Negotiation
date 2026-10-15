@@ -1,4 +1,5 @@
 import StaggeredMenu from "./StaggeredMenu";
+import { useTheme } from "../context/ThemeContext";
 
 const navigationItems = [
   {
@@ -45,7 +46,6 @@ const navigationItems = [
   },
 ];
 
-
 export default function Sidebar({
   isOpen,
   onClose,
@@ -54,6 +54,8 @@ export default function Sidebar({
   onClearHistory,
   onReplayIntro,
 }) {
+  const { isDark } = useTheme();
+
   function handleMenuItemClick(item) {
     onNavigate?.(item.page || item.label);
     onClose?.();
@@ -72,9 +74,10 @@ export default function Sidebar({
       onItemClick={handleMenuItemClick}
       displaySocials={false}
       displayItemNumbering={false}
-      colors={["#17161B", "#25242C"]}
+      colors={isDark ? ["#17161B", "#25242C"] : ["#E2E8F0", "#F8FAFC"]}
       accentColor="#34D399"
       isFixed={true}
     />
   );
 }
+

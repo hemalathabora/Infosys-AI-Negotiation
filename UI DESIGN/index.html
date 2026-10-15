@@ -20,6 +20,25 @@
       rel="stylesheet"
     />
     <title>NegoMind Ai — Think • Negotiate • Grow | AI Multi-Agent Platform</title>
+    <script>
+      (function() {
+        try {
+          var stored = localStorage.getItem('negomind_theme') || localStorage.getItem('theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored === 'system' || !stored ? (prefersDark ? 'dark' : 'light') : stored;
+          var root = document.documentElement;
+          if (theme === 'dark') {
+            root.classList.add('dark');
+            root.classList.remove('light');
+            root.style.colorScheme = 'dark';
+          } else {
+            root.classList.remove('dark');
+            root.classList.add('light');
+            root.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

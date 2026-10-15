@@ -128,25 +128,22 @@ export default function Dashboard({
   });
 
   return (
-    <main className="min-h-full flex-1 bg-[#17161B] px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn">
+    <main className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary animate-fadeIn transition-colors duration-200">
       <div className="mx-auto w-[95%] space-y-6">
 
         {/* =====================================================
-            BREADCRUMB & HEADER BAR MATCHING REFERENCE IMAGE
+            BREADCRUMB & HEADER BAR
         ====================================================== */}
 
-        <div className="flex flex-col gap-5 border-b border-[#292831] pb-6">
-          {/* Breadcrumb Header */}
-
+        <div className="flex flex-col gap-5 border-b border-border pb-6">
           {/* Project Action Pills Row */}
           <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
             <div className="flex flex-wrap items-center gap-2">
 
-
               {/* Indexes Counter Pill */}
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-xl border border-[#302F39] bg-[#1E1D24] px-4 py-2 text-xs font-medium text-slate-300 hover:bg-[#25242D] transition"
+                className="inline-flex items-center gap-2 rounded-xl border border-border bg-cardAlt px-4 py-2 text-xs font-medium text-textSecondary hover:bg-border transition shadow-sm"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3" />
@@ -160,7 +157,7 @@ export default function Dashboard({
               <button
                 type="button"
                 onClick={onClearHistory}
-                className="inline-flex justify-center items-center gap-1.5 rounded-sm border border-[#522026] bg-[#35161B] px-3.5 py-2 text-xs font-medium text-[#F87171] hover:bg-[#451B21] transition"
+                className="inline-flex justify-center items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -175,20 +172,18 @@ export default function Dashboard({
     group relative
     inline-flex items-center gap-2
     overflow-hidden
-    rounded-sm
-    bg-slate-100 hover:bg-white
+    rounded-xl
+    bg-slate-900 text-white hover:bg-slate-800
+    dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white
     px-4 py-2
     text-xs sm:text-sm
     font-bold
-    text-slate-950
-    border border-slate-200
+    border border-border
     shadow-md
-
     transition-all duration-300 ease-out
-    hover:-translate-y-1
-    hover:shadow-[0_8px_25px_rgba(255,255,255,0.18)]
+    hover:-translate-y-0.5
     active:translate-y-0
-    active:scale-[0.97]
+    cursor-pointer
   "
               >
                 {/* Animated shine */}
@@ -462,18 +457,18 @@ export default function Dashboard({
             </div>
 
             {/* Live Concession Tracking Widget */}
-            <div className="rounded-xl border border-indigo-500/20 bg-[#1A191E] p-4 space-y-3">
+            <div className="rounded-xl border border-indigo-500/20 bg-cardAlt p-4 space-y-3">
               <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-300">
+                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400 dark:text-indigo-300">
                     Live Concession Velocity & Boundary Tracking
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => onNavigate("Negotiation Arena")}
-                  className="text-[11px] font-mono text-indigo-400 hover:underline"
+                  className="text-[11px] font-mono text-indigo-500 dark:text-indigo-400 hover:underline"
                 >
                   View Full Arena →
                 </button>
@@ -489,29 +484,29 @@ export default function Dashboard({
                     const agentObj = activeScenario?.agents?.find((a) => a.id === agentId);
                     const agentName = agentObj?.name || agentId;
                     return (
-                      <div key={agentId} className="rounded-lg border border-[#2D2C36] bg-[#201F25] p-3 space-y-2">
+                      <div key={agentId} className="rounded-lg border border-border bg-card p-3 space-y-2">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-bold text-white font-sans">{agentName}</span>
-                          <span className="font-semibold text-emerald-400">
+                          <span className="font-bold text-textPrimary font-sans">{agentName}</span>
+                          <span className="font-semibold text-emerald-500 dark:text-emerald-400">
                             True Concession Sum: ${Math.round(totalMoved).toLocaleString()}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-[10px] text-slate-400 border-t border-[#2D2C36] pt-1.5">
+                        <div className="flex items-center justify-between text-[10px] text-textMuted border-t border-border pt-1.5">
                           <span>
                             Decay Rate: {decayRate !== null && decayRate !== undefined ? `${decayRate}%` : "Insufficient rounds"}
                           </span>
                           {remainingCap !== undefined && (
-                            <span className="text-indigo-300">
+                            <span className="text-indigo-500 dark:text-indigo-300">
                               Capacity Left: ${Math.round(remainingCap).toLocaleString()}
                             </span>
                           )}
                         </div>
                         <div className="flex flex-wrap gap-1 text-[10px] pt-1">
                           {entries.map((entry, idx) => (
-                            <span key={idx} className="rounded bg-[#17161B] px-2 py-0.5 border border-[#302F39] text-slate-300">
+                            <span key={idx} className="rounded bg-cardAlt px-2 py-0.5 border border-border text-textSecondary">
                               R{entry.round}: ${Math.round(entry.value).toLocaleString()}
                               {entry.delta !== null && entry.delta !== undefined && (
-                                <span className={entry.delta === 0 ? "text-slate-500" : "text-emerald-400"}>
+                                <span className={entry.delta === 0 ? "text-textMuted" : "text-emerald-500 dark:text-emerald-400"}>
                                   {" "}({entry.delta > 0 ? "+" : ""}${Math.round(entry.delta).toLocaleString()})
                                 </span>
                               )}
@@ -631,7 +626,7 @@ export default function Dashboard({
 
             <div className="overflow-x-auto rounded-xl border border-border/60">
               <table className="w-full min-w-[580px] text-left text-xs font-body">
-                <thead className="border-b border-border/80 bg-slate-900/60 font-mono text-[11px] uppercase tracking-wider text-textMuted">
+                <thead className="border-b border-border bg-cardAlt font-mono text-[11px] uppercase tracking-wider text-textMuted">
                   <tr>
                     <th className="px-4 py-3">Scenario</th>
                     <th className="px-4 py-3">Parties</th>
@@ -644,7 +639,7 @@ export default function Dashboard({
                 <tbody className="divide-y divide-border/40">
                   {latestHistory.length > 0 ? (
                     latestHistory.map((item, idx) => (
-                      <tr key={item.id || idx} className="hover:bg-white/[0.02] transition-colors">
+                      <tr key={item.id || idx} className="hover:bg-cardAlt/50 transition-colors">
                         <td className="px-4 py-3.5 font-semibold text-textPrimary">{item.scenario}</td>
                         <td className="px-4 py-3.5 text-textSecondary">{item.agents}</td>
                         <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>

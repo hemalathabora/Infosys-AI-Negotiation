@@ -195,9 +195,20 @@ def calculate_ai_stance(
         return "Firm"
 
     # Analyze recent concession
-    conc_data = last_turn.get("concession_data") or last_turn.get("parameters", {}).get("concession_tracking") or {}
-    conc_amt = float(conc_data.get("concession_amount") or conc_data.get("concession") or 0.0)
-    conc_pct = float(conc_data.get("concession_percentage") or 0.0)
+    conc_data = last_turn.get("concession_data") or (last_turn.get("parameters") or {}).get("concession_tracking") or {}
+    if not isinstance(conc_data, dict):
+        conc_data = {}
+    try:
+        raw_amt = conc_data.get("concession_amount") or conc_data.get("concession") or 0.0
+        conc_amt = float(raw_amt) if raw_amt is not None else 0.0
+    except (ValueError, TypeError):
+        conc_amt = 0.0
+
+    try:
+        raw_pct = conc_data.get("concession_percentage") or 0.0
+        conc_pct = float(raw_pct) if raw_pct is not None else 0.0
+    except (ValueError, TypeError):
+        conc_pct = 0.0
 
     if conc_pct >= 5.0 or conc_amt > 1500:
         return "Very Flexible"

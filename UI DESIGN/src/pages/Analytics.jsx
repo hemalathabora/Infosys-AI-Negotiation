@@ -575,7 +575,7 @@ export default function Analytics({ scenario, negotiation, onNavigate }) {
               <button
                 type="button"
                 onClick={() => onNavigate("Reports")}
-                className="w-full rounded-xl bg-primary hover:bg-primaryBright text-slate-950 px-5 py-3 text-xs font-bold border border-primaryBright shadow-md transition text-center cursor-pointer"
+                className="w-full rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white px-5 py-3 text-xs font-bold border border-slate-700 dark:border-slate-300 shadow-md transition text-center cursor-pointer"
               >
                 Generate Full Executive Audit Report →
               </button>

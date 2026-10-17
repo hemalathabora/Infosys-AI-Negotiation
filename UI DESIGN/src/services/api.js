@@ -581,5 +581,35 @@ export async function recordNegotiationSession(sessionData) {
   return null;
 }
 
+/**
+ * Sends a contact inquiry message to the backend which dispatches to negomindai@gmail.com
+ * @param {{ name: string, email: string, topic: string, message: string }} contactData
+ */
+export async function sendContactInquiry({ name, email, topic, message }) {
+  const response = await fetch(`${API_BASE_URL}/contact`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify({ name, email, topic, message })
+  });
+
+  if (!response.ok) {
+    let errMessage = "Failed to send message. Please try again.";
+    try {
+      const errData = await response.json();
+      if (errData && errData.detail) {
+        errMessage = typeof errData.detail === "string" ? errData.detail : JSON.stringify(errData.detail);
+      }
+    } catch {
+      // fallback
+    }
+    throw new Error(errMessage);
+  }
+
+  return await response.json();
+}
+
 
 

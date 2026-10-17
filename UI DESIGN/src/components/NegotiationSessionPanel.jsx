@@ -213,11 +213,11 @@ export default function NegotiationSessionPanel({
           type="button"
           onClick={onRunToCompletion}
           disabled={isRunning || isDone}
-          className="inline-flex items-center gap-2 rounded-xl bg-primary hover:bg-primaryBright px-5 py-2.5 font-sans text-xs font-extrabold text-slate-950 shadow-md border border-primaryBright transition disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white px-5 py-2.5 font-sans text-xs font-extrabold shadow-md border border-slate-700 dark:border-slate-300 transition disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           {isRunning ? (
             <>
-              <svg className="h-4 w-4 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none">
+              <svg className="h-4 w-4 animate-spin text-white dark:text-slate-950" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
                 <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" />
               </svg>

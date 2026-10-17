@@ -11,16 +11,28 @@ export default function UserProfileDropdown({ isDark: propIsDark }) {
 
   const [imgError, setImgError] = useState(false);
 
-  // Close dropdown on click outside
+  // Close dropdown on click outside or Escape key
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
 
   if (!user) return null;
 
@@ -41,7 +53,7 @@ export default function UserProfileDropdown({ isDark: propIsDark }) {
       : "Verified Email";
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={`relative ${isOpen ? "z-50" : "z-20"}`} ref={dropdownRef}>
       {/* Profile Chip Button */}
       <button
         type="button"
@@ -78,7 +90,7 @@ export default function UserProfileDropdown({ isDark: propIsDark }) {
       {/* Popover Dropdown Card */}
       {isOpen && (
         <div
-          className="absolute right-0 top-12 z-50 w-72 border border-border bg-card/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 text-textPrimary rounded-2xl"
+          className="absolute right-0 top-12 z-50 w-72 max-w-[calc(100vw-1.5rem)] border border-border bg-card p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 text-textPrimary rounded-2xl"
         >
           {/* User Details Header */}
           <div className="flex items-center gap-3 pb-3 border-b border-border">

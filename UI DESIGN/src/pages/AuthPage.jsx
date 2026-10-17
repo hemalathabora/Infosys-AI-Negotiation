@@ -517,7 +517,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     {loading ? "Connecting..." : "Continue with Google"}
                   </button>
 
-                  <button
+                  {/* <button
                     type="button"
                     onClick={async () => {
                       setLoading(true);
@@ -533,7 +533,7 @@ export default function AuthPage({ onNavigate, initialMode = "signin" }) {
                     className="flex h-11 items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400 transition cursor-pointer disabled:opacity-50"
                   >
                     <span>🚀 Quick Demo Login (Instant Access)</span>
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="my-7 flex items-center gap-4">

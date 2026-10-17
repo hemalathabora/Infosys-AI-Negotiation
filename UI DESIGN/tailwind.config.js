@@ -16,40 +16,40 @@ export default {
 
       colors: {
         // Outer Application & Sidebar
-        bg: "var(--bg)",
-        header: "var(--header)",
-        sidebar: "var(--sidebar)",
+        bg: "color-mix(in srgb, var(--bg) calc(<alpha-value> * 100%), transparent)",
+        header: "color-mix(in srgb, var(--header) calc(<alpha-value> * 100%), transparent)",
+        sidebar: "color-mix(in srgb, var(--sidebar) calc(<alpha-value> * 100%), transparent)",
 
         // Elevated Main Panel
-        mainPanel: "var(--main-panel)",
+        mainPanel: "color-mix(in srgb, var(--main-panel) calc(<alpha-value> * 100%), transparent)",
 
         // Inset Cards & Inner Surfaces
-        card: "var(--card)",
-        cardAlt: "var(--card-alt)",
+        card: "color-mix(in srgb, var(--card) calc(<alpha-value> * 100%), transparent)",
+        cardAlt: "color-mix(in srgb, var(--card-alt) calc(<alpha-value> * 100%), transparent)",
 
         // Borders & Dividers
-        border: "var(--border)",
-        borderSubtle: "var(--border-subtle)",
-        borderGlow: "var(--border-glow)",
+        border: "color-mix(in srgb, var(--border) calc(<alpha-value> * 100%), transparent)",
+        borderSubtle: "color-mix(in srgb, var(--border-subtle) calc(<alpha-value> * 100%), transparent)",
+        borderGlow: "color-mix(in srgb, var(--border-glow) calc(<alpha-value> * 100%), transparent)",
 
         // Primary Brand Accent
-        primary: "var(--primary)",
-        primaryBright: "var(--primary-bright)",
-        brandWhite: "var(--brand-white)",
-        azure: "var(--azure)",
-        azureBright: "var(--azure-bright)",
+        primary: "color-mix(in srgb, var(--primary) calc(<alpha-value> * 100%), transparent)",
+        primaryBright: "color-mix(in srgb, var(--primary-bright) calc(<alpha-value> * 100%), transparent)",
+        brandWhite: "color-mix(in srgb, var(--brand-white) calc(<alpha-value> * 100%), transparent)",
+        azure: "color-mix(in srgb, var(--azure) calc(<alpha-value> * 100%), transparent)",
+        azureBright: "color-mix(in srgb, var(--azure-bright) calc(<alpha-value> * 100%), transparent)",
 
         // Status & Badge Tones
-        success: "var(--success)",
-        successBright: "var(--success-bright)",
-        warning: "var(--warning)",
-        warningBright: "var(--warning-bright)",
-        danger: "var(--danger)",
+        success: "color-mix(in srgb, var(--success) calc(<alpha-value> * 100%), transparent)",
+        successBright: "color-mix(in srgb, var(--success-bright) calc(<alpha-value> * 100%), transparent)",
+        warning: "color-mix(in srgb, var(--warning) calc(<alpha-value> * 100%), transparent)",
+        warningBright: "color-mix(in srgb, var(--warning-bright) calc(<alpha-value> * 100%), transparent)",
+        danger: "color-mix(in srgb, var(--danger) calc(<alpha-value> * 100%), transparent)",
 
         // Typography Hierarchy
-        textPrimary: "var(--text-primary)",
-        textSecondary: "var(--text-secondary)",
-        textMuted: "var(--text-muted)",
+        textPrimary: "color-mix(in srgb, var(--text-primary) calc(<alpha-value> * 100%), transparent)",
+        textSecondary: "color-mix(in srgb, var(--text-secondary) calc(<alpha-value> * 100%), transparent)",
+        textMuted: "color-mix(in srgb, var(--text-muted) calc(<alpha-value> * 100%), transparent)",
       },
 
       /*

@@ -6,19 +6,19 @@ const THEME_OPTIONS = [
   {
     id: "light",
     label: "Light",
-    description: "Clean, high-contrast daylight theme",
+    // description: "Clean, high-contrast daylight theme",
     icon: Sun,
   },
   {
     id: "dark",
     label: "Dark",
-    description: "Sleek, low-light enterprise theme",
+    // description: "Sleek, low-light enterprise theme",
     icon: Moon,
   },
   {
     id: "system",
     label: "System",
-    description: "Sync with your OS color preference",
+    // description: "Sync with your OS color preference",
     icon: Monitor,
   },
 ];
@@ -68,7 +68,7 @@ export default function ThemeToggle({ className = "", compact = false }) {
   const ActiveIcon = theme === "system" ? Monitor : theme === "light" ? Sun : Moon;
 
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
+    <div className={`relative inline-block text-left ${isOpen ? "z-50" : "z-20"} ${className}`} ref={dropdownRef}>
       {/* Trigger Button */}
       <button
         ref={buttonRef}
@@ -118,7 +118,7 @@ export default function ThemeToggle({ className = "", compact = false }) {
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="theme-toggle-button"
-          className="absolute right-0 top-full mt-2 z-50 w-52 origin-top-right rounded-2xl border border-border bg-card/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+          className="absolute right-0 top-full mt-2 z-50 w-52 origin-top-right rounded-2xl border border-border bg-card p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
         >
           <div className="px-3 py-2 border-b border-border mb-1">
             <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-textMuted">

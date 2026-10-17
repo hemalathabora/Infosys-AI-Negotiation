@@ -379,6 +379,70 @@ def extract_normalized_offer_variables(raw_offer: Any) -> Dict[str, float]:
     return res
 
 
+def _parse_constraints(constraints: Any, role: str = "") -> Tuple[Optional[float], Optional[float]]:
+    """Safely extracts (max_price, min_price) whether constraints is dict, list of dicts, or list of strings."""
+    max_price = None
+    min_price = None
+
+    if isinstance(constraints, dict):
+        max_price = constraints.get("maximum_price") or constraints.get("max_price")
+        min_price = constraints.get("minimum_price") or constraints.get("min_price")
+        try:
+            max_price = float(max_price) if max_price is not None else None
+        except (ValueError, TypeError):
+            max_price = None
+        try:
+            min_price = float(min_price) if min_price is not None else None
+        except (ValueError, TypeError):
+            min_price = None
+        return max_price, min_price
+
+    if isinstance(constraints, list):
+        import re
+        r_lower = (role or "").lower()
+        is_minimizer = any(k in r_lower for k in ["buyer", "employer", "finance", "client", "customer", "tenant"])
+        for item in constraints:
+            if isinstance(item, dict):
+                text = str(item.get("text", "")).lower()
+                val = item.get("defaultValue", item.get("value"))
+                if val is not None:
+                    try:
+                        fval = float(val)
+                        if "max" in text or is_minimizer:
+                            if max_price is None:
+                                max_price = fval
+                        if "min" in text or not is_minimizer:
+                            if min_price is None:
+                                min_price = fval
+                    except (ValueError, TypeError):
+                        pass
+                if "maximum_price" in item:
+                    try:
+                        max_price = float(item["maximum_price"])
+                    except (ValueError, TypeError):
+                        pass
+                if "minimum_price" in item:
+                    try:
+                        min_price = float(item["minimum_price"])
+                    except (ValueError, TypeError):
+                        pass
+            elif isinstance(item, str):
+                numbers = re.findall(r"[\d,]+", item)
+                if numbers:
+                    try:
+                        fval = float(numbers[0].replace(",", ""))
+                        if "max" in item.lower() or is_minimizer:
+                            if max_price is None:
+                                max_price = fval
+                        if "min" in item.lower() or not is_minimizer:
+                            if min_price is None:
+                                min_price = fval
+                    except (ValueError, TypeError):
+                        pass
+
+    return max_price, min_price
+
+
 def calculate_utility(
     agent_profile: Dict[str, Any],
     offer: Any,
@@ -405,10 +469,9 @@ def calculate_utility(
             is_valid=True
         )
 
-    # Agent constraints & weights
+    # Agent constraints & weights safely parsed from dict or list
     constraints = agent_profile.get("constraints", {})
-    max_price = constraints.get("maximum_price") or constraints.get("max_price")
-    min_price = constraints.get("minimum_price") or constraints.get("min_price")
+    max_price, min_price = _parse_constraints(constraints, role)
 
     custom_weights = agent_profile.get("variable_weights", {})
     weights_to_normalize = {}
@@ -648,8 +711,9 @@ def generate_tradeoff_package(
         # Clamp primary within variable boundaries and hard constraints
         p_def = vdefs[primary_var]
         constraints = proposer_profile.get("constraints", {})
-        min_p = constraints.get("minimum_price") or p_def.min_value
-        max_p = constraints.get("maximum_price") or p_def.max_value
+        c_max, c_min = _parse_constraints(constraints, role)
+        min_p = c_min if c_min is not None else p_def.min_value
+        max_p = c_max if c_max is not None else p_def.max_value
         new_primary = max(min_p, min(max_p, new_primary))
         package[primary_var] = round(new_primary, 2)
 

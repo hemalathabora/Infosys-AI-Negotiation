@@ -2,9 +2,9 @@ import { buildNegotiationReportData, formatCurrency, safeText } from "../service
 import NegoMindLogo from "../components/NegoMindLogo";
 
 function decisionClass(decision) {
-  if (decision === "ACCEPT") return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
-  if (decision === "REJECT") return "border-rose-500/40 bg-rose-500/10 text-rose-400";
-  return "border-sky-500/40 bg-sky-500/10 text-sky-300";
+  if (decision === "ACCEPT") return "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+  if (decision === "REJECT") return "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400";
+  return "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300";
 }
 
 export default function Reports({ scenario, negotiation, onNavigate }) {
@@ -19,24 +19,6 @@ export default function Reports({ scenario, negotiation, onNavigate }) {
   return (
     <main data-guide="reports-panel" className="min-h-full flex-1 bg-mainPanel px-4 py-6 sm:px-8 text-textPrimary print:bg-white print:px-0">
       <div className="mx-auto max-w-[1500px] space-y-6 print:max-w-none">
-        <header className="border-b border-border pb-6 print:border-slate-900">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <NegoMindLogo size={38} onNavigate={onNavigate} />
-              </div>
-              <p className="mt-2 text-xs text-textSecondary print:text-slate-600">AI-Driven Multi-Agent Negotiation Training & Simulation Platform</p>
-              <p className="mt-4 text-[11px] font-mono font-bold uppercase tracking-widest text-textMuted">NEGOTIATION SUMMARY REPORT</p>
-              <h1 className="mt-1 text-2xl font-extrabold text-textPrimary print:text-slate-900">{report.scenarioName}</h1>
-              <p className="mt-1 text-xs text-textSecondary print:text-slate-600">Mode: {report.mode} · Generated: {report.generatedAt}</p>
-              <span className="mt-3 inline-flex rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-xs font-mono font-bold uppercase text-emerald-600 dark:text-emerald-400">{report.statusLabel}</span>
-            </div>
-            <div className="flex gap-2 print:hidden">
-              <button type="button" onClick={() => window.print()} className="rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition cursor-pointer">Download PDF</button>
-              <button type="button" onClick={() => onNavigate("Configure Agents")} className="rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-textPrimary hover:bg-cardAlt transition cursor-pointer">New Negotiation</button>
-            </div>
-          </div>
-        </header>
 
         <section className="grid grid-cols-2 gap-3 lg:grid-cols-4 print:grid-cols-4">
           {overview.map(([label, value]) => <div key={label} className="rounded-xl border border-border bg-card p-4 print:border-slate-300 print:bg-white"><p className="text-[10px] font-mono font-bold uppercase text-textMuted">{label}</p><p className="mt-1 break-words text-lg font-extrabold text-textPrimary print:text-slate-900">{safeText(value)}</p></div>)}

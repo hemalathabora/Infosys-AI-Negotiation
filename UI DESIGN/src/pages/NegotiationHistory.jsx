@@ -11,31 +11,31 @@ import NegoMindLogo from "../components/NegoMindLogo";
 function outcomeBadgeClass(outcome) {
   const o = String(outcome || "").toLowerCase();
   if (o === "agreement" || o === "accepted" || o === "completed") {
-    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
   }
   if (o === "deadlock" || o === "breakdown" || o === "rejected") {
-    return "border-rose-500/40 bg-rose-500/10 text-rose-400";
+    return "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400";
   }
-  return "border-amber-500/40 bg-amber-500/10 text-amber-400";
+  return "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400";
 }
 
 function modeBadgeClass(mode) {
   const m = String(mode || "").toLowerCase();
   if (m === "practice") {
-    return "border-indigo-500/40 bg-indigo-500/10 text-indigo-400";
+    return "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400";
   }
-  return "border-sky-500/40 bg-sky-500/10 text-sky-400";
+  return "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-400";
 }
 
 function decisionBadgeClass(decision) {
   const d = String(decision || "").toUpperCase();
   if (d === "ACCEPT" || d === "AGREEMENT") {
-    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+    return "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
   }
   if (d === "REJECT") {
-    return "border-rose-500/40 bg-rose-500/10 text-rose-400";
+    return "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400";
   }
-  return "border-sky-500/40 bg-sky-500/10 text-sky-300";
+  return "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300";
 }
 
 const STORAGE_KEY = "negotiation_platform_history_v1";
@@ -405,9 +405,6 @@ export default function NegotiationHistory({ onNavigate }) {
         <header className="border-b border-border pb-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="flex items-center gap-3">
-                <NegoMindLogo size={38} onNavigate={onNavigate} />
-              </div>
               <h1 className="mt-4 text-2xl font-extrabold text-textPrimary">Negotiation History</h1>
               <p className="mt-1 text-xs text-textSecondary">
                 Inspect complete session records, view chronological transcripts, and export authenticated reports.
@@ -437,7 +434,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   type="button"
                   onClick={() => handleExportAll("csv")}
                   disabled={isExportingAll || totalCount === 0}
-                  className="rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-400 hover:bg-indigo-500/15 transition disabled:opacity-40 cursor-pointer"
+                  className="rounded-lg px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 hover:bg-indigo-500/15 transition disabled:opacity-40 cursor-pointer"
                 >
                   CSV
                 </button>
@@ -445,7 +442,7 @@ export default function NegotiationHistory({ onNavigate }) {
                   type="button"
                   onClick={() => handleExportAll("json")}
                   disabled={isExportingAll || totalCount === 0}
-                  className="rounded-lg px-3 py-1.5 text-xs font-bold text-cyan-400 hover:bg-cyan-500/15 transition disabled:opacity-40 cursor-pointer"
+                  className="rounded-lg px-3 py-1.5 text-xs font-bold text-cyan-700 dark:text-cyan-400 hover:bg-cyan-500/15 transition disabled:opacity-40 cursor-pointer"
                 >
                   JSON
                 </button>
@@ -466,7 +463,7 @@ export default function NegotiationHistory({ onNavigate }) {
         {!isAuthenticated && (
           <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-sans">
             <div className="flex items-center gap-2.5">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 font-bold">
                 ℹ
               </span>
               <p className="text-textSecondary">
@@ -474,7 +471,7 @@ export default function NegotiationHistory({ onNavigate }) {
                 <button
                   type="button"
                   onClick={() => onNavigate("AuthPage")}
-                  className="text-indigo-400 font-bold underline hover:text-indigo-300 cursor-pointer"
+                  className="text-indigo-700 dark:text-indigo-400 font-bold underline hover:text-indigo-900 dark:hover:text-indigo-300 cursor-pointer"
                 >
                   Sign in or create an account
                 </button>{" "}

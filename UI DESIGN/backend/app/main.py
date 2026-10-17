@@ -7,7 +7,8 @@ from app.database import Base, engine
 from app.models.user import User, OTPToken  # Ensure SQLAlchemy registers user & otp models
 from app.models.chat import ChatConversationModel, ChatMessageModel # Register chat models
 from app.models.custom_scenario import CustomScenarioModel # Register custom scenario models
-from app.api import agents, negotiations, scenarios, analytics, guide, auth, chat, custom_scenarios
+from app.models.contact import ContactMessageModel # Register contact models
+from app.api import agents, negotiations, scenarios, analytics, guide, auth, chat, custom_scenarios, contact
 
 # Setup logging
 logging.basicConfig(
@@ -74,6 +75,7 @@ app.include_router(analytics.router)
 app.include_router(analytics.analytics_router)
 app.include_router(guide.router)
 app.include_router(chat.router)
+app.include_router(contact.router)
 
 
 @app.get("/")
@@ -226,12 +228,39 @@ async def list_and_test_llm_models():
         "message": "Single API Key powering multi-model selection & automatic rate-limit failover."
     }
 
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    origin = request.headers.get("origin") or "*"
+    headers = {
+        "Access-Control-Allow-Origin": origin if origin != "*" else "*",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+    }
+    if origin and origin != "*":
+        headers["Access-Control-Allow-Credentials"] = "true"
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=headers
+    )
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Global exception caught on {request.url}: {exc}", exc_info=True)
+    origin = request.headers.get("origin") or "*"
+    headers = {
+        "Access-Control-Allow-Origin": origin if origin != "*" else "*",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+    }
+    if origin and origin != "*":
+        headers["Access-Control-Allow-Credentials"] = "true"
     return JSONResponse(
         status_code=500,
-        content={"detail": "An internal server error occurred.", "error": str(exc)}
+        content={"detail": "An internal server error occurred.", "error": str(exc)},
+        headers=headers
     )
 
 if __name__ == "__main__":

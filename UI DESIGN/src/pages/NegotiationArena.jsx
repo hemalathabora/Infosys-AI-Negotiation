@@ -57,13 +57,13 @@ function deriveStanceBadge(agent, history = [], state = {}) {
   const lastDecision = String(lastTurn?.decision || "").toLowerCase();
 
   if (status === "agreement" || status === "accepted" || lastDecision === "accept") {
-    return { label: "Cooperative", classes: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" };
+    return { label: "Cooperative", classes: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" };
   }
   if (status === "rejected" || lastDecision === "reject") {
-    return { label: "Aggressive", classes: "border-rose-500/40 bg-rose-500/10 text-rose-400" };
+    return { label: "Aggressive", classes: "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400" };
   }
   if (status === "deadlock" || status === "breakdown") {
-    return { label: "Firm", classes: "border-amber-500/40 bg-amber-500/10 text-amber-300" };
+    return { label: "Firm", classes: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300" };
   }
 
   if (lastTurn) {
@@ -75,24 +75,24 @@ function deriveStanceBadge(agent, history = [], state = {}) {
 
     if (isConc || concAmt > 0) {
       if (concPct >= 4 || concDir === "toward_target") {
-        return { label: "Flexible", classes: "border-emerald-400/50 bg-emerald-500/20 text-emerald-300" };
+        return { label: "Flexible", classes: "border-emerald-400/50 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300" };
       }
-      return { label: "Neutral", classes: "border-sky-500/40 bg-sky-500/10 text-sky-300" };
+      return { label: "Neutral", classes: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300" };
     } else {
       if (concDir === "away_from_target" || agent?.personality === "Aggressive" || agent?.persona === "Aggressive") {
-        return { label: "Aggressive", classes: "border-rose-500/40 bg-rose-500/10 text-rose-400" };
+        return { label: "Aggressive", classes: "border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-400" };
       }
-      return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-300" };
+      return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300" };
     }
   }
 
   const persona = agent?.personality || agent?.persona || "Collaborative";
   if (persona === "Aggressive") {
-    return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-300" };
+    return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300" };
   } else if (persona === "Collaborative") {
-    return { label: "Neutral", classes: "border-sky-500/40 bg-sky-500/10 text-sky-300" };
+    return { label: "Neutral", classes: "border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300" };
   }
-  return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-300" };
+  return { label: "Firm", classes: "border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300" };
 }
 
 function ActionBadge({ decision }) {
@@ -100,25 +100,25 @@ function ActionBadge({ decision }) {
   switch (d) {
     case "accept":
       return (
-        <span className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-emerald-400">
+        <span className="rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-emerald-700 dark:text-emerald-400">
           ACCEPT
         </span>
       );
     case "reject":
       return (
-        <span className="rounded-lg border border-rose-500/40 bg-rose-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-rose-400">
+        <span className="rounded-lg border border-rose-500/40 bg-rose-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-rose-700 dark:text-rose-400">
           REJECT
         </span>
       );
     case "offer":
       return (
-        <span className="rounded-lg border border-sky-500/40 bg-sky-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-sky-400">
+        <span className="rounded-lg border border-sky-500/40 bg-sky-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-sky-700 dark:text-sky-400">
           OFFER
         </span>
       );
     default:
       return (
-        <span className="rounded-lg border border-indigo-500/40 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-indigo-300">
+        <span className="rounded-lg border border-indigo-500/40 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-mono font-extrabold uppercase text-indigo-700 dark:text-indigo-300">
           COUNTEROFFER
         </span>
       );
@@ -1232,7 +1232,7 @@ export default function NegotiationArena({
             <button
               type="button"
               onClick={() => onNavigate("Reports")}
-              className="rounded-xl bg-primary hover:bg-primaryBright text-slate-950 px-5 py-2.5 text-xs font-bold border border-primaryBright shadow-md transition cursor-pointer"
+              className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-950 dark:hover:bg-white px-5 py-2.5 text-xs font-bold border border-slate-700 dark:border-slate-300 shadow-md transition cursor-pointer"
             >
               Open Full Audit Report →
             </button>

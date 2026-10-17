@@ -524,3 +524,92 @@ table {
     inset 0 1px 0 rgba(255,255,255,.045),
     0 16px 30px rgba(0,0,0,.24);
 }
+
+/* ============================================================
+   LIGHT MODE CONTRAST & ACCESSIBILITY ENHANCEMENTS
+   Ensures neon/pastel utility classes have high WCAG contrast
+   on light surfaces without breaking dark mode styles.
+============================================================ */
+
+html:not(.dark) {
+  /* Pastel neon text remap for crisp light mode legibility */
+  .text-emerald-400,
+  .text-emerald-300 {
+    color: #059669; /* emerald-600 */
+  }
+
+  .text-emerald-500 {
+    color: #047857; /* emerald-700 */
+  }
+
+  .text-amber-400,
+  .text-amber-300 {
+    color: #b45309; /* amber-700 */
+  }
+
+  .text-sky-400,
+  .text-sky-300 {
+    color: #0284c7; /* sky-600 */
+  }
+
+  .text-blue-400,
+  .text-blue-300 {
+    color: #2563eb; /* blue-600 */
+  }
+
+  .text-indigo-400,
+  .text-indigo-300 {
+    color: #4f46e5; /* indigo-600 */
+  }
+
+  .text-purple-400,
+  .text-purple-300 {
+    color: #7c3aed; /* purple-600 */
+  }
+
+  .text-rose-400,
+  .text-rose-300 {
+    color: #e11d48; /* rose-600 */
+  }
+
+  .text-red-400,
+  .text-red-300 {
+    color: #dc2626; /* red-600 */
+  }
+
+  /* Badge border and background contrast reinforcement */
+  .border-emerald-500\/30,
+  .border-emerald-500\/40 {
+    border-color: rgba(5, 150, 105, 0.4);
+  }
+
+  .border-indigo-500\/30,
+  .border-indigo-500\/40 {
+    border-color: rgba(79, 70, 229, 0.35);
+  }
+
+  .border-blue-500\/30,
+  .border-blue-500\/40 {
+    border-color: rgba(37, 99, 235, 0.35);
+  }
+
+  .border-amber-500\/30,
+  .border-amber-500\/40 {
+    border-color: rgba(180, 83, 9, 0.35);
+  }
+
+  /* Card elevation and border definitions in light mode */
+  .metric-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06);
+    border-color: #E2E8F0;
+  }
+
+  .metric-card:hover {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1), 0 0 16px rgba(99, 102, 241, 0.15);
+  }
+
+  .earthy-panel {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+    border-color: #E2E8F0;
+  }
+}

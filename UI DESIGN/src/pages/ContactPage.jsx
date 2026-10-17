@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import NegoMindLogo from "../components/NegoMindLogo";
+import { sendContactInquiry } from "../services/api";
 
 function Arrow({ className = "" }) {
     return (
@@ -190,12 +191,67 @@ function Footer({ onNavigate }) {
 
 function ContactPage({ onNavigate }) {
     const navigate = onNavigate || (() => { });
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const [submitted, setSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const [submissionResult, setSubmissionResult] = useState(null);
 
-    const handleSubmit = (event) => {
+    const [formData, setFormData] = useState({
+        name: user?.full_name || "",
+        email: user?.email || "",
+        topic: "",
+        message: ""
+    });
+
+    useEffect(() => {
+        if (user) {
+            setFormData((prev) => ({
+                ...prev,
+                name: prev.name || user.full_name || "",
+                email: prev.email || user.email || ""
+            }));
+        }
+    }, [user]);
+
+    const topicOptions = [
+        { value: "product", label: "Product information" },
+        { value: "demo", label: "Request a demo" },
+        { value: "support", label: "Product support" },
+        { value: "partnership", label: "Partnership" },
+        { value: "other", label: "Something else" }
+    ];
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        setSubmitted(true);
+        setSubmitError("");
+        setIsSubmitting(true);
+
+        try {
+            const result = await sendContactInquiry(formData);
+            setSubmissionResult(result);
+            setSubmitted(true);
+        } catch (err) {
+            console.error("Contact submission error:", err);
+            setSubmitError(
+                err.message ||
+                "Failed to send message. Please try again or reach out directly to negomindai@gmail.com."
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleReset = () => {
+        setSubmitted(false);
+        setSubmissionResult(null);
+        setSubmitError("");
+        setFormData({
+            name: user?.full_name || "",
+            email: user?.email || "",
+            topic: "",
+            message: ""
+        });
     };
 
     const handleWorkspace = () => {
@@ -249,7 +305,7 @@ function ContactPage({ onNavigate }) {
                                 </p>
 
                                 <a
-                                    href="mailto:hello@negomind.ai"
+                                    href="mailto:negomindai@gmail.com?subject=General%20Enquiry%20-%20NegoMind%20AI"
                                     className="mt-2 block text-lg font-semibold transition hover:text-[#69665F]"
                                 >
                                     negomindai@gmail.com
@@ -262,7 +318,7 @@ function ContactPage({ onNavigate }) {
                                 </p>
 
                                 <a
-                                    href="mailto:support@negomind.ai"
+                                    href="mailto:negomindai@gmail.com?subject=Product%20Support%20-%20NegoMind%20AI"
                                     className="mt-2 block text-lg font-semibold transition hover:text-[#69665F]"
                                 >
                                     negomindai@gmail.com
@@ -271,33 +327,67 @@ function ContactPage({ onNavigate }) {
                         </div>
                     </div>
 
-                    <div className="relative
-  -translate-y-1 border border-[#B6B0A4] bg-[#724133] p-6 sm:p-8 shadow-[0_20px_45px_rgba(0,0,0,0.38)]">
+                    <div className="relative -translate-y-1 border border-[#B6B0A4] bg-[#724133] p-6 sm:p-8 shadow-[0_20px_45px_rgba(0,0,0,0.38)]">
                         {submitted ? (
-                            <div className="flex min-h-[420px] flex-col justify-center">
-                                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#77736B]">
-                                    Message received
-                                </p>
+                            <div className="flex min-h-[440px] flex-col justify-center">
+                                <div className="flex items-center gap-2">
+                                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-300 font-semibold">
+                                        Delivered to negomindai@gmail.com
+                                    </p>
+                                </div>
 
-                                <h3 className="mt-5 max-w-lg font-serif text-4xl leading-tight">
-                                    Thank you for reaching out.
+                                <h3 className="mt-4 max-w-lg font-serif text-3xl sm:text-4xl leading-tight text-[#F1EEE6]">
+                                    Thank you, {formData.name || "there"}.
                                 </h3>
 
-                                <p className="mt-5 max-w-md text-sm leading-7 text-[#68655E]">
-                                    Your message has been recorded. Connect this form to your
-                                    backend or email service to process submissions in production.
+                                <p className="mt-4 max-w-md text-sm leading-7 text-[#E8DFD2]">
+                                    Your message has been safely recorded and dispatched to our email at{" "}
+                                    <strong className="text-white underline decoration-emerald-400/60">negomindai@gmail.com</strong>.
+                                    Our team will review your inquiry regarding{" "}
+                                    <span className="font-semibold text-white">
+                                        {topicOptions.find(t => t.value === formData.topic)?.label || formData.topic || "General"}
+                                    </span>{" "}
+                                    and respond to <span className="font-semibold text-white">{formData.email}</span> shortly.
                                 </p>
 
-                                <button
-                                    type="button"
-                                    onClick={() => setSubmitted(false)}
-                                    className="mt-8 w-fit border-b border-[#77736B] pb-1 text-[11px] font-bold uppercase tracking-[0.16em]"
-                                >
-                                    Send another message
-                                </button>
+                                <div className="mt-8 flex flex-wrap items-center gap-4">
+                                    <a
+                                        href={`mailto:negomindai@gmail.com?subject=${encodeURIComponent(
+                                            `[NegoMind AI] ${topicOptions.find(t => t.value === formData.topic)?.label || "Inquiry"}: ${formData.name}`
+                                        )}&body=${encodeURIComponent(
+                                            `Hi NegoMind Team,\n\n${formData.message}\n\n---\nSender: ${formData.name}\nEmail: ${formData.email}`
+                                        )}`}
+                                        className="inline-flex items-center gap-2 bg-[#1D1E20] hover:bg-[#303133] border border-[#A98F82]/50 px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E8E3D8] transition"
+                                    >
+                                        <span>Open in Email App</span>
+                                        <Arrow />
+                                    </a>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleReset}
+                                        className="w-fit border-b border-[#E8DFD2] pb-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E8DFD2] hover:text-white transition"
+                                    >
+                                        Send another message
+                                    </button>
+                                </div>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {submitError && (
+                                    <div className="border border-rose-400/60 bg-rose-950/60 p-3.5 text-xs text-rose-200">
+                                        <p className="font-bold text-rose-300">Notice:</p>
+                                        <p className="mt-1">{submitError}</p>
+                                        <p className="mt-2 text-[11px] text-rose-200/80">
+                                            You can also email us directly at{" "}
+                                            <a href="mailto:negomindai@gmail.com" className="font-bold underline text-white hover:text-rose-100">
+                                                negomindai@gmail.com
+                                            </a>.
+                                        </p>
+                                    </div>
+                                )}
+
                                 <div>
                                     <label
                                         htmlFor="name"
@@ -311,8 +401,10 @@ function ContactPage({ onNavigate }) {
                                         name="name"
                                         type="text"
                                         required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                         placeholder="Your name"
-                                        className="mt-3 w-full border-0 border-b border-[#A9A49A] text-[#F3EDE3] bg-transparent px-0 py-3 text-base outline-none placeholder:text-[#ffffff] focus:outline-none"
+                                        className="mt-3 w-full border-0 border-b border-[#A9A49A] text-[#F3EDE3] bg-transparent px-0 py-3 text-base outline-none placeholder:text-[#ffffff]/70 focus:outline-none focus:border-[#E8DFD2]"
                                     />
                                 </div>
 
@@ -329,18 +421,10 @@ function ContactPage({ onNavigate }) {
                                         name="email"
                                         type="email"
                                         required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                                         placeholder="you@company.com"
-                                        className="
-            mt-3 w-full
-            border-0 border-b border-[#A98F82]
-            bg-transparent
-            px-0 py-3
-            text-base text-[#F3EDE3]
-            outline-none
-            placeholder:text-[#C8BFB3]
-            focus:outline-none
-            focus:border-[#E8DFD2]
-        "
+                                        className="mt-3 w-full border-0 border-b border-[#A98F82] bg-transparent px-0 py-3 text-base text-[#F3EDE3] outline-none placeholder:text-[#C8BFB3] focus:outline-none focus:border-[#E8DFD2]"
                                     />
                                 </div>
 
@@ -355,33 +439,19 @@ function ContactPage({ onNavigate }) {
                                     <select
                                         id="topic"
                                         name="topic"
-                                        defaultValue=""
+                                        value={formData.topic}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, topic: e.target.value }))}
                                         required
-                                        className="mt-3 w-full border-0 border-b border-[#A9A49A] bg-transparent px-0 py-3 text-base text-white outline-none focus:outline-none"
+                                        className="mt-3 w-full border-0 border-b border-[#A9A49A] bg-transparent px-0 py-3 text-base text-white outline-none focus:outline-none focus:border-[#E8DFD2]"
                                     >
-                                        <option value="" disabled className="text-white">
+                                        <option value="" disabled className="text-black bg-white">
                                             Select a topic
                                         </option>
-
-                                        <option value="product" className="text-black">
-                                            Product information
-                                        </option>
-
-                                        <option value="demo" className="text-black">
-                                            Request a demo
-                                        </option>
-
-                                        <option value="support" className="text-black">
-                                            Product support
-                                        </option>
-
-                                        <option value="partnership" className="text-black">
-                                            Partnership
-                                        </option>
-
-                                        <option value="other" className="text-black">
-                                            Something else
-                                        </option>
+                                        {topicOptions.map((opt) => (
+                                            <option key={opt.value} value={opt.value} className="text-black bg-white">
+                                                {opt.label}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 
@@ -398,17 +468,32 @@ function ContactPage({ onNavigate }) {
                                         name="message"
                                         rows={5}
                                         required
+                                        value={formData.message}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                                         placeholder="Tell us what you are working through..."
-                                        className="mt-3 w-full resize-none border text-[#F3EDE3] border-[#A9A49A] bg-transparent p-3 text-base outline-none placeholder:text-[#ffffff] focus:outline-none"
+                                        className="mt-3 w-full resize-none border text-[#F3EDE3] border-[#A9A49A] bg-transparent p-3 text-base outline-none placeholder:text-[#ffffff]/70 focus:outline-none focus:border-[#E8DFD2]"
                                     />
                                 </div>
 
                                 <button
                                     type="submit"
-                                    className="group inline-flex items-center gap-4 bg-[#1D1E20] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E8E3D8] transition hover:bg-[#303133]"
+                                    disabled={isSubmitting}
+                                    className="group inline-flex items-center gap-4 bg-[#1D1E20] px-6 py-3.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E8E3D8] transition hover:bg-[#303133] disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                                 >
-                                    Send message
-                                    <Arrow className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                                    {isSubmitting ? (
+                                        <>
+                                            <svg className="h-4 w-4 animate-spin text-emerald-400" viewBox="0 0 24 24" fill="none">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                            </svg>
+                                            <span>Sending to negomindai@gmail.com...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Send message</span>
+                                            <Arrow className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                                        </>
+                                    )}
                                 </button>
                             </form>
                         )}

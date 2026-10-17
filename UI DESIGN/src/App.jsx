@@ -280,18 +280,16 @@ function MainAppContent() {
       )}
 
       {/* Navbar */}
-      <header className="print:hidden">
-        <TopNavigation
-          onMenuToggle={() => setSidebarOpen((value) => !value)}
-          isMenuOpen={sidebarOpen}
-          theme={theme}
-          onThemeChange={setTheme}
-          activePage={activePage}
-          onNavigate={setActivePage}
-          onReplayIntro={handleReplayIntro}
-          onOpenAuthModal={handleOpenAuthModal}
-        />
-      </header>
+      <TopNavigation
+        onMenuToggle={() => setSidebarOpen((value) => !value)}
+        isMenuOpen={sidebarOpen}
+        theme={theme}
+        onThemeChange={setTheme}
+        activePage={activePage}
+        onNavigate={setActivePage}
+        onReplayIntro={handleReplayIntro}
+        onOpenAuthModal={handleOpenAuthModal}
+      />
 
       {/* Sidebar */}
       {isAuthenticated && (

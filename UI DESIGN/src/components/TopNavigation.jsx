@@ -108,9 +108,9 @@ export default function TopNavigation({
   };
 
   return (
-    <header className="sticky top-0 z-50 flex flex-col border-b border-border bg-header/90 text-textPrimary backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-50 flex flex-col border-b border-border bg-header/90 text-textPrimary backdrop-blur-md transition-colors duration-200 print:hidden">
       {/* Top Navbar Main Header */}
-      <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
+      <div className="relative z-20 mx-auto flex w-full max-w-[1500px] items-center justify-between px-5 py-3.5 sm:px-8 lg:px-12">
         {/* Left Side - Brand / Logo */}
         <div className="flex items-center gap-4">
           <NegoMindLogo size={44} onClick={handleLogoClick} onNavigate={onNavigate} />
@@ -201,7 +201,7 @@ export default function TopNavigation({
 
       {/* Sub-Navbar Breadcrumb & Menu Bar (Below Main Navbar for Logged In Users) */}
       {isAuthenticated && (
-        <div className="border-t border-border bg-card/90 px-5 sm:px-8 lg:px-12 text-textPrimary transition-colors duration-200">
+        <div className="relative z-10 border-t border-border bg-card/90 px-5 sm:px-8 lg:px-12 text-textPrimary transition-colors duration-200">
           <div className="mx-auto flex h-11 max-w-[1500px] items-center justify-between">
             <div className="flex items-center gap-4">
               {/* Menu Toggle Button */}

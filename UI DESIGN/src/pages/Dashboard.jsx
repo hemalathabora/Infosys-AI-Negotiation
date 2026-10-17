@@ -282,14 +282,14 @@ export default function Dashboard({
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
                 Total Simulations
               </p>
-              <span className="rounded-lg bg-indigo-500/10 p-2 text-indigo-400">
+              <span className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
               </span>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-textPrimary font-mono">
               {stats.totalSimulations}
             </p>
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium font-mono">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold font-mono">
               <span>{stats.agreementsCount} Deals Settled</span>
             </div>
           </div>
@@ -302,14 +302,14 @@ export default function Dashboard({
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
                 Agreement Rate
               </p>
-              <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-400">
+              <span className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
               </span>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-textPrimary font-mono">
               {stats.agreementRate}.0<span className="text-xl font-normal text-textMuted">%</span>
             </p>
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium font-mono">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-400 font-semibold font-mono">
               <span>Calculated from live runs</span>
             </div>
           </div>
@@ -322,14 +322,14 @@ export default function Dashboard({
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
                 Deadlocks Recorded
               </p>
-              <span className="rounded-lg bg-amber-500/10 p-2 text-amber-400">
+              <span className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
               </span>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-textPrimary font-mono">
               {stats.deadlocksCount}
             </p>
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-400 font-medium font-mono">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 font-semibold font-mono">
               <span>Constraint Gap Limit Reached</span>
             </div>
           </div>
@@ -342,14 +342,14 @@ export default function Dashboard({
               <p className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">
                 Avg Convergence
               </p>
-              <span className="rounded-lg bg-blue-500/10 p-2 text-blue-400">
+              <span className="rounded-lg bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
               </span>
             </div>
             <p className="mt-3 text-3xl font-extrabold text-textPrimary font-mono">
               {stats.avgRounds} <span className="text-xs font-normal text-textMuted uppercase font-sans">rounds</span>
             </p>
-            <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-400 font-medium font-mono">
+            <div className="mt-2 flex items-center gap-1.5 text-xs text-blue-700 dark:text-blue-400 font-semibold font-mono">
               <span>Average turn velocity</span>
             </div>
           </div>
@@ -370,7 +370,7 @@ export default function Dashboard({
               <div>
                 <div className="flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${hasActiveSession ? "bg-emerald-400 animate-pulse" : "bg-slate-500"}`} />
-                  <p className="text-xs font-semibold font-mono uppercase tracking-wider text-indigo-400">
+                  <p className="text-xs font-semibold font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     {hasActiveSession ? "LIVE SESSION HIGHLIGHT" : "ENGINE STATUS: READY"}
                   </p>
                 </div>
@@ -380,13 +380,13 @@ export default function Dashboard({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 font-mono text-xs font-semibold text-indigo-300">
+                <span className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 font-mono text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                   {hasActiveSession ? `ROUND ${currentRound} / 10` : "READY TO LAUNCH"}
                 </span>
                 <button
                   type="button"
                   onClick={() => onNavigate(hasActiveSession ? "Negotiation Arena" : "Configure Agents")}
-                  className="rounded-xl border border-indigo-500/40 bg-indigo-500/15 px-3.5 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/25 transition-all font-sans"
+                  className="rounded-xl border border-indigo-500/40 bg-indigo-500/15 px-3.5 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/25 transition-all font-sans cursor-pointer"
                 >
                   {hasActiveSession ? "Open Arena →" : "Launch Session →"}
                 </button>
@@ -399,11 +399,11 @@ export default function Dashboard({
 
               {/* Agent 1 Card */}
               <div className="rounded-xl border border-blue-500/30 bg-cardAlt/80 p-4 space-y-3 relative overflow-hidden">
-                <div className="absolute top-0 right-0 rounded-bl-lg bg-blue-500/20 px-2.5 py-0.5 font-mono text-[10px] font-bold text-blue-400 uppercase">
+                <div className="absolute top-0 right-0 rounded-bl-lg bg-blue-500/20 px-2.5 py-0.5 font-mono text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase">
                   AGENT A
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20 text-blue-400 font-bold text-xs font-mono">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold text-xs font-mono">
                     A1
                   </div>
                   <div>
@@ -413,17 +413,17 @@ export default function Dashboard({
                 </div>
                 <div className="pt-2 border-t border-border/50">
                   <p className="text-xs text-textSecondary font-mono">Current Bid Position</p>
-                  <p className="text-2xl font-extrabold text-blue-400 font-mono mt-0.5">{agent1Offer}</p>
+                  <p className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono mt-0.5">{agent1Offer}</p>
                 </div>
               </div>
 
               {/* Agent 2 Card */}
               <div className="rounded-xl border border-indigo-500/30 bg-cardAlt/80 p-4 space-y-3 relative overflow-hidden">
-                <div className="absolute top-0 right-0 rounded-bl-lg bg-indigo-500/20 px-2.5 py-0.5 font-mono text-[10px] font-bold text-indigo-400 uppercase">
+                <div className="absolute top-0 right-0 rounded-bl-lg bg-indigo-500/20 px-2.5 py-0.5 font-mono text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase">
                   AGENT B
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 font-bold text-xs font-mono">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 font-bold text-xs font-mono">
                     A2
                   </div>
                   <div>
@@ -433,7 +433,7 @@ export default function Dashboard({
                 </div>
                 <div className="pt-2 border-t border-border/50">
                   <p className="text-xs text-textSecondary font-mono">Current Ask Position</p>
-                  <p className="text-2xl font-extrabold text-indigo-400 font-mono mt-0.5">{agent2Offer}</p>
+                  <p className="text-2xl font-extrabold text-indigo-600 dark:text-indigo-400 font-mono mt-0.5">{agent2Offer}</p>
                 </div>
               </div>
 
@@ -444,11 +444,11 @@ export default function Dashboard({
             <div className="space-y-2 pt-2">
               <div className="flex items-center justify-between font-mono text-xs">
                 <span className="text-textSecondary">Bid-Ask Convergence Progress</span>
-                <span className="font-semibold text-emerald-400">
+                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
                   {hasActiveSession ? `Round ${currentRound} Active` : "Engine Standby"}
                 </span>
               </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-slate-900 border border-border/60">
+              <div className="h-2.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-900 border border-border/60">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400 shadow-glowSm transition-all duration-500"
                   style={{ width: `${Math.min(100, Math.max(15, currentRound * 14))}%` }}
@@ -461,14 +461,14 @@ export default function Dashboard({
               <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400 dark:text-indigo-300">
+                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
                     Live Concession Velocity & Boundary Tracking
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => onNavigate("Negotiation Arena")}
-                  className="text-[11px] font-mono text-indigo-500 dark:text-indigo-400 hover:underline"
+                  className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                 >
                   View Full Arena →
                 </button>
@@ -525,7 +525,7 @@ export default function Dashboard({
                   <button
                     type="button"
                     onClick={() => onNavigate("Negotiation Arena")}
-                    className="mt-2 text-xs font-semibold text-emerald-400 hover:text-emerald-300 font-sans"
+                    className="mt-2 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-sans cursor-pointer"
                   >
                     Start or Step Turn in Negotiation Arena →
                   </button>
@@ -550,15 +550,15 @@ export default function Dashboard({
               <div className="mt-5 space-y-3.5">
                 <div className="flex items-center justify-between text-xs rounded-xl border border-border/60 bg-cardAlt/50 p-3">
                   <span className="text-textSecondary font-medium">Orchestrator Mode</span>
-                  <span className="font-mono font-semibold text-indigo-400">Turn-Based Rule Engine</span>
+                  <span className="font-mono font-semibold text-indigo-700 dark:text-indigo-400">Turn-Based Rule Engine</span>
                 </div>
                 <div className="flex items-center justify-between text-xs rounded-xl border border-border/60 bg-cardAlt/50 p-3">
                   <span className="text-textSecondary font-medium">Evaluation Model</span>
-                  <span className="font-mono font-semibold text-emerald-400">Utility Weighting</span>
+                  <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">Utility Weighting</span>
                 </div>
                 <div className="flex items-center justify-between text-xs rounded-xl border border-border/60 bg-cardAlt/50 p-3">
                   <span className="text-textSecondary font-medium">History State</span>
-                  <span className="font-mono font-semibold text-blue-400">{history.length} Runs Logged</span>
+                  <span className="font-mono font-semibold text-blue-700 dark:text-blue-400">{history.length} Runs Logged</span>
                 </div>
               </div>
             </div>
@@ -567,7 +567,7 @@ export default function Dashboard({
               <button
                 type="button"
                 onClick={() => onNavigate("Analytics")}
-                className="w-full rounded-xl border border-border/80 bg-cardAlt px-4 py-2.5 text-xs font-semibold text-textPrimary hover:bg-white/[0.06] transition-all text-center font-sans"
+                className="w-full rounded-xl border border-border/80 bg-cardAlt px-4 py-2.5 text-xs font-semibold text-textPrimary hover:bg-slate-200/60 dark:hover:bg-white/[0.06] transition-all text-center font-sans cursor-pointer"
               >
                 View System Analytics →
               </button>
@@ -576,7 +576,7 @@ export default function Dashboard({
                 <button
                   type="button"
                   onClick={onClearHistory}
-                  className="w-full text-center font-mono text-[10px] text-textMuted hover:text-rose-400 transition"
+                  className="w-full text-center font-mono text-[10px] text-textMuted hover:text-rose-500 dark:hover:text-rose-400 transition cursor-pointer"
                 >
                   Reset History Store
                 </button>
@@ -610,14 +610,14 @@ export default function Dashboard({
                 <button
                   type="button"
                   onClick={() => onNavigate("Negotiation History")}
-                  className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 transition font-sans cursor-pointer"
+                  className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/20 transition font-sans cursor-pointer"
                 >
                   Negotiation History →
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigate("Reports")}
-                  className="text-xs font-semibold text-primary hover:text-primaryBright transition font-sans"
+                  className="text-xs font-semibold text-primary hover:text-primaryBright transition font-sans cursor-pointer"
                 >
                   Audit Reports →
                 </button>
@@ -645,18 +645,18 @@ export default function Dashboard({
                         <td className="px-4 py-3.5 font-mono text-textMuted">{item.rounds}</td>
                         <td className="px-4 py-3.5">
                           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-[10px] font-semibold ${item.result === "Agreement"
-                            ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-                            : "bg-amber-500/10 border border-amber-500/30 text-amber-400"
+                            ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+                            : "bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400"
                             }`}>
                             {item.result}
                           </span>
                         </td>
-                        <td className="px-4 py-3.5 font-mono font-semibold text-indigo-400">{item.settlement || "N/A"}</td>
+                        <td className="px-4 py-3.5 font-mono font-semibold text-indigo-700 dark:text-indigo-400">{item.settlement || "N/A"}</td>
                         <td className="px-4 py-3.5 text-right">
                           <button
                             type="button"
                             onClick={() => onNavigate("Negotiation History")}
-                            className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition"
+                            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition cursor-pointer"
                           >
                             Inspect →
                           </button>
@@ -680,7 +680,7 @@ export default function Dashboard({
                 <button
                   type="button"
                   onClick={() => onNavigate("Negotiation History")}
-                  className="font-medium text-indigo-400 hover:text-indigo-300 transition cursor-pointer"
+                  className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition cursor-pointer"
                 >
                   View full history ({history.length}) →
                 </button>

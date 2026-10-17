@@ -561,49 +561,92 @@ class NegotiationOrchestrator:
 
     def get_live_metrics(self) -> Dict[str, Any]:
         """Calculates live round telemetry, utility scores, and trade-off metrics."""
-        agents = self.agents or []
-        human_agent = next((a for a in agents if a.get("participant_type") == "human"), agents[0] if agents else {})
-        ai_agent = next((a for a in agents if a.get("id") != human_agent.get("id")), agents[-1] if agents else {})
+        try:
+            agents = self.agents or []
+            human_agent = next((a for a in agents if a.get("participant_type") == "human"), agents[0] if agents else {})
+            ai_agent = next((a for a in agents if a.get("id") != human_agent.get("id")), agents[-1] if agents else {})
 
-        vdefs_h = get_scenario_variables(self.scenario_id, human_agent.get("role"))
-        vdefs_ai = get_scenario_variables(self.scenario_id, ai_agent.get("role"))
+            vdefs_h = get_scenario_variables(self.scenario_id, human_agent.get("role"))
+            vdefs_ai = get_scenario_variables(self.scenario_id, ai_agent.get("role"))
 
-        h_util = calculate_utility(human_agent, self.current_offer, vdefs_h, self.scenario_id)
-        ai_util = calculate_utility(ai_agent, self.current_offer, vdefs_ai, self.scenario_id)
+            h_util = calculate_utility(human_agent, self.current_offer, vdefs_h, self.scenario_id)
+            ai_util = calculate_utility(ai_agent, self.current_offer, vdefs_ai, self.scenario_id)
 
-        ai_stance = calculate_ai_stance(ai_agent, self.history, ai_util.overall_score)
+            ai_stance = calculate_ai_stance(ai_agent, self.history, ai_util.overall_score)
 
-        tradeoffs_count = sum(1 for h in self.history if h.get("tradeoff_data", {}).get("tradeoff_detected"))
-        concessions_count = sum(1 for h in self.history if float(h.get("concession_data", {}).get("concession_amount", 0.0)) > 0)
+            tradeoffs_count = 0
+            concessions_count = 0
+            for h in self.history:
+                t_data = h.get("tradeoff_data")
+                if isinstance(t_data, dict) and t_data.get("tradeoff_detected"):
+                    tradeoffs_count += 1
+                c_data = h.get("concession_data")
+                if isinstance(c_data, dict):
+                    c_amt = c_data.get("concession_amount") or c_data.get("concession")
+                    try:
+                        if c_amt is not None and float(c_amt) > 0:
+                            concessions_count += 1
+                    except (ValueError, TypeError):
+                        pass
 
-        # Gap calculation
-        h_hist = [h for h in self.history if h.get("agent_id") == human_agent.get("id")]
-        ai_hist = [h for h in self.history if h.get("agent_id") == ai_agent.get("id")]
+            # Gap calculation with robust scalar extraction
+            def _extract_scalar(val):
+                if val is None:
+                    return None
+                if isinstance(val, (int, float)):
+                    return float(val)
+                if isinstance(val, dict):
+                    p = val.get("price") or val.get("value")
+                    if p is not None:
+                        try:
+                            return float(p)
+                        except (ValueError, TypeError):
+                            return None
+                return None
 
-        h_open = h_hist[0].get("value") if h_hist else None
-        ai_open = ai_hist[0].get("value") if ai_hist else None
-        open_gap = abs(h_open - ai_open) if (h_open is not None and ai_open is not None) else None
+            h_hist = [h for h in self.history if h.get("agent_id") == human_agent.get("id")]
+            ai_hist = [h for h in self.history if h.get("agent_id") == ai_agent.get("id")]
 
-        h_latest = h_hist[-1].get("value") if h_hist else None
-        ai_latest = ai_hist[-1].get("value") if ai_hist else None
-        curr_gap = abs(h_latest - ai_latest) if (h_latest is not None and ai_latest is not None) else None
+            h_open = _extract_scalar(h_hist[0].get("value")) if h_hist else None
+            ai_open = _extract_scalar(ai_hist[0].get("value")) if ai_hist else None
+            open_gap = abs(h_open - ai_open) if (h_open is not None and ai_open is not None) else None
 
-        conv_pct = None
-        if open_gap and open_gap > 0 and curr_gap is not None:
-            conv_pct = max(0.0, min(100.0, round((1.0 - (curr_gap / open_gap)) * 100.0, 1)))
+            h_latest = _extract_scalar(h_hist[-1].get("value")) if h_hist else None
+            ai_latest = _extract_scalar(ai_hist[-1].get("value")) if ai_hist else None
+            curr_gap = abs(h_latest - ai_latest) if (h_latest is not None and ai_latest is not None) else None
 
-        return {
-            "human_utility_pct": round(h_util.overall_score * 100, 1),
-            "ai_utility_pct": round(ai_util.overall_score * 100, 1),
-            "ai_stance": ai_stance,
-            "opening_gap": open_gap,
-            "current_gap": curr_gap,
-            "convergence_pct": conv_pct,
-            "tradeoffs_detected": tradeoffs_count,
-            "concessions_count": concessions_count,
-            "zopa_status": "Active" if not self.deadlock_info.get("is_deadlock") else "Constrained",
-            "agreement_likelihood": "High" if (conv_pct or 0) > 60 else "Moderate" if (conv_pct or 0) > 25 else "Low"
-        }
+            conv_pct = None
+            if open_gap and open_gap > 0 and curr_gap is not None:
+                conv_pct = max(0.0, min(100.0, round((1.0 - (curr_gap / open_gap)) * 100.0, 1)))
+
+            is_dl = bool(isinstance(self.deadlock_info, dict) and self.deadlock_info.get("is_deadlock"))
+
+            return {
+                "human_utility_pct": round(h_util.overall_score * 100, 1),
+                "ai_utility_pct": round(ai_util.overall_score * 100, 1),
+                "ai_stance": ai_stance,
+                "opening_gap": open_gap,
+                "current_gap": curr_gap,
+                "convergence_pct": conv_pct,
+                "tradeoffs_detected": tradeoffs_count,
+                "concessions_count": concessions_count,
+                "zopa_status": "Constrained" if is_dl else "Active",
+                "agreement_likelihood": "High" if (conv_pct or 0) > 60 else "Moderate" if (conv_pct or 0) > 25 else "Low"
+            }
+        except Exception as e:
+            logger.warning(f"Error calculating live metrics in negotiation {self.negotiation_id}: {e}")
+            return {
+                "human_utility_pct": 50.0,
+                "ai_utility_pct": 50.0,
+                "ai_stance": "Neutral",
+                "opening_gap": None,
+                "current_gap": None,
+                "convergence_pct": None,
+                "tradeoffs_detected": 0,
+                "concessions_count": 0,
+                "zopa_status": "Active",
+                "agreement_likelihood": "Moderate"
+            }
 
     def get_state_dict(self) -> Dict[str, Any]:
         mode_label = "LLM Mode" if settings.LLM_PROVIDER.lower() in ["gemini", "openai"] else "Normal Mode"

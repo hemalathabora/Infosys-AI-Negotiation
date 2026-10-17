@@ -25,15 +25,15 @@ const CATEGORIES = [
 
 function getCategoryColor(cat = "") {
   const c = String(cat).toLowerCase();
-  if (c.includes("real")) return "border-blue-500/30 bg-blue-500/10 text-blue-400";
-  if (c.includes("consumer") || c.includes("purchasing")) return "border-emerald-500/30 bg-emerald-500/10 text-emerald-400";
-  if (c.includes("employment")) return "border-purple-500/30 bg-purple-500/10 text-purple-400";
-  if (c.includes("freelance")) return "border-amber-500/30 bg-amber-500/10 text-amber-400";
-  if (c.includes("supply")) return "border-cyan-500/30 bg-cyan-500/10 text-cyan-400";
-  if (c.includes("project")) return "border-indigo-500/30 bg-indigo-500/10 text-indigo-400";
-  if (c.includes("housing")) return "border-rose-500/30 bg-rose-500/10 text-rose-400";
-  if (c.includes("business")) return "border-yellow-500/30 bg-yellow-500/10 text-yellow-400";
-  return "border-slate-500/30 bg-slate-500/10 text-slate-400";
+  if (c.includes("real")) return "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400";
+  if (c.includes("consumer") || c.includes("purchasing")) return "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400";
+  if (c.includes("employment")) return "border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-400";
+  if (c.includes("freelance")) return "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400";
+  if (c.includes("supply")) return "border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400";
+  if (c.includes("project")) return "border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400";
+  if (c.includes("housing")) return "border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400";
+  if (c.includes("business")) return "border-yellow-600/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
+  return "border-slate-500/30 bg-slate-500/10 text-slate-700 dark:text-slate-400";
 }
 
 function ScenarioIcon({ category = "" }) {
@@ -488,7 +488,7 @@ function ScenarioCard({ scenario, onStart }) {
 
       <button
         onClick={onStart}
-        className="w-full rounded-xl bg-emerald-500/10 border border-emerald-500/30 py-2.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer"
+        className="w-full rounded-xl bg-emerald-500/10 border border-emerald-500/30 py-2.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer"
       >
         Start Negotiation →
       </button>

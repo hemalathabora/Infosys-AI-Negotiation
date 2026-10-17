@@ -708,14 +708,25 @@ async def run_negotiation_turn(negotiation_id: str, db: Session = Depends(get_db
             detail=f"Negotiation '{negotiation_id}' has already completed with status '{orch.status}'."
         )
 
-    res = await orch.run_turn()
-    save_orchestrator_state(db, orch)
+    try:
+        res = await orch.run_turn()
+        save_orchestrator_state(db, orch)
 
-    last_turn = orch.history[-1] if orch.history else {}
-    return {
-        "turn": last_turn,
-        "state": NegotiationStateResponse(**orch.get_state_dict())
-    }
+        last_turn = orch.history[-1] if orch.history else {}
+        state_dict = orch.get_state_dict()
+        return {
+            "turn": last_turn,
+            "state": NegotiationStateResponse(**state_dict)
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Turn execution failed: {str(exc)}"
+        )
 
 @router.post("/{negotiation_id}/practice-turn")
 async def run_practice_turn(
@@ -827,10 +838,19 @@ async def run_to_completion(negotiation_id: str, db: Session = Depends(get_db)):
             detail=f"Negotiation session '{negotiation_id}' not found."
         )
 
-    await orch.run_to_completion()
-    save_orchestrator_state(db, orch)
-
-    return NegotiationStateResponse(**orch.get_state_dict())
+    try:
+        await orch.run_to_completion()
+        save_orchestrator_state(db, orch)
+        return NegotiationStateResponse(**orch.get_state_dict())
+    except HTTPException:
+        raise
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Run to completion failed: {str(exc)}"
+        )
 
 @router.get("/{negotiation_id}/history", response_model=List[OfferLog])
 def get_negotiation_history(negotiation_id: str, db: Session = Depends(get_db)):

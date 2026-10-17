@@ -273,7 +273,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
             <div>
               <div className="mb-2 flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-400">
+                <span className="font-mono text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
                   ORCHESTRATOR ENGINE CONFIGURATION
                 </span>
               </div>
@@ -453,7 +453,7 @@ export default function AgentConfiguration({ onNegotiationStart, onNegotiationRe
                     type="button"
                     onClick={() => setMaxRounds(r)}
                     className={`rounded-xl border px-3.5 py-1.5 text-xs font-bold transition-all cursor-pointer ${maxRounds === r
-                        ? "border-sky-400 bg-sky-500/20 text-sky-600 dark:text-sky-300 shadow-md scale-105"
+                        ? "border-sky-500 bg-sky-500/20 text-sky-700 dark:text-sky-300 shadow-md scale-105"
                         : "border-border bg-mainPanel text-textSecondary hover:text-textPrimary hover:border-borderHover"
                       }`}
                   >

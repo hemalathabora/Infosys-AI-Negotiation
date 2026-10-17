@@ -126,12 +126,16 @@
 
 .sm-panel-eyebrow {
   margin: 0;
-  color: #34d399;
+  color: #059669;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+}
+
+.dark .sm-panel-eyebrow {
+  color: #34d399;
 }
 
 .sm-panel-title {
@@ -257,10 +261,14 @@
 .sm-socials {
   margin-top: auto;
   padding-top: 1.5rem;
-  border-t: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.dark .sm-socials {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sm-socials-title {
@@ -270,7 +278,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .sm-socials-list {
@@ -286,12 +294,20 @@
 .sm-socials-link {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
+.dark .sm-socials-link {
+  color: #cbd5e1;
+}
+
 .sm-socials-link:hover {
+  color: #059669;
+}
+
+.dark .sm-socials-link:hover {
   color: #34d399;
 }
 
